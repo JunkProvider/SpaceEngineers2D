@@ -1,4 +1,6 @@
-﻿namespace SpaceEngineers2D.Model.Inventories
+﻿using System.Linq;
+
+namespace SpaceEngineers2D.Model.Inventories
 {
     using System;
     using System.Collections.Generic;
@@ -14,7 +16,12 @@
             new InventorySlot(), new InventorySlot(), new InventorySlot()
         };
 
-        public bool TryTakeNOfType(ItemType itemType, int n, out ItemStack stack)
+        /* public IList<IItem> GetItems()
+        {
+            return this.Slots.Select(slot => slot.Item).Where(item => item != null).ToList();
+        }*/
+
+        /* public bool TryTakeNOfType(ItemType itemType, int n, out ItemStack stack)
         {
             stack = null;
 
@@ -27,20 +34,19 @@
             }
 
             return stack != null;
-        }
+        }*/
 
-        public void Put(ItemStack itemStack)
+        /* public bool Put(IItem item)
         {
-            if (itemStack.Size == 0)
-                throw new InvalidOperationException();
-
             foreach (var slot in Slots)
             {
-                slot.Put(itemStack);
-
-                if (itemStack.Size == 0)
-                    break;
+                if (slot.Put(item))
+                {
+                    return true;
+                }
             }
-        }
+
+            return false;
+        } */
     }
 }

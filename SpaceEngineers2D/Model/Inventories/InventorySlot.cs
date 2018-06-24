@@ -1,55 +1,62 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using SpaceEngineers2D.Annotations;
 
 namespace SpaceEngineers2D.Model.Inventories
 {
-    using System;
-
     using Items;
 
     public class InventorySlot : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public bool ContainsItem => ItemStack != null;
+        public bool ContainsItem => Item != null;
 
-        public ItemStack ItemStack { get; private set; }
+        public IItem Item { get; set; }
 
-        public ItemStack TakeNOfType(ItemType itemType, int n)
+        /* public IItem Take(Func<IItem, bool> condition, double amount)
         {
-            if (ItemStack == null || ItemStack.Item.ItemType != itemType)
+            if (Item == null || !condition(Item))
                 return null;
 
-            var returnedStack = new ItemStack(ItemStack.Item.Clone(), Math.Min(ItemStack.Size, n));
+            var returnedStack = new ItemStack(Item.Item.Clone(), Math.Min(Item.Size, n));
 
-            ItemStack.Size -= returnedStack.Size;
+            Item.Size -= returnedStack.Size;
 
-            if (ItemStack.Size == 0)
-                ItemStack = null;
+            if (Item.Size == 0)
+                Item = null;
 
-            RaisePropertyChanged(nameof(ItemStack));
+            RaisePropertyChanged(nameof(Item));
             RaisePropertyChanged(nameof(ContainsItem));
 
             return returnedStack;
         }
 
-        public void Put(ItemStack itemStack)
+        public bool Put(IItem item)
         {
-            if (ItemStack == null)
+            if (Item == null)
             {
-                ItemStack = new ItemStack(itemStack.Item.Clone(), itemStack.Size);
-                itemStack.Size = 0;
-            }
-            else if (itemStack.Item.Equals(ItemStack.Item))
-            {
-                ItemStack.Size += itemStack.Size;
-                itemStack.Size = 0;
+                Item = item;
+
+                RaisePropertyChanged(nameof(Item));
+                RaisePropertyChanged(nameof(ContainsItem));
+
+                return true;
             }
 
-            RaisePropertyChanged(nameof(ItemStack));
-            RaisePropertyChanged(nameof(ContainsItem));
-        }
+            if (Item.CanBeCombinded(item))
+            {
+                Item = Item.Combine(item);
+
+                RaisePropertyChanged(nameof(Item));
+                RaisePropertyChanged(nameof(ContainsItem));
+
+                return true;
+            }
+
+            return false;
+        } */
 
         [NotifyPropertyChangedInvocator]
         private void RaisePropertyChanged([CallerMemberName] string propertyName = null)

@@ -29,7 +29,7 @@
             _components = blueprint.Components.Select(c => new BlockBlueprintComponentState(c)).ToList();
         }
 
-        public void PutItem(Item item)
+        public void PutItem(IItem item)
         {
             foreach (var component in _components)
             {

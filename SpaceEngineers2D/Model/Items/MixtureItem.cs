@@ -4,36 +4,43 @@ using SpaceEngineers2D.Model.Chemicals;
 
 namespace SpaceEngineers2D.Model.Items
 {
-    public class MixtureItem : Item
+    public class MixtureItem : IItem
     {
         private readonly CompoundIconProvider _iconProvider;
 
         public Mixture Mixture { get; }
 
-        public override float Mass => (float)Mixture.Mass;
+        public string Name => string.Join(", ", Mixture.Components.Select(component => component.Compound.Name));
 
-        public override float Volume => 1;
+        public double Amount => Mixture.Amount;
 
-        public override ImageSource Icon { get; }
+        public double Mass => Mixture.Mass;
 
-        public MixtureItem(ItemType itemType, CompoundIconProvider iconProvider, Mixture mixture)
-            : base(itemType)
+        public double Volume => 1;
+
+        public ImageSource Icon { get; }
+
+        public MixtureItem(CompoundIconProvider iconProvider, Mixture mixture)
         {
             _iconProvider = iconProvider;
             Mixture = mixture;
             Icon = iconProvider.GetIcon(mixture.Components.First().Compound);
         }
 
-        protected override bool Equals(Item other)
+        public bool ShouldBeAutoCombined(IItem other)
         {
-            // TODO: Remove this method
-            return ReferenceEquals(other, this);
+            return other is MixtureItem otherMixtureItem && otherMixtureItem.Mixture.HasSameConcentrationsAs(Mixture);
         }
 
-        public override Item Clone()
+        public bool CanBeCombinded(IItem other)
         {
-            // TODO: Remove this method
-            return new MixtureItem(ItemType, _iconProvider, Mixture);
+            return other is MixtureItem;
+        }
+
+        public IItem Combine(IItem other)
+        {
+            var otherMixtureItem = (MixtureItem) other;
+            return new MixtureItem(_iconProvider, Mixture.MixWith(otherMixtureItem.Mixture));
         }
     }
 }

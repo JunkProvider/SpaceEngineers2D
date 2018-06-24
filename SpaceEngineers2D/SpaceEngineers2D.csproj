@@ -75,7 +75,6 @@
     <Compile Include="Model\BlockBlueprints\BlockBlueprint.cs" />
     <Compile Include="Model\BlockBlueprints\BlockBlueprintComponent.cs" />
     <Compile Include="Model\BlockBlueprints\BlockBlueprintComponentState.cs" />
-    <Compile Include="Model\BlockBlueprints\BlockComponentData.cs" />
     <Compile Include="Model\BlockBlueprints\BlockBlueprintState.cs" />
     <Compile Include="Model\BlockCoords.cs" />
     <Compile Include="Model\Blocks\BlockInWorld.cs" />
@@ -89,8 +88,10 @@
     <Compile Include="Model\Blocks\StandardBlockType.cs" />
     <Compile Include="Model\Blocks\StructuralBlock.cs" />
     <Compile Include="Model\Blocks\StructuralBlockType.cs" />
-    <Compile Include="Model\Chemicals\CompoundDefinition.cs" />
-    <Compile Include="Model\Chemicals\CompoundDefinitionList.cs" />
+    <Compile Include="Model\Blueprints\Blueprint.cs" />
+    <Compile Include="Model\Chemicals\Compound.cs" />
+    <Compile Include="Model\Chemicals\CompoundIconProvider.cs" />
+    <Compile Include="Model\Chemicals\CompoundList.cs" />
     <Compile Include="Model\Chemicals\Element.cs" />
     <Compile Include="Model\Chemicals\ElementList.cs" />
     <Compile Include="Model\Chemicals\Mixture.cs" />
@@ -98,13 +99,8 @@
     <Compile Include="Model\IMobileObject.cs" />
     <Compile Include="Model\Inventories\Inventory.cs" />
     <Compile Include="Model\Inventories\InventorySlot.cs" />
-    <Compile Include="Model\Items\ElementItemType.cs" />
-    <Compile Include="Model\Items\Item.cs" />
-    <Compile Include="Model\Items\ItemStack.cs" />
-    <Compile Include="Model\Items\ItemType.cs" />
-    <Compile Include="Model\Items\ItemTypes.cs" />
-    <Compile Include="Model\Items\StandardItem.cs" />
-    <Compile Include="Model\Items\StandardItemType.cs" />
+    <Compile Include="Model\Items\IItem.cs" />
+    <Compile Include="Model\Items\MixtureItem.cs" />
     <Compile Include="Model\MobileItem.cs" />
     <Compile Include="Physics\PhysicsEngine.cs" />
     <Compile Include="Properties\Annotations.cs" />
@@ -223,6 +219,11 @@
     <EmbeddedResource Include="Assets\Images\Compounds\Methane.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Images\NoImage.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -17,7 +17,7 @@
             IntegrityValue = integrityValue;
         }
 
-        public Item CreateItem()
+        public IItem CreateItem()
         {
             return new StandardItem(ItemType);
         }
