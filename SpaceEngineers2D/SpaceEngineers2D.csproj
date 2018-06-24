@@ -89,16 +89,10 @@
     <Compile Include="Model\Blocks\StandardBlockType.cs" />
     <Compile Include="Model\Blocks\StructuralBlock.cs" />
     <Compile Include="Model\Blocks\StructuralBlockType.cs" />
-    <Compile Include="Model\Chemicals\CompoundDefinition.cs" />
-    <Compile Include="Model\Chemicals\CompoundDefinitionList.cs" />
-    <Compile Include="Model\Chemicals\Element.cs" />
-    <Compile Include="Model\Chemicals\ElementList.cs" />
-    <Compile Include="Model\Chemicals\Mixture.cs" />
     <Compile Include="Model\IGridContainer.cs" />
     <Compile Include="Model\IMobileObject.cs" />
     <Compile Include="Model\Inventories\Inventory.cs" />
     <Compile Include="Model\Inventories\InventorySlot.cs" />
-    <Compile Include="Model\Items\ElementItemType.cs" />
     <Compile Include="Model\Items\Item.cs" />
     <Compile Include="Model\Items\ItemStack.cs" />
     <Compile Include="Model\Items\ItemType.cs" />

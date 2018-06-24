@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using SpaceEngineers2D.Model.Chemicals;
-using SpaceEngineers2D.Physics;
+﻿using SpaceEngineers2D.Physics;
 
 namespace SpaceEngineers2D.Model
 {
@@ -12,10 +10,6 @@ namespace SpaceEngineers2D.Model
 
     public class World : IGridContainer
     {
-        public ElementList Elements { get; }
-
-        public CompoundList Compounds { get; }
-
         public ItemTypes ItemTypes { get; }
 
         public BlockTypes BlockTypes { get; }
@@ -34,9 +28,7 @@ namespace SpaceEngineers2D.Model
         {
             Player = player;
             Camera = camera;
-            Elements = new ElementList();
-            Compounds = new CompoundList(Elements);
-            ItemTypes = new ItemTypes(Compounds);
+            ItemTypes = new ItemTypes();
             BlockTypes = new BlockTypes(ItemTypes);
         }
 
