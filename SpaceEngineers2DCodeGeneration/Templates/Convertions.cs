@@ -58,6 +58,12 @@ namespace SpaceEngineers2DCodeGeneration.Templates
                     quantityB: "HeatCapacity",
                     result: "Temperature",
                     formula: "return Temperature.FromKelvin(energy.InJoule / heatCapacity.InJoulePerKelvin);"),
+                new QuantityGenerator.Convertion(
+                    quantityA: "Temperature",
+                    @operator: "*",
+                    quantityB: "HeatCapacity",
+                    result: "Energy",
+                    formula: "return Energy.FromJoule(temperature.InKelvin * heatCapacity.InJoulePerKelvin);"),
 
                 new QuantityGenerator.Convertion(
                     quantityA: "Distance",
