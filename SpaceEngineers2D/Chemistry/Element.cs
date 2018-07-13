@@ -16,17 +16,17 @@ namespace SpaceEngineers2D.Chemistry
 
         public MolecularMass Mass { get; }
 
-        public MolecularVolume Volume => Mass / Density;
+        public MolecularVolume MolecularVolume => Mass / Density;
 
         public Density Density { get; }
 
-        public MolecularHeatCapacity HeatCapacity { get; }
+        public MolecularHeatCapacity MolecularHeatCapacity { get; }
 
         public ElementClassification Classification { get; }
 
         public bool IsMetal => Classification == ElementClassification.Metal;
 
-        public Element(string symbol, string name, int @group, int period, int electrons, MolecularMass mass, Density density, ElementClassification classification, MolecularHeatCapacity heatCapacity)
+        public Element(string symbol, string name, int @group, int period, int electrons, MolecularMass mass, Density density, ElementClassification classification, MolecularHeatCapacity molecularHeatCapacity)
         {
             Symbol = symbol;
             Name = name;
@@ -36,7 +36,7 @@ namespace SpaceEngineers2D.Chemistry
             Mass = mass;
             Density = density;
             Classification = classification;
-            HeatCapacity = heatCapacity;
+            MolecularHeatCapacity = molecularHeatCapacity;
         }
     }
 }

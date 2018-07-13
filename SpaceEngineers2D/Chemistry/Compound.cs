@@ -15,15 +15,13 @@ namespace SpaceEngineers2D.Chemistry
 
         public IReadOnlyCollection<CompountComponent> Components { get; }
 
-        // public AmountOfSubstance AmountOfSubstance => new AmountOfSubstance(Components.Sum(component => component.Count.Value));
+        public MolecularMass MolecularMass => MolecularMass.Sum(Components.Select(component => component.MolecularMass));
 
-        public MolecularMass Mass => MolecularMass.Sum(Components.Select(component => component.Mass));
-
-        public MolecularVolume Volume => Mass / Density;
+        public MolecularVolume MolecularVolume => MolecularMass / Density;
 
         public Density Density { get; }
 
-        public HeatCapacity HeatCapacity => new HeatCapacity(Components.Sum(component => component.Element.HeatCapacity.Value));
+        public MolecularHeatCapacity MolecularHeatCapacity => MolecularHeatCapacity.Sum(Components.Select(component => component.MolecularHeatCapacity));
 
         public Compound(string name, string forumla, IReadOnlyDictionary<Element, int> components, Density density)
         {
@@ -61,7 +59,9 @@ namespace SpaceEngineers2D.Chemistry
 
         public int Count { get; }
 
-        public MolecularMass Mass => Element.Mass * Count;
+        public MolecularMass MolecularMass => Element.Mass * Count;
+
+        public MolecularHeatCapacity MolecularHeatCapacity => Element.MolecularHeatCapacity * Count;
 
         public CompountComponent(Element element, int count)
         {

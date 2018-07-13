@@ -16,9 +16,9 @@ namespace SpaceEngineers2D.Chemistry
         /// </summary>
         public double Portion { get; }
 
-        public Mass Mass => Amount * Compound.Mass;
+        public Mass Mass => Amount * Compound.MolecularMass;
 
-        public Volume Volume => Amount * Compound.Volume;
+        public Volume Volume => Amount * Compound.MolecularVolume;
 
         public MixtureComponent(Compound compound, AmountOfSubstance amount, double portion)
         {
