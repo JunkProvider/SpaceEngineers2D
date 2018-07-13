@@ -94,7 +94,7 @@ namespace SpaceEngineers2DCodeGeneration.Templates
                     new QuantityGenerator.Unit(symbol:
                         "g/L", name:
                         "GramPerLiter",
-                        factor: "* 1000")
+                        factor: "/ 1000")
                 }));
 
             quantities.Add(new QuantityGenerator.Quantity(
@@ -105,7 +105,15 @@ namespace SpaceEngineers2DCodeGeneration.Templates
                     new QuantityGenerator.Unit(
                         symbol: "J ",
                         name: "Joule",
-                        factor: "")
+                        factor: ""),
+                    new QuantityGenerator.Unit(
+                        symbol: "kJ ",
+                        name: "KiloJoule",
+                        factor: "* 1000"),
+                    new QuantityGenerator.Unit(
+                        symbol: "MJ ",
+                        name: "MegaJoule",
+                        factor: "* 10000000")
                 }));
 
             quantities.Add(new QuantityGenerator.Quantity(
