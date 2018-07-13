@@ -18,7 +18,7 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 		
 		public static Density FromGramPerLiter(double value)
 		{
-			return new Density(value* 1000);
+			return new Density(value/ 1000);
 		}
 		
 		public static Density Sum(IEnumerable<Density> items)

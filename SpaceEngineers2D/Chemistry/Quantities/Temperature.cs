@@ -96,6 +96,11 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 			return new Temperature(a.Value / b);
 		}
 		
+		public static Energy operator *(Temperature temperature, HeatCapacity heatCapacity)
+		{
+			return Energy.FromJoule(temperature.InKelvin * heatCapacity.InJoulePerKelvin);
+		}
+		
 		public readonly double Value;
 		
 		public bool IsZero => Value == 0;

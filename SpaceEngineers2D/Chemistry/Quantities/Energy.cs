@@ -16,6 +16,16 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 			return new Energy(value);
 		}
 		
+		public static Energy FromKiloJoule(double value)
+		{
+			return new Energy(value* 1000);
+		}
+		
+		public static Energy FromMegaJoule(double value)
+		{
+			return new Energy(value* 10000000);
+		}
+		
 		public static Energy Sum(IEnumerable<Energy> items)
 		{
 			return new Energy(items.Sum(item => item.Value));
@@ -106,6 +116,10 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 		public bool IsZero => Value == 0;
 		
 		public double InJoule => Value;
+		
+		public double InKiloJoule => Value/ 1000;
+		
+		public double InMegaJoule => Value/ 10000000;
 		
 		public Energy(double value)
 		{
