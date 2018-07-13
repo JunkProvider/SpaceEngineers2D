@@ -1,20 +1,22 @@
-﻿namespace SpaceEngineers2D.Model.BlockBlueprints
+﻿using SpaceEngineers2D.Model.Blueprints;
+
+namespace SpaceEngineers2D.Model.BlockBlueprints
 {
     using System.Collections.Generic;
     using System.Linq;
 
     public class BlockBlueprint
     {
-        public IList<BlockBlueprintComponent> Components { get; }
+        public Blueprint Blueprint { get; }
 
-        public BlockBlueprint(IList<BlockBlueprintComponent> components)
+        public IReadOnlyList<BlockBlueprintComponent> Components { get; }
+
+        public double MaxIntegrity => Components.Sum(c => c.IntegrityValue);
+
+        public BlockBlueprint(IReadOnlyList<BlockBlueprintComponent> components)
         {
+            Blueprint = new Blueprint(components.Select(c => c.BlueprintComponent).ToList());
             Components = components;
-        }
-
-        public float GetIntegrityValueSum()
-        {
-            return Components.Sum(c => c.Count * c.IntegrityValue);
         }
     }
 }

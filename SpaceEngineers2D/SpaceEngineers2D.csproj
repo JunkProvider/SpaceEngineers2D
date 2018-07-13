@@ -55,6 +55,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="View\Inventory\InventorySlotView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Inventory\InventoryView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -71,6 +75,23 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Chemistry\AggregationState.cs" />
+    <Compile Include="Chemistry\ElementClassification.cs" />
+    <Compile Include="Chemistry\MixtureComponent.cs" />
+    <Compile Include="Chemistry\Quantities\AmountOfSubstance.cs" />
+    <Compile Include="Chemistry\Quantities\Density.cs" />
+    <Compile Include="Chemistry\Quantities\Distance.cs" />
+    <Compile Include="Chemistry\Quantities\Energy.cs" />
+    <Compile Include="Chemistry\Quantities\HeatCapacity.cs" />
+    <Compile Include="Chemistry\Quantities\Mass.cs" />
+    <Compile Include="Chemistry\Quantities\MolecularHeatCapacity.cs" />
+    <Compile Include="Chemistry\Quantities\MolecularMass.cs" />
+    <Compile Include="Chemistry\Quantities\MolecularVolume.cs" />
+    <Compile Include="Chemistry\Quantities\Temperature.cs" />
+    <Compile Include="Chemistry\Quantities\Time.cs" />
+    <Compile Include="Chemistry\Quantities\Velocity.cs" />
+    <Compile Include="Chemistry\Quantities\Volume.cs" />
+    <Compile Include="Chemistry\ReactionService.cs" />
     <Compile Include="Controllers\WorldRendererController.cs" />
     <Compile Include="Model\BlockBlueprints\BlockBlueprint.cs" />
     <Compile Include="Model\BlockBlueprints\BlockBlueprintComponent.cs" />
@@ -89,12 +110,18 @@
     <Compile Include="Model\Blocks\StructuralBlock.cs" />
     <Compile Include="Model\Blocks\StructuralBlockType.cs" />
     <Compile Include="Model\Blueprints\Blueprint.cs" />
-    <Compile Include="Model\Chemicals\Compound.cs" />
-    <Compile Include="Model\Chemicals\CompoundIconProvider.cs" />
-    <Compile Include="Model\Chemicals\CompoundList.cs" />
-    <Compile Include="Model\Chemicals\Element.cs" />
-    <Compile Include="Model\Chemicals\ElementList.cs" />
-    <Compile Include="Model\Chemicals\Mixture.cs" />
+    <Compile Include="Model\Blueprints\BlueprintComponentAddItemResult.cs" />
+    <Compile Include="Model\Blueprints\BlueprintState.cs" />
+    <Compile Include="Model\Blueprints\IBlueprintComponent.cs" />
+    <Compile Include="Model\Blueprints\IBlueprintComponentState.cs" />
+    <Compile Include="Model\Blueprints\MixtureBlueprintComponent.cs" />
+    <Compile Include="Model\Blueprints\MixtureBlueprintComponentState.cs" />
+    <Compile Include="Chemistry\Compound.cs" />
+    <Compile Include="Chemistry\CompoundIconProvider.cs" />
+    <Compile Include="Chemistry\CompoundList.cs" />
+    <Compile Include="Chemistry\Element.cs" />
+    <Compile Include="Chemistry\ElementList.cs" />
+    <Compile Include="Chemistry\Mixture.cs" />
     <Compile Include="Model\IGridContainer.cs" />
     <Compile Include="Model\IMobileObject.cs" />
     <Compile Include="Model\Inventories\Inventory.cs" />
@@ -104,11 +131,17 @@
     <Compile Include="Model\MobileItem.cs" />
     <Compile Include="Physics\PhysicsEngine.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Utility\DictionaryExtensions.cs" />
+    <Compile Include="Utility\NumberFormatUtility.cs" />
+    <Compile Include="Utility\StringExtensions.cs" />
     <Compile Include="View\BlockRenderers\BlockRendererRegistry.cs" />
     <Compile Include="View\BlockRenderers\BlockRenderer.cs" />
     <Compile Include="View\BlockRenderers\GrassBlockRenderer.cs" />
     <Compile Include="View\BlockRenderers\StandardBlockRenderer.cs" />
     <Compile Include="View\BlockRenderers\StructuralBlockRenderer.cs" />
+    <Compile Include="View\Inventory\InventorySlotView.xaml.cs">
+      <DependentUpon>InventorySlotView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Inventory\InventoryView.xaml.cs">
       <DependentUpon>InventoryView.xaml</DependentUpon>
     </Compile>
@@ -221,9 +254,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Assets\Images\NoImage.png">
+    <EmbeddedResource Include="Assets\Images\NoImage.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
+    </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

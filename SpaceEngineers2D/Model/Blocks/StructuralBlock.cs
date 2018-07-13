@@ -26,7 +26,7 @@
             BlueprintState = new BlockBlueprintState(blockType.Blueprint);
         }
 
-        public override ICollection<ItemStack> GetDroppedItems()
+        public override IReadOnlyList<IItem> GetDroppedItems()
         {
             return BlueprintState.GetDroppedItems();
         }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using SpaceEngineers2D.Chemistry.Quantities;
 using SpaceEngineers2D.Geometry;
 using SpaceEngineers2D.Model;
 using SpaceEngineers2D.Model.Blocks;
+using SpaceEngineers2D.Model.Items;
 using SpaceEngineers2D.Physics;
 
 namespace SpaceEngineers2D.Controllers
@@ -72,6 +74,8 @@ namespace SpaceEngineers2D.Controllers
 
             var block = World.GetBlock(_mousePosition);
 
+            this.UpdateItemsInPlayerInventory(elapsedTime);
+
             player.TargetPosition = _mousePosition;
             player.TargetBlockCoords = block != null ? new BlockCoords(block.Grid, block.Bounds) : null;
             player.TargetBlockCoordsInRange = player.TargetBlockCoords != null && IsInPlayerRange(player.TargetBlockCoords.Bounds);
@@ -88,30 +92,48 @@ namespace SpaceEngineers2D.Controllers
             }
         }
 
+        private void UpdateItemsInPlayerInventory(TimeSpan elapsedTime)
+        {
+            var player = World.Player;
+
+            foreach (var inventorySlot in player.Inventory.Slots)
+            {
+                if (inventorySlot.Item is MixtureItem mixtureItem)
+                {
+                    var reactedMixture = World.ReactionService.Check(mixtureItem.Mixture, Temperature.FromKelvin(2000), elapsedTime);
+
+                    if (!reactedMixture.Equals(mixtureItem.Mixture))
+                    {
+                        inventorySlot.Item = new MixtureItem(reactedMixture);
+                    }
+                }
+            }
+        }
+
         private void PlaceBlock(BlockCoords coords)
         {
             var player = World.Player;
             var blockType = World.BlockTypes.Concrete;
 
-            if (player.Inventory.TryTakeNOfType(blockType.Blueprint.Components.First().ItemType, 1, out var itemStack))
+            var block = blockType.InstantiateBlock();
+            block.BlueprintState.Weld(player.Inventory, 1);
+
+            if (!block.IsDestoryed)
             {
-                var block = blockType.InstantiateBlock();
-                block.BlueprintState.PutItem(itemStack.Item);
                 coords.Grid.SetBlock(coords.Bounds.Position, block);
-                // player.WeldedBlock = new BlockInWorld<StructuralBlock>(block, coords.Grid, coords.Bounds.Position);
             }
         }
 
         private void WeldBlock(BlockInWorld<StructuralBlock> block, TimeSpan elapsedTime)
         {
-            block.Object.BlueprintState.Weld(World.Player.Inventory, 10 * (float)elapsedTime.TotalSeconds);
+            block.Object.BlueprintState.Weld(World.Player.Inventory, 50 * (float)elapsedTime.TotalSeconds);
         }
 
         private void GrindBlock(TimeSpan elapsedTime)
         {
             var block = World.Player.TargetBlock;
 
-            block.Object.Damage(10 * (float)elapsedTime.TotalSeconds);
+            block.Object.Damage(20 * (float)elapsedTime.TotalSeconds);
 
             if (block.Object.IsDestoryed)
             {

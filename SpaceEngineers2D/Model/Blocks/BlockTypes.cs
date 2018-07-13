@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Media.Imaging;
+using SpaceEngineers2D.Model.BlockBlueprints;
+using SpaceEngineers2D.Model.Blueprints;
+using SpaceEngineers2D.Chemistry;
+using SpaceEngineers2D.Chemistry.Quantities;
 
 namespace SpaceEngineers2D.Model.Blocks
 {
@@ -20,29 +25,38 @@ namespace SpaceEngineers2D.Model.Blocks
 
         public readonly GrassBlockType Grass;
 
-        public BlockTypes(ItemTypes itemTypes)
+        public BlockTypes(ElementList elements, CompoundList compounds)
         {
             Rock = new StandardBlockType(
                 image: LoadImage("rock"),
-                droppedItems: new Dictionary<StandardItemType, int>
+                getDroppedItemsFunc: () => new List<IItem>
                 {
-                    { itemTypes.Rock, 1 }
+                    new MixtureItem( Mixture.FromSingleCompound(compounds.Fe3O4, Volume.FromLiters(100)))
                 });
 
             Ore = new StandardBlockType(
                 image: LoadImage("ore"),
-                droppedItems: new Dictionary<StandardItemType, int>
+                getDroppedItemsFunc: () => new List<IItem>
                 {
-                    { itemTypes.Compounds[0], 1 },
-                    { itemTypes.Compounds[1], 1 },
-                    { itemTypes.Compounds[2], 1 },
-                    { itemTypes.Compounds[3], 1 },
-                    { itemTypes.Compounds[4], 1 }
+                    new MixtureItem(Mixture.FromSingleCompound(compounds.GetForElement(elements.Carbon), Volume.FromLiters(100)))
                 });
 
+            var concreteBlueprint = new BlockBlueprint(new List<BlockBlueprintComponent>
+            {
+                new BlockBlueprintComponent(
+                    new MixtureBlueprintComponent(
+                        "200L Magnetite",
+                        Volume.FromLiters(200), 
+                        mixture =>
+                            {
+                                return mixture.Components.Count == 1 && mixture.Components.Single().Compound == compounds.Fe3O4;
+                            }),
+                    100)
+            });
+
             Concrete = new ConcreteBlockType(
-                image: LoadImage("stone_slab_side"),
-                itemTypes: itemTypes);
+                LoadImage("stone_slab_side"),
+                concreteBlueprint);
 
             Grass = new GrassBlockType();
         }

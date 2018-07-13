@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceEngineers2D", "SpaceEn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceEngineers2DTest", "SpaceEngineers2DTest\SpaceEngineers2DTest.csproj", "{255FB615-B7D1-420B-9798-0C1F459A1B6C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceEngineers2DCodeGeneration", "SpaceEngineers2DCodeGeneration\SpaceEngineers2DCodeGeneration.csproj", "{B4AB707C-5CBA-4AD2-AD92-C30E7E5DF052}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{255FB615-B7D1-420B-9798-0C1F459A1B6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{255FB615-B7D1-420B-9798-0C1F459A1B6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{255FB615-B7D1-420B-9798-0C1F459A1B6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4AB707C-5CBA-4AD2-AD92-C30E7E5DF052}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4AB707C-5CBA-4AD2-AD92-C30E7E5DF052}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4AB707C-5CBA-4AD2-AD92-C30E7E5DF052}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4AB707C-5CBA-4AD2-AD92-C30E7E5DF052}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

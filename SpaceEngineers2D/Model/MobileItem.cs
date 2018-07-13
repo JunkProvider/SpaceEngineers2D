@@ -18,11 +18,11 @@
 
         public Dictionary<Side, List<Block>> TouchedBlocks { get; set; } = new Dictionary<Side, List<Block>>();
 
-        public ItemStack ItemStack { get; }
+        public IItem Item { get; }
 
-        public MobileItem(ItemStack itemStack)
+        public MobileItem(IItem item)
         {
-            ItemStack = itemStack;
+            Item = item;
             TouchedBlocks[Side.Left] = new List<Block>();
             TouchedBlocks[Side.Right] = new List<Block>();
             TouchedBlocks[Side.Top] = new List<Block>();

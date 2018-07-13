@@ -6,13 +6,13 @@ using System.Reflection;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace SpaceEngineers2D.Model.Chemicals
+namespace SpaceEngineers2D.Chemistry
 {
-    public class CompoundIconProvider
+    public static class CompoundIconProvider
     {
-        private readonly Dictionary<Compound, ImageSource> _cache = new Dictionary<Compound, ImageSource>();
+        private static readonly Dictionary<Compound, ImageSource> _cache = new Dictionary<Compound, ImageSource>();
 
-        public ImageSource GetIcon(Compound compound)
+        public static ImageSource GetIcon(Compound compound)
         {
             if (_cache.TryGetValue(compound, out var image1))
             {
@@ -25,7 +25,7 @@ namespace SpaceEngineers2D.Model.Chemicals
                 return image2;
             }
 
-            if (TryLoadImage("Elements\\" + compound.Elements.First().Key.Name.Replace(" ", "") + ".jpg", out var image3))
+            if (TryLoadImage("Elements\\" + compound.Components.First().Element.Name.Replace(" ", "") + ".jpg", out var image3))
             {
                 _cache.Add(compound, image3);
                 return image3;

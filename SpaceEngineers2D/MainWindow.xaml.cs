@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using SpaceEngineers2D.Chemistry.Quantities;
 using SpaceEngineers2D.Controllers;
 using SpaceEngineers2D.Geometry;
 using SpaceEngineers2D.Model;
@@ -104,9 +105,7 @@ namespace SpaceEngineers2D
             if (item == null)
                 return;
 
-            player.Inventory.Put(item.ItemStack);
-
-            if (item.ItemStack.Size == 0)
+            if (player.Inventory.Put(item.Item))
             {
                 World.Items.Remove(item);
             }

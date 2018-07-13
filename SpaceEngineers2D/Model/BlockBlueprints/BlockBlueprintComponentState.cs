@@ -1,26 +1,32 @@
-﻿namespace SpaceEngineers2D.Model.BlockBlueprints
-{
-    using SpaceEngineers2D.Model.Items;
+﻿using SpaceEngineers2D.Model.Blueprints;
+using SpaceEngineers2D.Model.Items;
 
+namespace SpaceEngineers2D.Model.BlockBlueprints
+{
     public class BlockBlueprintComponentState
     {
         private readonly BlockBlueprintComponent _component;
 
-        public StandardItemType ItemType => _component.ItemType;
+        private readonly IBlueprintComponentState _blueprintComponentState;
 
-        public int RequiredCount => _component.Count;
+        public double IntegrityCap => _blueprintComponentState.Progress * _component.IntegrityValue;
 
-        public int ActualCount { get; set; }
+        public bool IsCompleted => _blueprintComponentState.IsCompleted;
 
-        public int RemainingCount => RequiredCount - ActualCount;
-
-        public bool Complete => RemainingCount == 0;
-
-        public float ActualIntegrityValue => ActualCount * _component.IntegrityValue;
-
-        public BlockBlueprintComponentState(BlockBlueprintComponent component)
+        public BlockBlueprintComponentState(BlockBlueprintComponent component, IBlueprintComponentState blueprintComponentState)
         {
             _component = component;
+            _blueprintComponentState = blueprintComponentState;
+        }
+
+        public BlueprintComponentAddItemResult AddItem(IItem item)
+        {
+            return _blueprintComponentState.AddItem(item);
+        }
+
+        public IItem RemoveItem()
+        {
+            return _blueprintComponentState.RemoveItem();
         }
     }
 }

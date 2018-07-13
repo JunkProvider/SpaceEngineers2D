@@ -28,9 +28,9 @@ namespace SpaceEngineers2D.Model.Blocks
             Integrity = blockType.MaxIntegrity;
         }
 
-        public override ICollection<ItemStack> GetDroppedItems()
+        public override IReadOnlyList<IItem> GetDroppedItems()
         {
-            return StandardBlockType.DroppedItems.Select(pair => new ItemStack(pair.Key.InstantiateItem(), pair.Value)).ToList();
+            return StandardBlockType.GetDroppedItems();
         }
 
         public override void Damage(float damage)

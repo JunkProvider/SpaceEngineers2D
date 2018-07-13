@@ -1,25 +1,19 @@
-﻿namespace SpaceEngineers2D.Model.BlockBlueprints
+﻿using SpaceEngineers2D.Model.Blueprints;
+
+namespace SpaceEngineers2D.Model.BlockBlueprints
 {
-    using SpaceEngineers2D.Model.Items;
+    using Items;
 
     public class BlockBlueprintComponent
     {
-        public int Count { get; }
+        public IBlueprintComponent BlueprintComponent { get; }
 
-        public StandardItemType ItemType { get; }
+        public double IntegrityValue { get; }
 
-        public float IntegrityValue { get; }
-
-        public BlockBlueprintComponent(int count, StandardItemType itemType, float integrityValue)
+        public BlockBlueprintComponent(IBlueprintComponent blueprintComponent, double integrityValue)
         {
-            Count = count;
-            ItemType = itemType;
+            BlueprintComponent = blueprintComponent;
             IntegrityValue = integrityValue;
-        }
-
-        public IItem CreateItem()
-        {
-            return new StandardItem(ItemType);
         }
     }
 }

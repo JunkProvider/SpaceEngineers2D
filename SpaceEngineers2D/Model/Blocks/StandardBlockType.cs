@@ -1,4 +1,6 @@
-﻿namespace SpaceEngineers2D.Model.Blocks
+﻿using System;
+
+namespace SpaceEngineers2D.Model.Blocks
 {
     using System.Collections.Generic;
     using System.Windows.Media;
@@ -7,16 +9,22 @@
 
     public class StandardBlockType : BlockType
     {
-        public ImageSource Image{ get; }
+        private readonly Func<IReadOnlyList<IItem>> _getDroppedItemsFunc;
 
-        public IDictionary<StandardItemType, int> DroppedItems { get; }
+        public ImageSource Image{ get; }
 
         public float MaxIntegrity { get; } = 10f;
 
-        public StandardBlockType(ImageSource image, IDictionary<StandardItemType, int> droppedItems)
+
+        public StandardBlockType(ImageSource image, Func<IReadOnlyList<IItem>> getDroppedItemsFunc)
         {
             Image = image;
-            DroppedItems = droppedItems;
+            _getDroppedItemsFunc = getDroppedItemsFunc;
+        }
+
+        public IReadOnlyList<IItem> GetDroppedItems()
+        {
+            return _getDroppedItemsFunc();
         }
 
         public StandardBlock InstantiateBlock()

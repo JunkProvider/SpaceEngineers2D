@@ -40,19 +40,27 @@ namespace SpaceEngineers2D.View
             _blockRendererRegistry.Add<StructuralBlock, StructuralBlock>(new StructuralBlockRenderer());
             _blockRendererRegistry.Add<GrassBlock, GrassBlock>(new GrassBlockRenderer());
 
+            var lastTime = DateTime.Now;
+
             var timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(30);
             timer.Start();
             timer.Tick += (sender, args) =>
                 {
-                    if (Parameters != null)
+                    if (Parameters == null)
                     {
-                        var mousePosition = Parameters.World.Camera.UncastPosition(IntVector.FromWindowsPoint(Mouse.GetPosition(this)));
-                        Parameters.Controller.OnMouseMove(mousePosition);
-                        Parameters.Controller.OnUpdate(timer.Interval);
-                        _physicsEngine.Update(Parameters.World, timer.Interval);
-                        InvalidateVisual();
+                        return;
                     }
+
+                    var currentTime = DateTime.Now;
+                    var elapsedTime = currentTime - lastTime;
+                    lastTime = currentTime;
+
+                    var mousePosition = Parameters.World.Camera.UncastPosition(IntVector.FromWindowsPoint(Mouse.GetPosition(this)));
+                    Parameters.Controller.OnMouseMove(mousePosition);
+                    Parameters.Controller.OnUpdate(timer.Interval);
+                    _physicsEngine.Update(Parameters.World, elapsedTime);
+                    InvalidateVisual();
                 };
         }
 

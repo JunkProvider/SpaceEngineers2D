@@ -1,70 +1,112 @@
-﻿namespace SpaceEngineers2D.Model.BlockBlueprints
+﻿using SpaceEngineers2D.Model.Blueprints;
+
+namespace SpaceEngineers2D.Model.BlockBlueprints
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using SpaceEngineers2D.Model.Inventories;
-    using SpaceEngineers2D.Model.Items;
+    using Inventories;
+    using Items;
 
     public class BlockBlueprintState
     {
-        private readonly BlockBlueprint _blueprint;
+        private readonly BlockBlueprint _blockBlueprint;
 
-        private readonly List<BlockBlueprintComponentState> _components;
+        private readonly BlueprintState _blueprintState;
 
-        public float Integrity { get; private set; }
+        private readonly List<BlockBlueprintComponentState> _blockComponents;
 
-        public float IntegrityRatio => Integrity / _blueprint.GetIntegrityValueSum();
+        public double Integrity { get; private set; }
 
-        public float IntegrityCap => GetIntegrityCap();
+        public double IntegrityRatio => Integrity / _blockBlueprint.MaxIntegrity;
 
-        public float IntegrityCapRatio => IntegrityCap / _blueprint.GetIntegrityValueSum();
+        public double IntegrityCap => GetIntegrityCap();
 
-        public bool Finished => Integrity >= _blueprint.GetIntegrityValueSum();
+        public double IntegrityCapRatio => IntegrityCap / _blockBlueprint.MaxIntegrity;
 
-        public BlockBlueprintState(BlockBlueprint blueprint)
+        public bool Finished => Integrity >= _blockBlueprint.MaxIntegrity;
+
+        public BlockBlueprintState(BlockBlueprint blockBlueprint)
         {
-            _blueprint = blueprint;
-            _components = blueprint.Components.Select(c => new BlockBlueprintComponentState(c)).ToList();
-        }
+            _blockBlueprint = blockBlueprint;
+            _blueprintState = blockBlueprint.Blueprint.CreateState();
 
-        public void PutItem(IItem item)
-        {
-            foreach (var component in _components)
+            var components = new List<BlockBlueprintComponentState>();
+
+            for (var i = 0; i < blockBlueprint.Components.Count; i++)
             {
-                if (component.Complete)
-                    continue;
-
-                if (component.ItemType != item.ItemType)
-                    continue;
-
-                component.ActualCount += 1;
-                return;
+                components.Add(new BlockBlueprintComponentState(blockBlueprint.Components[i], _blueprintState.Components[i]));
             }
 
-            throw new ArgumentException();
+            _blockComponents = components;
+        }
+
+        public void PutAllPossible(Inventory inventory)
+        {
+            foreach (var slot in inventory.Slots)
+            {
+                if (!slot.ContainsItem)
+                {
+                    continue;
+                }
+
+                var remainingItem = PutItem(slot.Item);
+                slot.Item = remainingItem;
+            }
+        }
+
+        public IItem PutItem(IItem item)
+        {
+            foreach (var blockComponent in _blockComponents)
+            {
+                var result = blockComponent.AddItem(item);
+
+                var doBreak = result.Match(
+                    added =>
+                        {
+                            return true;
+                        },
+                    addedPartial =>
+                        {
+                            item = addedPartial.Remaining;
+                            return false;
+                        },
+                    notAdded =>
+                        {
+                            return false;
+                        });
+
+                if (doBreak)
+                {
+                    return null;
+                }
+            }
+
+            return item;
         }
 
         public bool Weld(Inventory inventory, float integrityIncrease)
         {
-            foreach (var component in _components)
+            foreach (var slot in inventory.Slots)
             {
-                if (component.Complete)
+                if (!slot.ContainsItem)
+                {
                     continue;
+                }
 
-                if (inventory.TryTakeNOfType(component.ItemType, component.RemainingCount, out var stack))
-                    component.ActualCount += stack.Size;
+                var remainingItem = PutItem(slot.Item);
+                slot.Item = remainingItem;
             }
 
-            var maxIntegrity = GetIntegrityCap();
+            var integrityCap = GetIntegrityCap();
 
-            if (Integrity >= maxIntegrity)
+            if (Integrity >= integrityCap)
             {
                 return false;
             }
 
-            Integrity = Math.Min(maxIntegrity, Integrity + integrityIncrease);
+            Integrity = Math.Min(integrityCap, Integrity + integrityIncrease);
             return true;
         }
 
@@ -126,17 +168,14 @@
             } */
         }
 
-        public ICollection<ItemStack> GetDroppedItems()
+        public IReadOnlyList<IItem> GetDroppedItems()
         {
-            return _components
-                .Where(c => c.ActualCount > 0)
-                .Select(c => new ItemStack(c.ItemType.InstantiateItem(), c.ActualCount))
-                .ToList();
+            return _blockComponents.Select(c => c.RemoveItem()).Where(i => i != null).ToList();
         }
 
-        private float GetIntegrityCap()
+        private double GetIntegrityCap()
         {
-            return _components.Sum(c => c.ActualIntegrityValue);
+            return _blockComponents.Sum(c => c.IntegrityCap);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace SpaceEngineers2D.Model.Blocks
             BlockType = blockType;
         }
 
-        public abstract ICollection<ItemStack> GetDroppedItems();
+        public abstract IReadOnlyList<IItem> GetDroppedItems();
 
         public abstract void Damage(float damage);
 

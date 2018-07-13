@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using SpaceEngineers2D.Model.Chemicals;
+using SpaceEngineers2D.Chemistry;
 using SpaceEngineers2D.Physics;
 
 namespace SpaceEngineers2D.Model
@@ -12,11 +12,11 @@ namespace SpaceEngineers2D.Model
 
     public class World : IGridContainer
     {
+        public ReactionService ReactionService { get; }
+
         public ElementList Elements { get; }
 
         public CompoundList Compounds { get; }
-
-        public ItemTypes ItemTypes { get; }
 
         public BlockTypes BlockTypes { get; }
 
@@ -32,12 +32,13 @@ namespace SpaceEngineers2D.Model
 
         public World(Player player, Camera camera)
         {
+
             Player = player;
             Camera = camera;
             Elements = new ElementList();
             Compounds = new CompoundList(Elements);
-            ItemTypes = new ItemTypes(Compounds);
-            BlockTypes = new BlockTypes(ItemTypes);
+            BlockTypes = new BlockTypes(Elements, Compounds);
+            ReactionService = new ReactionService(Elements, Compounds);
         }
 
         public IBlockInWorld GetBlock(IntVector position)

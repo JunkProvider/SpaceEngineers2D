@@ -1,4 +1,5 @@
 ﻿using System.Windows.Media;
+using SpaceEngineers2D.Chemistry.Quantities;
 
 namespace SpaceEngineers2D.Model.Items
 {
@@ -6,11 +7,13 @@ namespace SpaceEngineers2D.Model.Items
     {
         string Name { get; }
 
+        string Tooltip { get; }
+
         ImageSource Icon { get; }
 
-        double Amount { get; }
+        Mass Mass { get; }
 
-        double Mass { get; }
+        Volume Volume { get; }
 
         bool ShouldBeAutoCombined(IItem other);
 

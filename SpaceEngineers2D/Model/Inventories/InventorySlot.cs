@@ -11,9 +11,26 @@ namespace SpaceEngineers2D.Model.Inventories
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        private IItem _item;
+
         public bool ContainsItem => Item != null;
 
-        public IItem Item { get; set; }
+        public IItem Item
+        {
+            get => _item;
+            set
+            {
+                if (value == _item)
+                {
+                    return;;
+                }
+
+                _item = value;
+
+                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(ContainsItem));
+            }
+        }
 
         /* public IItem Take(Func<IItem, bool> condition, double amount)
         {
@@ -31,16 +48,13 @@ namespace SpaceEngineers2D.Model.Inventories
             RaisePropertyChanged(nameof(ContainsItem));
 
             return returnedStack;
-        }
+        }*/
 
         public bool Put(IItem item)
         {
             if (Item == null)
             {
                 Item = item;
-
-                RaisePropertyChanged(nameof(Item));
-                RaisePropertyChanged(nameof(ContainsItem));
 
                 return true;
             }
@@ -49,14 +63,11 @@ namespace SpaceEngineers2D.Model.Inventories
             {
                 Item = Item.Combine(item);
 
-                RaisePropertyChanged(nameof(Item));
-                RaisePropertyChanged(nameof(ContainsItem));
-
                 return true;
             }
 
             return false;
-        } */
+        }
 
         [NotifyPropertyChangedInvocator]
         private void RaisePropertyChanged([CallerMemberName] string propertyName = null)

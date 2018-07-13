@@ -1,27 +1,19 @@
-﻿using SpaceEngineers2D.Model.Chemicals;
+﻿using System.Collections.Generic;
 
 namespace SpaceEngineers2D.Model.Blueprints
 {
     public class Blueprint
     {
-    }
+        public IReadOnlyList<IBlueprintComponent> Components { get; }
 
-    public interface IBlueprintComponent
-    {
-        /// <summary>
-        /// Something like "3x steel plate" or "1kg iron" or "mixture (min 90% iron, max 10% carbon)".
-        /// </summary>
-        string DisplayText { get; }
-    }
+        public Blueprint(IReadOnlyList<IBlueprintComponent> components)
+        {
+            Components = components;
+        }
 
-    public delegate bool DoesMixtureFulfillCriteria(Mixture mixture);
-
-    public class MixtureBlueprintComponent : IBlueprintComponent
-    {
-        public string DisplayText { get; }
-
-        public double RequiredVolume { get; }
-
-        public DoesMixtureFulfillCriteria DoesMixtureFulfillCriteriaFunc { get; }
+        public BlueprintState CreateState()
+        {
+            return new BlueprintState(this);
+        }
     }
 }

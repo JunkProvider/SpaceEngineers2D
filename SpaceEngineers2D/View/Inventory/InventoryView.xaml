@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:model="clr-namespace:SpaceEngineers2D.Model.Inventories"
+             xmlns:view="clr-namespace:SpaceEngineers2D.View.Inventory"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance Type=model:Inventory, IsDesignTimeCreatable=True}">
     <Border>
@@ -15,40 +16,7 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Width="60"
-                            Height="60"
-                            Margin="5 0 5 0"
-                            Background="#40FFFFFF"
-                            BorderThickness="1"
-                            BorderBrush="#80FFFFFF">
-                        <Grid ToolTip="{Binding Item.Item.Name}">
-                            <Grid.Style>
-                                <Style TargetType="Grid">
-                                    <Style.Setters>
-                                        <Setter Property="Visibility" Value="Hidden" />
-                                    </Style.Setters>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{ Binding ContainsItem }" Value="True">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Grid.Style>
-                            <Image HorizontalAlignment="Stretch"
-                                   VerticalAlignment="Stretch"
-                                   Source="{Binding Item.Item.Icon}" />
-                            <Border Background="Black"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Bottom">
-                                <TextBlock HorizontalAlignment="Left"
-                                           VerticalAlignment="Bottom"
-                                           Foreground="White"
-                                           FontSize="20"
-                                           Margin="5 0 5 0"
-                                           Text="{Binding Item.Size}" />
-                            </Border>
-                        </Grid>
-                    </Border>
+                    <view:InventorySlotView DataContext="{Binding}" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

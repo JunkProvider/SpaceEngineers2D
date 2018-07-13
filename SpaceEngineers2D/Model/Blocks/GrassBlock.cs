@@ -16,9 +16,9 @@ namespace SpaceEngineers2D.Model.Blocks
         {
         }
 
-        public override ICollection<ItemStack> GetDroppedItems()
+        public override IReadOnlyList<IItem> GetDroppedItems()
         {
-            return new List<ItemStack>();
+            return new List<IItem>();
         }
 
         public override void Damage(float damage)

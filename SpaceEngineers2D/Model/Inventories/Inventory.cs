@@ -36,7 +36,7 @@ namespace SpaceEngineers2D.Model.Inventories
             return stack != null;
         }*/
 
-        /* public bool Put(IItem item)
+        public bool Put(IItem item)
         {
             foreach (var slot in Slots)
             {
@@ -47,6 +47,6 @@ namespace SpaceEngineers2D.Model.Inventories
             }
 
             return false;
-        } */
+        }
     }
 }
