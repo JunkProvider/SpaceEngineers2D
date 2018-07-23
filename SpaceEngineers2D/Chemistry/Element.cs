@@ -38,5 +38,10 @@ namespace SpaceEngineers2D.Chemistry
             Classification = classification;
             MolecularHeatCapacity = molecularHeatCapacity;
         }
+
+        public override string ToString()
+        {
+            return Symbol;
+        }
     }
 }

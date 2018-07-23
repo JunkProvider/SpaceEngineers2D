@@ -7,7 +7,7 @@ namespace SpaceEngineers2D.Chemistry
 {
     public class Mixture
     {
-        public static Mixture FromAbsoluteAmounts(IReadOnlyDictionary<Compound, AmountOfSubstance> compounds)
+        public static Mixture FromAbsoluteAmounts(IReadOnlyDictionary<Compound, AmountOfSubstance> compounds, Energy thermalEnergy)
         {
             var totalAmount = new AmountOfSubstance(compounds.Values.Sum(c => c.Value));
             var components = new HashSet<MixtureComponent>();
@@ -15,31 +15,47 @@ namespace SpaceEngineers2D.Chemistry
             {
                 components.Add(new MixtureComponent(compound.Key, compound.Value, compound.Value / totalAmount));
             }
-            return new Mixture(components);
+            return new Mixture(components, thermalEnergy);
         }
 
-        public static Mixture FromSingleCompound(Compound compound, Volume volume)
+        public static Mixture FromSingleCompound(Compound compound, Volume volume, Temperature temperature)
+        {
+            var amount = volume / compound.MolecularVolume;
+            return FromSingleCompound(compound, volume, temperature * (amount * compound.MolecularHeatCapacity));
+        }
+
+        public static Mixture FromSingleCompound(Compound compound, Volume volume, Energy thermalEnergy)
         {
             var components = new HashSet<MixtureComponent>
             {
-                new MixtureComponent(compound, volume / compound.Volume, 1)
+                new MixtureComponent(compound, volume / compound.MolecularVolume, 1)
             };
-            return new Mixture(components);
+            return new Mixture(components, thermalEnergy);
         }
 
         private readonly Dictionary<Compound, MixtureComponent> _componentDictionary;
 
         public IReadOnlyCollection<MixtureComponent> Components { get; }
 
-        public Mass Mass => new Mass(Components.Sum(component => component.Mass.Value));
+        public Mass Mass => Mass.Sum(Components.Select(component => component.Mass));
 
-        public Volume Volume => new Volume(Components.Sum(component => component.Volume.Value));
+        public Volume Volume => Volume.Sum(Components.Select(component => component.Volume));
 
-        public HeatCapacity HeatCapacity => new HeatCapacity(Components.Sum(component => component.Compound.HeatCapacity.Value));
+        public HeatCapacity HeatCapacity => HeatCapacity.Sum(Components.Select(component => component.HeatCapacity));
 
         public Energy ThermalEnergy { get; }
 
         public Temperature Temperature => ThermalEnergy / HeatCapacity;
+
+        public IDictionary<Compound, AmountOfSubstance> GetAmountsMappedByCompounds()
+        {
+            var amounts = new Dictionary<Compound, AmountOfSubstance>();
+            foreach (var component in this.Components)
+            {
+                amounts.Add(component.Compound, component.Amount);                    
+            }
+            return amounts;
+        }
 
         public AmountOfSubstance GetAmountOfCompound(Compound compound)
         {
@@ -56,7 +72,7 @@ namespace SpaceEngineers2D.Chemistry
             return _componentDictionary.TryGetValue(compound, out component);
         }
 
-        private Mixture(IReadOnlyCollection<MixtureComponent> components)
+        private Mixture(IReadOnlyCollection<MixtureComponent> components, Energy thermalEnergy)
         {
             if (components == null || !components.Any())
             {
@@ -65,6 +81,8 @@ namespace SpaceEngineers2D.Chemistry
 
             _componentDictionary = components.ToDictionary(component => component.Compound);
             Components = components.OrderByDescending(component => component.Portion).ToList();
+
+            ThermalEnergy = thermalEnergy;
         }
 
         public bool HasSameConcentrationsAs(Mixture otherMixture)
@@ -116,7 +134,7 @@ namespace SpaceEngineers2D.Chemistry
                 compounds.Add(component.Compound, component.Amount);
             }
 
-            return FromAbsoluteAmounts(compounds);
+            return FromAbsoluteAmounts(compounds, ThermalEnergy + otherMixture.ThermalEnergy);
         }
 
         public IExtractAmountResult Extract(Volume volume)
@@ -140,7 +158,7 @@ namespace SpaceEngineers2D.Chemistry
                 multipliedComponents.Add(component.Compound, component.Amount * factor);
             }
 
-            return FromAbsoluteAmounts(multipliedComponents);
+            return FromAbsoluteAmounts(multipliedComponents, ThermalEnergy * factor);
         }
 
         public override bool Equals(object obj)
@@ -155,7 +173,7 @@ namespace SpaceEngineers2D.Chemistry
                 return true;
             }
 
-            if (obj.GetType() != this.GetType())
+            if (obj.GetType() != GetType())
             {
                 return false;
             }
@@ -165,12 +183,15 @@ namespace SpaceEngineers2D.Chemistry
 
         public bool Equals(Mixture other)
         {
-            return _componentDictionary.SequenceEqual(other._componentDictionary);
+            return _componentDictionary.SequenceEqual(other._componentDictionary) && ThermalEnergy == other.ThermalEnergy;
         }
 
         public override int GetHashCode()
         {
-            return _componentDictionary.GetHashCode();
+            unchecked
+            {
+                return ((_componentDictionary != null ? _componentDictionary.GetHashCode() : 0) * 397) ^ ThermalEnergy.GetHashCode();
+            }
         }
 
         public override string ToString()

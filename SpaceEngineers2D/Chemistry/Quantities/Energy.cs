@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace SpaceEngineers2D.Chemistry.Quantities
@@ -9,21 +8,28 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 	{
 		private const double Accuracy = 0.00001;
 		
+		public static IReadOnlyList<Unit> Units = new List<Unit>
+		{
+			new Unit(1, "J "),
+			new Unit(1000, "kJ "),
+			new Unit(10000000, "MJ "),
+		};
+		
 		public static readonly Energy Zero = new Energy(0);
 		
 		public static Energy FromJoule(double value)
 		{
-			return new Energy(value);
+			return new Energy(value * 1);
 		}
 		
 		public static Energy FromKiloJoule(double value)
 		{
-			return new Energy(value* 1000);
+			return new Energy(value * 1000);
 		}
 		
 		public static Energy FromMegaJoule(double value)
 		{
-			return new Energy(value* 10000000);
+			return new Energy(value * 10000000);
 		}
 		
 		public static Energy Sum(IEnumerable<Energy> items)
@@ -41,7 +47,17 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 			return new Energy(items.Min(item => item.Value));
 		}
 		
+		public static Energy Min(params Energy[] items)
+		{
+			return new Energy(items.Min(item => item.Value));
+		}
+		
 		public static Energy Max(IEnumerable<Energy> items)
+		{
+			return new Energy(items.Max(item => item.Value));
+		}
+		
+		public static Energy Max(params Energy[] items)
 		{
 			return new Energy(items.Max(item => item.Value));
 		}
@@ -81,6 +97,11 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 			return new Energy(a.Value + b.Value);
 		}
 		
+		public static Energy operator -(Energy a)
+		{
+			return new Energy(-a.Value);
+		}
+		
 		public static Energy operator -(Energy a, Energy b)
 		{
 			return new Energy(a.Value - b.Value);
@@ -111,19 +132,29 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 			return Temperature.FromKelvin(energy.InJoule / heatCapacity.InJoulePerKelvin);
 		}
 		
+		public static AmountOfSubstance operator /(Energy energy, EnthalpyOfFormation enthalpyOfFormation)
+		{
+			return AmountOfSubstance.FromMol(energy.InJoule / enthalpyOfFormation.InJoulePerMol);
+		}
+		
 		public readonly double Value;
 		
-		public bool IsZero => Value == 0;
+		public bool IsZero => Value.Equals(0);
 		
-		public double InJoule => Value;
+		public double InJoule => Value / 1;
 		
-		public double InKiloJoule => Value/ 1000;
+		public double InKiloJoule => Value / 1000;
 		
-		public double InMegaJoule => Value/ 10000000;
+		public double InMegaJoule => Value / 10000000;
 		
 		public Energy(double value)
 		{
 			Value = value;
+		}
+		
+		public Energy Abs()
+		{
+			return new Energy(Math.Abs(Value));
 		}
 		
 		public override bool Equals(object obj)
@@ -148,8 +179,20 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 		
 		public override string ToString()
 		{
-			return Value.ToString("0.00", CultureInfo.InvariantCulture) + "J ";
+			return UnitUtility.Format(Units, Value);
 		}
 		
+		public class Unit : IUnit
+		{
+			public double Factor { get; }
+			
+			public string Symbol { get; }
+			
+			public Unit(double factor, string symbol)
+			{
+				Factor = factor;
+				Symbol = symbol;
+			}
+		}
 	}
 }

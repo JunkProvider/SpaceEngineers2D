@@ -21,9 +21,11 @@ namespace SpaceEngineers2D.Chemistry
 
         public Density Density { get; }
 
+        public EnthalpyOfFormation EnthalpyOfFormation { get; }
+
         public MolecularHeatCapacity MolecularHeatCapacity => MolecularHeatCapacity.Sum(Components.Select(component => component.MolecularHeatCapacity));
 
-        public Compound(string name, string forumla, IReadOnlyDictionary<Element, int> components, Density density)
+        public Compound(string name, string forumla, IReadOnlyDictionary<Element, int> components, Density density, EnthalpyOfFormation enthalpyOfFormation)
         {
             if (components == null || !components.Any())
             {
@@ -35,6 +37,7 @@ namespace SpaceEngineers2D.Chemistry
             Components = components.Select(component => new CompountComponent(component.Key, component.Value)).ToList();
             _componentDict = Components.ToDictionary(component => component.Element);
             Density = density;
+            EnthalpyOfFormation = enthalpyOfFormation;
         }
 
         public int GetElementCount(Element element)

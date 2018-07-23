@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace SpaceEngineers2D.Chemistry.Quantities
@@ -9,11 +8,16 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 	{
 		private const double Accuracy = 0.00001;
 		
+		public static IReadOnlyList<Unit> Units = new List<Unit>
+		{
+			new Unit(1, "g/mol"),
+		};
+		
 		public static readonly MolecularMass Zero = new MolecularMass(0);
 		
 		public static MolecularMass FromGramPerMol(double value)
 		{
-			return new MolecularMass(value);
+			return new MolecularMass(value * 1);
 		}
 		
 		public static MolecularMass Sum(IEnumerable<MolecularMass> items)
@@ -31,7 +35,17 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 			return new MolecularMass(items.Min(item => item.Value));
 		}
 		
+		public static MolecularMass Min(params MolecularMass[] items)
+		{
+			return new MolecularMass(items.Min(item => item.Value));
+		}
+		
 		public static MolecularMass Max(IEnumerable<MolecularMass> items)
+		{
+			return new MolecularMass(items.Max(item => item.Value));
+		}
+		
+		public static MolecularMass Max(params MolecularMass[] items)
 		{
 			return new MolecularMass(items.Max(item => item.Value));
 		}
@@ -71,6 +85,11 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 			return new MolecularMass(a.Value + b.Value);
 		}
 		
+		public static MolecularMass operator -(MolecularMass a)
+		{
+			return new MolecularMass(-a.Value);
+		}
+		
 		public static MolecularMass operator -(MolecularMass a, MolecularMass b)
 		{
 			return new MolecularMass(a.Value - b.Value);
@@ -103,13 +122,18 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 		
 		public readonly double Value;
 		
-		public bool IsZero => Value == 0;
+		public bool IsZero => Value.Equals(0);
 		
-		public double InGramPerMol => Value;
+		public double InGramPerMol => Value / 1;
 		
 		public MolecularMass(double value)
 		{
 			Value = value;
+		}
+		
+		public MolecularMass Abs()
+		{
+			return new MolecularMass(Math.Abs(Value));
 		}
 		
 		public override bool Equals(object obj)
@@ -134,8 +158,20 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 		
 		public override string ToString()
 		{
-			return Value.ToString("0.00", CultureInfo.InvariantCulture) + "g/mol";
+			return UnitUtility.Format(Units, Value);
 		}
 		
+		public class Unit : IUnit
+		{
+			public double Factor { get; }
+			
+			public string Symbol { get; }
+			
+			public Unit(double factor, string symbol)
+			{
+				Factor = factor;
+				Symbol = symbol;
+			}
+		}
 	}
 }

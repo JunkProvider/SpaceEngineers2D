@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace SpaceEngineers2D.Chemistry.Quantities
@@ -9,16 +8,22 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 	{
 		private const double Accuracy = 0.00001;
 		
+		public static IReadOnlyList<Unit> Units = new List<Unit>
+		{
+			new Unit(1, "cm³"),
+			new Unit(1000, "L"),
+		};
+		
 		public static readonly Volume Zero = new Volume(0);
 		
 		public static Volume FromCubicCentimeters(double value)
 		{
-			return new Volume(value);
+			return new Volume(value * 1);
 		}
 		
 		public static Volume FromLiters(double value)
 		{
-			return new Volume(value* 1000);
+			return new Volume(value * 1000);
 		}
 		
 		public static Volume Sum(IEnumerable<Volume> items)
@@ -36,7 +41,17 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 			return new Volume(items.Min(item => item.Value));
 		}
 		
+		public static Volume Min(params Volume[] items)
+		{
+			return new Volume(items.Min(item => item.Value));
+		}
+		
 		public static Volume Max(IEnumerable<Volume> items)
+		{
+			return new Volume(items.Max(item => item.Value));
+		}
+		
+		public static Volume Max(params Volume[] items)
 		{
 			return new Volume(items.Max(item => item.Value));
 		}
@@ -76,6 +91,11 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 			return new Volume(a.Value + b.Value);
 		}
 		
+		public static Volume operator -(Volume a)
+		{
+			return new Volume(-a.Value);
+		}
+		
 		public static Volume operator -(Volume a, Volume b)
 		{
 			return new Volume(a.Value - b.Value);
@@ -113,15 +133,20 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 		
 		public readonly double Value;
 		
-		public bool IsZero => Value == 0;
+		public bool IsZero => Value.Equals(0);
 		
-		public double InCubicCentimeters => Value;
+		public double InCubicCentimeters => Value / 1;
 		
-		public double InLiters => Value/ 1000;
+		public double InLiters => Value / 1000;
 		
 		public Volume(double value)
 		{
 			Value = value;
+		}
+		
+		public Volume Abs()
+		{
+			return new Volume(Math.Abs(Value));
 		}
 		
 		public override bool Equals(object obj)
@@ -146,8 +171,20 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 		
 		public override string ToString()
 		{
-			return Value.ToString("0.00", CultureInfo.InvariantCulture) + "cm³";
+			return UnitUtility.Format(Units, Value);
 		}
 		
+		public class Unit : IUnit
+		{
+			public double Factor { get; }
+			
+			public string Symbol { get; }
+			
+			public Unit(double factor, string symbol)
+			{
+				Factor = factor;
+				Symbol = symbol;
+			}
+		}
 	}
 }

@@ -49,7 +49,15 @@ namespace SpaceEngineers2DCodeGeneration.Templates
                     new QuantityGenerator.Unit(
                         symbol: "J/(mol·K) ",
                         name: "JoulePerMolTimesKelvin",
-                        factor: "")
+                        factor: ""),
+                    new QuantityGenerator.Unit(
+                        symbol: "kJ/(mol·K) ",
+                        name: "KiloJoulePerMolTimesKelvin",
+                        factor: "1000"),
+                    new QuantityGenerator.Unit(
+                        symbol: "MJ/(mol·K) ",
+                        name: "MegaJoulePerMolTimesKelvin",
+                        factor: "1000000")
                 }));
 
             quantities.Add(new QuantityGenerator.Quantity(
@@ -64,7 +72,7 @@ namespace SpaceEngineers2DCodeGeneration.Templates
                     new QuantityGenerator.Unit(symbol:
                         "kg", name:
                         "KiloGram",
-                        factor: "* 1000")
+                        factor: "1000")
                 }));
 
             quantities.Add(new QuantityGenerator.Quantity(
@@ -79,7 +87,7 @@ namespace SpaceEngineers2DCodeGeneration.Templates
                     new QuantityGenerator.Unit(symbol:
                         "L", name:
                         "Liters",
-                        factor: "* 1000")
+                        factor: "1000")
                 }));
 
             quantities.Add(new QuantityGenerator.Quantity(
@@ -94,7 +102,7 @@ namespace SpaceEngineers2DCodeGeneration.Templates
                     new QuantityGenerator.Unit(symbol:
                         "g/L", name:
                         "GramPerLiter",
-                        factor: "/ 1000")
+                        factor: "0.001")
                 }));
 
             quantities.Add(new QuantityGenerator.Quantity(
@@ -109,11 +117,11 @@ namespace SpaceEngineers2DCodeGeneration.Templates
                     new QuantityGenerator.Unit(
                         symbol: "kJ ",
                         name: "KiloJoule",
-                        factor: "* 1000"),
+                        factor: "1000"),
                     new QuantityGenerator.Unit(
                         symbol: "MJ ",
                         name: "MegaJoule",
-                        factor: "* 10000000")
+                        factor: "10000000")
                 }));
 
             quantities.Add(new QuantityGenerator.Quantity(
@@ -135,10 +143,37 @@ namespace SpaceEngineers2DCodeGeneration.Templates
                     new QuantityGenerator.Unit(
                         symbol: "J/K ",
                         name: "JoulePerKelvin",
-                        factor: "")
+                        factor: ""),
+                    new QuantityGenerator.Unit(
+                        symbol: "kJ/K ",
+                        name: "KiloJoulePerKelvin",
+                        factor: "1000"),
+                    new QuantityGenerator.Unit(
+                        symbol: "MJ/K ",
+                        name: "MegaPerKelvin",
+                        factor: "10000000")
                 }));
 
             quantities.Add(new QuantityGenerator.Quantity(
+                name: "EnthalpyOfFormation",
+                accuracy: "0.00001",
+                units: new List<QuantityGenerator.Unit>
+                {
+                    new QuantityGenerator.Unit(
+                        symbol: "J/mol ",
+                        name: "JoulePerMol",
+                        factor: ""),
+                    new QuantityGenerator.Unit(
+                        symbol: "kJ/mol ",
+                        name: "KiloJoulePerMol",
+                        factor: "1000"),
+                    new QuantityGenerator.Unit(
+                        symbol: "MJ/mol ",
+                        name: "MegaJoulePerMol",
+                        factor: "1000000")
+                }));
+
+            /* quantities.Add(new QuantityGenerator.Quantity(
                 name: "Distance",
                 accuracy: "0.00001",
                 units: new List<QuantityGenerator.Unit>
@@ -150,7 +185,7 @@ namespace SpaceEngineers2DCodeGeneration.Templates
                     new QuantityGenerator.Unit(symbol:
                         "km", name:
                         "KiloMeters",
-                        factor: "* 1000")
+                        factor: "1000")
                 }));
 
             quantities.Add(new QuantityGenerator.Quantity(
@@ -185,7 +220,7 @@ namespace SpaceEngineers2DCodeGeneration.Templates
                         "km/h", name:
                         "KiloMetersPerHour",
                         factor: "/ 3.6")
-                }));
+                }));*/
 
             return quantities;
         }

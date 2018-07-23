@@ -11,8 +11,6 @@ namespace SpaceEngineers2D.Chemistry
 
         private readonly CompoundList _compoundList;
 
-        // private Dictionary<Compound, Dictionary<Compound, Func<>>>
-
         public ReactionService(ElementList elementList, CompoundList compoundList)
         {
             _elementList = elementList;
@@ -28,7 +26,7 @@ namespace SpaceEngineers2D.Chemistry
             {
                 foreach (var originalComponentB in originalMixture.Components)
                 {
-                    if (originalComponentA == originalComponentB)
+                    if (ReferenceEquals(originalComponentA, originalComponentB))
                     {
                         continue;
                     }
@@ -37,9 +35,9 @@ namespace SpaceEngineers2D.Chemistry
                     {
                         if (reactedMixture.TryGetComponentByCompound(originalComponentB.Compound, out var componentB))
                         {
-                            var componentReactionResult = CheckTwoComponents(reactedMixture, componentA, componentB, temperature, elapsedTime);
+                            var componentReactionResult = CheckTwoComponents(reactedMixture, componentA, componentB, elapsedTime);
 
-                            reactedMixture = AlterMixture(reactedMixture, componentReactionResult.ReactedCompounds);
+                            reactedMixture = AlterMixture(reactedMixture, componentReactionResult.ReactedCompounds, componentReactionResult.ThermalEnergyDelta);
                         }
                     }
                 }
@@ -48,7 +46,13 @@ namespace SpaceEngineers2D.Chemistry
             return reactedMixture;
         }
 
-        private Mixture AlterMixture(Mixture mixture, IDictionary<Compound, AmountOfSubstance> compoundsToChange)
+        private Mixture AlterMixture(Mixture mixture, IDictionary<Compound, AmountOfSubstance> compoundsToChange, Energy thermalEnergyDelta)
+        {
+            var compounds = AlterMixtureComponents(mixture, compoundsToChange);
+            return Mixture.FromAbsoluteAmounts(compounds, mixture.ThermalEnergy + thermalEnergyDelta);
+        }
+
+        private IReadOnlyDictionary<Compound, AmountOfSubstance> AlterMixtureComponents(Mixture mixture, IDictionary<Compound, AmountOfSubstance> compoundsToChange)
         {
             var compounds = new Dictionary<Compound, AmountOfSubstance>();
 
@@ -79,10 +83,10 @@ namespace SpaceEngineers2D.Chemistry
                 compounds.Add(component.Key, component.Value);
             }
 
-            return Mixture.FromAbsoluteAmounts(compounds);
+            return compounds;
         }
 
-        private TwoComponentReactionResult CheckTwoComponents(Mixture mixture, MixtureComponent componentA, MixtureComponent componentB, Temperature temperature, TimeSpan elapsedTime)
+        private TwoComponentReactionResult CheckTwoComponents(Mixture mixture, MixtureComponent componentA, MixtureComponent componentB, TimeSpan elapsedTime)
         {
             var originalCompounds = new Dictionary<Compound, AmountOfSubstance>
             {
@@ -108,68 +112,84 @@ namespace SpaceEngineers2D.Chemistry
                 {
                     if (componentDict.TryGetValue(oxideCompound, out var oxide))
                     {
-                        return new TwoComponentReactionResult(Reduce(mixture, oxide, reducer, temperature, elapsedTime));
+                        return Reduce(mixture, oxide, reducer, elapsedTime);
                     }
                 }
             }
 
-            return new TwoComponentReactionResult(originalCompounds);
+            return new TwoComponentReactionResult(originalCompounds, Energy.Zero);
         }
 
-        private Dictionary<Compound, AmountOfSubstance> Reduce(Mixture mixture, MixtureComponent oxide, MixtureComponent reducer, Temperature temperature, TimeSpan elapsedTime)
+        private TwoComponentReactionResult Reduce(Mixture mixture, MixtureComponent oxide, MixtureComponent reducer, TimeSpan elapsedTime)
         {
-            var deltaTemperature = temperature - Temperature.FromKelvin(900);
+            var oxideACompound = oxide.Compound;
+            var reducerACompound = reducer.Compound;
+            var oxidizerElement = _elementList.Oxygen;
+            var oxideBCompound = _compoundList.CO2;
+            var reducerAElement = oxideBCompound.Components.Select(c => c.Element).Single(e => e != oxidizerElement);
+            var reducerBElement = oxideACompound.Components.Select(c => c.Element).Single(e => e != oxidizerElement);
+            var reducerBCompound = _compoundList.GetForElement(reducerBElement);
 
-            if (deltaTemperature < Temperature.Zero)
+            var oxideAOxidizerAtomCount = oxideACompound.GetElementCount(oxidizerElement);
+            var oxideBOxidizerAtomCount = oxideBCompound.GetElementCount(oxidizerElement);
+            var oxideAReducerBAtomCount = oxideACompound.GetElementCount(reducerBElement);
+
+            var oxideBPerOxideA = oxideAOxidizerAtomCount / (double)oxideBOxidizerAtomCount;
+            var reducerAPerOxideA = oxideBCompound.GetElementCount(reducerAElement) * oxideBPerOxideA;
+            var reducerBPerOxideA = oxideAReducerBAtomCount / (double)reducerBCompound.GetElementCount(reducerBElement);
+
+            var enthalpyOfFormation = (reducerBCompound.EnthalpyOfFormation * reducerBPerOxideA + oxideBCompound.EnthalpyOfFormation * oxideBPerOxideA) -
+                                      (oxideACompound.EnthalpyOfFormation + reducerACompound.EnthalpyOfFormation * reducerBPerOxideA);
+  
+            var requiredTemperature = Temperature.FromKelvin(1200);
+            var requiredEnergy = requiredTemperature * mixture.HeatCapacity;
+            var usableEnergy = mixture.ThermalEnergy - requiredEnergy;
+
+            var reactionSpeedFactor = mixture.ThermalEnergy / requiredEnergy - 1;
+
+            if (reactionSpeedFactor <= 0)
             {
-                deltaTemperature = Temperature.Zero;
+                // Available energy is less than required energy so no reaction at all.
+                return new TwoComponentReactionResult(mixture.GetAmountsMappedByCompounds(), Energy.Zero);
             }
 
-            var t = deltaTemperature.InKelvin / 10;
-
-            // Get the first element of the oxide which is not oxygen. It must be the element which will be the result of the reduction.
-            var reducedOxideCompound = _compoundList.GetForElement(oxide.Compound.Components.Select(c => c.Element).Single(e => e != _elementList.Oxygen));
-            var oxideCompound = oxide.Compound;
-            var reducerCompound = reducer.Compound;
-            var oxydizedReducerCompound = _compoundList.CO2;
-
-            var oxideOxygenAtomCount = oxide.Compound.GetElementCount(_elementList.Oxygen);
-            var oxidizedReducerOxygenAtomCount = oxydizedReducerCompound.GetElementCount(_elementList.Oxygen);
-            var metalAtomsPerOxide = oxideCompound.GetElementCount(_elementList.Iron);
-            var oxidizedReducerToOxideOxygenAtomCountRatio = (double)oxidizedReducerOxygenAtomCount / oxideOxygenAtomCount;
-
-            var reducedOxideAmount = oxide.Amount;
-            if (reducer.Amount * oxidizedReducerToOxideOxygenAtomCountRatio < oxide.Amount)
+            var reactedOxideAAmount = oxide.Amount;
+            if (reducer.Amount / reducerAPerOxideA < oxide.Amount)
             {
-                reducedOxideAmount = reducer.Amount * oxidizedReducerToOxideOxygenAtomCountRatio;
+                reactedOxideAAmount = reducer.Amount * reducerAPerOxideA;
             }
 
-            reducedOxideAmount = new AmountOfSubstance(Math.Min(elapsedTime.TotalSeconds * t, reducedOxideAmount.Value));
+            reactedOxideAAmount = AmountOfSubstance.Min(reactedOxideAAmount, elapsedTime.TotalSeconds * reactionSpeedFactor * AmountOfSubstance.FromMol(1));
 
-            var oxidizedReducerAmount = reducedOxideAmount / oxidizedReducerToOxideOxygenAtomCountRatio;
-
-            return new Dictionary<Compound, AmountOfSubstance>
+            if (enthalpyOfFormation > EnthalpyOfFormation.Zero)
             {
-                { oxideCompound, oxide.Amount - reducedOxideAmount },
-                { reducedOxideCompound, mixture.GetAmountOfCompound(reducedOxideCompound) + reducedOxideAmount * metalAtomsPerOxide },
-                { reducerCompound, reducer.Amount - oxidizedReducerAmount },
-                { oxydizedReducerCompound, mixture.GetAmountOfCompound(oxydizedReducerCompound) + oxidizedReducerAmount }
+                reactedOxideAAmount = AmountOfSubstance.Min(reactedOxideAAmount, usableEnergy / enthalpyOfFormation);
+            }
+            
+            var reactedCompounds = new Dictionary<Compound, AmountOfSubstance>
+            {
+                { oxideACompound, oxide.Amount - reactedOxideAAmount },
+                { reducerBCompound, mixture.GetAmountOfCompound(reducerBCompound) + reactedOxideAAmount * reducerBPerOxideA },
+                { reducerACompound, reducer.Amount - reactedOxideAAmount * reducerAPerOxideA },
+                { oxideBCompound, mixture.GetAmountOfCompound(oxideBCompound) + reactedOxideAAmount * oxideBPerOxideA }
             };
+
+            var energyDelta = reactedOxideAAmount * -enthalpyOfFormation;
+
+            return new TwoComponentReactionResult(reactedCompounds, energyDelta);
         }
-    }
 
-    public class TwoComponentReactionParameters
-    {
-        public Compound Compound1 { get; }
-    }
-
-    public class TwoComponentReactionResult
-    {
-        public Dictionary<Compound, AmountOfSubstance> ReactedCompounds { get; }
-
-        public TwoComponentReactionResult(Dictionary<Compound, AmountOfSubstance> reactedCompounds)
+        private class TwoComponentReactionResult
         {
-            ReactedCompounds = reactedCompounds;
+            public IDictionary<Compound, AmountOfSubstance> ReactedCompounds { get; }
+
+            public Energy ThermalEnergyDelta { get; }
+
+            public TwoComponentReactionResult(IDictionary<Compound, AmountOfSubstance> reactedCompounds, Energy thermalEnergyDelta)
+            {
+                ReactedCompounds = reactedCompounds;
+                ThermalEnergyDelta = thermalEnergyDelta;
+            }
         }
     }
 }

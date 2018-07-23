@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace SpaceEngineers2D.Chemistry.Quantities
@@ -9,11 +8,28 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 	{
 		private const double Accuracy = 0.00001;
 		
+		public static IReadOnlyList<Unit> Units = new List<Unit>
+		{
+			new Unit(1, "J/(mol·K) "),
+			new Unit(1000, "kJ/(mol·K) "),
+			new Unit(1000000, "MJ/(mol·K) "),
+		};
+		
 		public static readonly MolecularHeatCapacity Zero = new MolecularHeatCapacity(0);
 		
 		public static MolecularHeatCapacity FromJoulePerMolTimesKelvin(double value)
 		{
-			return new MolecularHeatCapacity(value);
+			return new MolecularHeatCapacity(value * 1);
+		}
+		
+		public static MolecularHeatCapacity FromKiloJoulePerMolTimesKelvin(double value)
+		{
+			return new MolecularHeatCapacity(value * 1000);
+		}
+		
+		public static MolecularHeatCapacity FromMegaJoulePerMolTimesKelvin(double value)
+		{
+			return new MolecularHeatCapacity(value * 1000000);
 		}
 		
 		public static MolecularHeatCapacity Sum(IEnumerable<MolecularHeatCapacity> items)
@@ -31,7 +47,17 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 			return new MolecularHeatCapacity(items.Min(item => item.Value));
 		}
 		
+		public static MolecularHeatCapacity Min(params MolecularHeatCapacity[] items)
+		{
+			return new MolecularHeatCapacity(items.Min(item => item.Value));
+		}
+		
 		public static MolecularHeatCapacity Max(IEnumerable<MolecularHeatCapacity> items)
+		{
+			return new MolecularHeatCapacity(items.Max(item => item.Value));
+		}
+		
+		public static MolecularHeatCapacity Max(params MolecularHeatCapacity[] items)
 		{
 			return new MolecularHeatCapacity(items.Max(item => item.Value));
 		}
@@ -71,6 +97,11 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 			return new MolecularHeatCapacity(a.Value + b.Value);
 		}
 		
+		public static MolecularHeatCapacity operator -(MolecularHeatCapacity a)
+		{
+			return new MolecularHeatCapacity(-a.Value);
+		}
+		
 		public static MolecularHeatCapacity operator -(MolecularHeatCapacity a, MolecularHeatCapacity b)
 		{
 			return new MolecularHeatCapacity(a.Value - b.Value);
@@ -98,13 +129,22 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 		
 		public readonly double Value;
 		
-		public bool IsZero => Value == 0;
+		public bool IsZero => Value.Equals(0);
 		
-		public double InJoulePerMolTimesKelvin => Value;
+		public double InJoulePerMolTimesKelvin => Value / 1;
+		
+		public double InKiloJoulePerMolTimesKelvin => Value / 1000;
+		
+		public double InMegaJoulePerMolTimesKelvin => Value / 1000000;
 		
 		public MolecularHeatCapacity(double value)
 		{
 			Value = value;
+		}
+		
+		public MolecularHeatCapacity Abs()
+		{
+			return new MolecularHeatCapacity(Math.Abs(Value));
 		}
 		
 		public override bool Equals(object obj)
@@ -129,8 +169,20 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 		
 		public override string ToString()
 		{
-			return Value.ToString("0.00", CultureInfo.InvariantCulture) + "J/(mol·K) ";
+			return UnitUtility.Format(Units, Value);
 		}
 		
+		public class Unit : IUnit
+		{
+			public double Factor { get; }
+			
+			public string Symbol { get; }
+			
+			public Unit(double factor, string symbol)
+			{
+				Factor = factor;
+				Symbol = symbol;
+			}
+		}
 	}
 }

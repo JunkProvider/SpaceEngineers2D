@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using SpaceEngineers2D.Chemistry.Quantities;
 using SpaceEngineers2D.Controllers;
@@ -9,6 +10,7 @@ using SpaceEngineers2D.Model.Blocks;
 using SpaceEngineers2D.Physics;
 using SpaceEngineers2D.View;
 using SpaceEngineers2D.View.Inventory;
+using Grid = SpaceEngineers2D.Model.Grid;
 
 namespace SpaceEngineers2D
 {
@@ -51,6 +53,9 @@ namespace SpaceEngineers2D
             World.Grids.Add(grid);
             
             WorldRendererParameters = new WorldRendererParameters(World, new WorldRendererController(World));
+
+            ToolTipService.ShowDurationProperty.OverrideMetadata(
+                typeof(DependencyObject), new FrameworkPropertyMetadata(Int32.MaxValue));
 
             InitializeComponent();
             DataContext = this;

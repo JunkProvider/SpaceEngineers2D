@@ -36,7 +36,6 @@ namespace SpaceEngineers2DCodeGeneration
 
             code.WriteLine("using System;");
             code.WriteLine("using System.Collections.Generic;");
-            code.WriteLine("using System.Globalization;");
             code.WriteLine("using System.Linq;");
             code.WriteLine();
 
@@ -49,6 +48,17 @@ namespace SpaceEngineers2DCodeGeneration
             code.WriteLine($"private const double Accuracy = {accuracy};");
             code.WriteLine();
 
+            code.WriteLine("public static IReadOnlyList<Unit> Units = new List<Unit>");
+            code.WriteLine("{");
+            code.Indent();
+            foreach (var unit in units)
+            {
+                code.WriteLine($"new Unit({unit.Factor}, \"{unit.Symbol}\"),");
+            }
+            code.UnIndent();
+            code.WriteLine("};");
+            code.WriteLine();
+
             code.WriteLine($"public static readonly {name} Zero = new {name}(0);");
             code.WriteLine();
 
@@ -56,7 +66,7 @@ namespace SpaceEngineers2DCodeGeneration
             {
                 code.WriteLine($"public static {name} From{unit.Name}(double value)");
                 code.OpenBrackets();
-                code.WriteLine($"return new {name}(value{unit.Factor});");
+                code.WriteLine($"return new {name}(value * {unit.Factor});");
                 code.CloseBrackets();
                 code.WriteLine();
             }
@@ -79,7 +89,19 @@ namespace SpaceEngineers2DCodeGeneration
             code.CloseBrackets();
             code.WriteLine();
 
+            code.WriteLine($"public static {name} Min(params {name}[] items)");
+            code.OpenBrackets();
+            code.WriteLine($"return new {name}(items.Min(item => item.Value));");
+            code.CloseBrackets();
+            code.WriteLine();
+
             code.WriteLine($"public static {name} Max(IEnumerable<{name}> items)");
+            code.OpenBrackets();
+            code.WriteLine($"return new {name}(items.Max(item => item.Value));");
+            code.CloseBrackets();
+            code.WriteLine();
+
+            code.WriteLine($"public static {name} Max(params {name}[] items)");
             code.OpenBrackets();
             code.WriteLine($"return new {name}(items.Max(item => item.Value));");
             code.CloseBrackets();
@@ -127,6 +149,12 @@ namespace SpaceEngineers2DCodeGeneration
             code.CloseBrackets();
             code.WriteLine();
 
+            code.WriteLine($"public static {name} operator -({name} a)");
+            code.OpenBrackets();
+            code.WriteLine($"return new {name}(-a.Value);");
+            code.CloseBrackets();
+            code.WriteLine();
+
             code.WriteLine($"public static {name} operator -({name} a, {name} b)");
             code.OpenBrackets();
             code.WriteLine($"return new {name}(a.Value - b.Value);");
@@ -169,18 +197,24 @@ namespace SpaceEngineers2DCodeGeneration
             code.WriteLine("public readonly double Value;");
             code.WriteLine();
 
-            code.WriteLine("public bool IsZero => Value == 0;");
+            code.WriteLine("public bool IsZero => Value.Equals(0);");
             code.WriteLine();
 
             foreach (var unit in units)
             {
-                code.WriteLine($"public double In{unit.Name} => Value{unit.ReverseFactor};");
+                code.WriteLine($"public double In{unit.Name} => Value / {unit.Factor};");
                 code.WriteLine();
             }
 
             code.WriteLine($"public {name}(double value)");
             code.OpenBrackets();
             code.WriteLine("Value = value;");
+            code.CloseBrackets();
+            code.WriteLine();
+
+            code.WriteLine($"public {name} Abs()");
+            code.OpenBrackets();
+            code.WriteLine($"return new {name}(Math.Abs(Value));");
             code.CloseBrackets();
             code.WriteLine();
 
@@ -207,14 +241,25 @@ namespace SpaceEngineers2DCodeGeneration
             code.CloseBrackets();
             code.WriteLine();
 
-            var defaultUnit = units.Single(unit => string.IsNullOrEmpty(unit.Factor));
-
             code.WriteLine("public override string ToString()");
             code.OpenBrackets();
-            code.WriteLine($"return Value.ToString(\"0.00\", CultureInfo.InvariantCulture) + \"{defaultUnit.Symbol}\";");
+            code.WriteLine("return UnitUtility.Format(Units, Value);");
             code.CloseBrackets();
             code.WriteLine();
 
+            code.WriteLine("public class Unit : IUnit");
+            code.OpenBrackets();
+            code.WriteLine("public double Factor { get; }");
+            code.WriteLine();
+            code.WriteLine("public string Symbol { get; }");
+            code.WriteLine();
+            code.WriteLine("public Unit(double factor, string symbol)");
+            code.OpenBrackets();
+            code.WriteLine("Factor = factor;");
+            code.WriteLine("Symbol = symbol;");
+            code.CloseBrackets();
+            code.CloseBrackets();
+ 
             code.CloseBrackets();
             code.CloseBrackets();
 
@@ -245,14 +290,16 @@ namespace SpaceEngineers2DCodeGeneration
 
             public string Factor { get; }
 
-            public string ReverseFactor { get; }
-
             public Unit(string symbol, string name, string factor)
             {
+                if (string.IsNullOrWhiteSpace(factor))
+                {
+                    factor = "1";
+                }
+
                 Symbol = symbol;
                 Name = name;
                 Factor = factor;
-                ReverseFactor = factor.Replace("*", "/");
             }
         }
 

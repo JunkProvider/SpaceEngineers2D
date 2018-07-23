@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace SpaceEngineers2D.Chemistry.Quantities
@@ -9,11 +8,16 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 	{
 		private const double Accuracy = 0.00001;
 		
+		public static IReadOnlyList<Unit> Units = new List<Unit>
+		{
+			new Unit(1, "K "),
+		};
+		
 		public static readonly Temperature Zero = new Temperature(0);
 		
 		public static Temperature FromKelvin(double value)
 		{
-			return new Temperature(value);
+			return new Temperature(value * 1);
 		}
 		
 		public static Temperature Sum(IEnumerable<Temperature> items)
@@ -31,7 +35,17 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 			return new Temperature(items.Min(item => item.Value));
 		}
 		
+		public static Temperature Min(params Temperature[] items)
+		{
+			return new Temperature(items.Min(item => item.Value));
+		}
+		
 		public static Temperature Max(IEnumerable<Temperature> items)
+		{
+			return new Temperature(items.Max(item => item.Value));
+		}
+		
+		public static Temperature Max(params Temperature[] items)
 		{
 			return new Temperature(items.Max(item => item.Value));
 		}
@@ -71,6 +85,11 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 			return new Temperature(a.Value + b.Value);
 		}
 		
+		public static Temperature operator -(Temperature a)
+		{
+			return new Temperature(-a.Value);
+		}
+		
 		public static Temperature operator -(Temperature a, Temperature b)
 		{
 			return new Temperature(a.Value - b.Value);
@@ -103,13 +122,18 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 		
 		public readonly double Value;
 		
-		public bool IsZero => Value == 0;
+		public bool IsZero => Value.Equals(0);
 		
-		public double InKelvin => Value;
+		public double InKelvin => Value / 1;
 		
 		public Temperature(double value)
 		{
 			Value = value;
+		}
+		
+		public Temperature Abs()
+		{
+			return new Temperature(Math.Abs(Value));
 		}
 		
 		public override bool Equals(object obj)
@@ -134,8 +158,20 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 		
 		public override string ToString()
 		{
-			return Value.ToString("0.00", CultureInfo.InvariantCulture) + "K ";
+			return UnitUtility.Format(Units, Value);
 		}
 		
+		public class Unit : IUnit
+		{
+			public double Factor { get; }
+			
+			public string Symbol { get; }
+			
+			public Unit(double factor, string symbol)
+			{
+				Factor = factor;
+				Symbol = symbol;
+			}
+		}
 	}
 }

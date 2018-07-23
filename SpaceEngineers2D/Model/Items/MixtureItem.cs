@@ -11,7 +11,7 @@ namespace SpaceEngineers2D.Model.Items
 
         public string Name => string.Join(", ", Mixture.Components.Select(component => component.Compound.Name));
 
-        public string Tooltip => $"{Mixture.Volume.InLiters:0.00}L ({Mixture.Mass.InKiloGram:0.00}kg)\n\n{string.Join("\n", Mixture.Components.Select(c => (100 * c.Portion).ToString("0") + "% " + c.Compound.Name))}";
+        public string Tooltip => $"Volume: {Mixture.Volume}\nMass: {Mixture.Mass}\nTemperature: {Mixture.Temperature}\nEnergy: {Mixture.ThermalEnergy}\n\n{string.Join("\n", Mixture.Components.Select(c => (100 * c.Portion).ToString("0") + "% " + c.Compound.Name + " (" + c.Volume + ")"))}";
 
         public Mass Mass => Mixture.Mass;
 

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace SpaceEngineers2D.Chemistry.Quantities
@@ -9,11 +8,16 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 	{
 		private const double Accuracy = 0.00001;
 		
+		public static IReadOnlyList<Unit> Units = new List<Unit>
+		{
+			new Unit(1, "cm³/mol"),
+		};
+		
 		public static readonly MolecularVolume Zero = new MolecularVolume(0);
 		
 		public static MolecularVolume FromCubicCentimetersPerMol(double value)
 		{
-			return new MolecularVolume(value);
+			return new MolecularVolume(value * 1);
 		}
 		
 		public static MolecularVolume Sum(IEnumerable<MolecularVolume> items)
@@ -31,7 +35,17 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 			return new MolecularVolume(items.Min(item => item.Value));
 		}
 		
+		public static MolecularVolume Min(params MolecularVolume[] items)
+		{
+			return new MolecularVolume(items.Min(item => item.Value));
+		}
+		
 		public static MolecularVolume Max(IEnumerable<MolecularVolume> items)
+		{
+			return new MolecularVolume(items.Max(item => item.Value));
+		}
+		
+		public static MolecularVolume Max(params MolecularVolume[] items)
 		{
 			return new MolecularVolume(items.Max(item => item.Value));
 		}
@@ -71,6 +85,11 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 			return new MolecularVolume(a.Value + b.Value);
 		}
 		
+		public static MolecularVolume operator -(MolecularVolume a)
+		{
+			return new MolecularVolume(-a.Value);
+		}
+		
 		public static MolecularVolume operator -(MolecularVolume a, MolecularVolume b)
 		{
 			return new MolecularVolume(a.Value - b.Value);
@@ -98,13 +117,18 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 		
 		public readonly double Value;
 		
-		public bool IsZero => Value == 0;
+		public bool IsZero => Value.Equals(0);
 		
-		public double InCubicCentimetersPerMol => Value;
+		public double InCubicCentimetersPerMol => Value / 1;
 		
 		public MolecularVolume(double value)
 		{
 			Value = value;
+		}
+		
+		public MolecularVolume Abs()
+		{
+			return new MolecularVolume(Math.Abs(Value));
 		}
 		
 		public override bool Equals(object obj)
@@ -129,8 +153,20 @@ namespace SpaceEngineers2D.Chemistry.Quantities
 		
 		public override string ToString()
 		{
-			return Value.ToString("0.00", CultureInfo.InvariantCulture) + "cm³/mol";
+			return UnitUtility.Format(Units, Value);
 		}
 		
+		public class Unit : IUnit
+		{
+			public double Factor { get; }
+			
+			public string Symbol { get; }
+			
+			public Unit(double factor, string symbol)
+			{
+				Factor = factor;
+				Symbol = symbol;
+			}
+		}
 	}
 }

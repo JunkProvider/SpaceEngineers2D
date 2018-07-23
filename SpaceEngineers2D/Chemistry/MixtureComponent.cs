@@ -20,6 +20,8 @@ namespace SpaceEngineers2D.Chemistry
 
         public Volume Volume => Amount * Compound.MolecularVolume;
 
+        public HeatCapacity HeatCapacity => Amount * Compound.MolecularHeatCapacity;
+
         public MixtureComponent(Compound compound, AmountOfSubstance amount, double portion)
         {
             Compound = compound;

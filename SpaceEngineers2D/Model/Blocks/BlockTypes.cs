@@ -31,14 +31,14 @@ namespace SpaceEngineers2D.Model.Blocks
                 image: LoadImage("rock"),
                 getDroppedItemsFunc: () => new List<IItem>
                 {
-                    new MixtureItem( Mixture.FromSingleCompound(compounds.Fe3O4, Volume.FromLiters(100)))
+                    new MixtureItem(Mixture.FromSingleCompound(compounds.Fe3O4, Volume.FromLiters(10), Temperature.FromKelvin(295 * 6)))
                 });
 
             Ore = new StandardBlockType(
                 image: LoadImage("ore"),
                 getDroppedItemsFunc: () => new List<IItem>
                 {
-                    new MixtureItem(Mixture.FromSingleCompound(compounds.GetForElement(elements.Carbon), Volume.FromLiters(100)))
+                    new MixtureItem(Mixture.FromSingleCompound(compounds.GetForElement(elements.Carbon), Volume.FromLiters(10), Temperature.FromKelvin(295)))
                 });
 
             var concreteBlueprint = new BlockBlueprint(new List<BlockBlueprintComponent>
@@ -46,7 +46,7 @@ namespace SpaceEngineers2D.Model.Blocks
                 new BlockBlueprintComponent(
                     new MixtureBlueprintComponent(
                         "200L Magnetite",
-                        Volume.FromLiters(200), 
+                        Volume.FromLiters(10), 
                         mixture =>
                             {
                                 return mixture.Components.Count == 1 && mixture.Components.Single().Compound == compounds.Fe3O4;
