@@ -25,7 +25,7 @@
                         blockPosition,
                         IntVector.RightBottom * Constants.PhysicsUnit);
 
-                    if (objBounds.TryGetTouchedSide(blockBounds, out var touchedSide))
+                    if (block.IsSolid && objBounds.TryGetTouchedSide(blockBounds, out var touchedSide))
                     {
                         obj.TouchedBlocks[touchedSide].Add(block);
                     }
