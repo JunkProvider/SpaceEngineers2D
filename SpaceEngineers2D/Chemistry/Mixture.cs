@@ -7,6 +7,22 @@ namespace SpaceEngineers2D.Chemistry
 {
     public class Mixture
     {
+        public static Mixture FromAbsoluteAmounts(IReadOnlyDictionary<Compound, Volume> compounds, Temperature temperature)
+        {
+            var totalAmount = AmountOfSubstance.Sum(compounds.Select(compound => compound.Value / compound.Key.MolecularVolume));
+            var components = new HashSet<MixtureComponent>();
+            foreach (var compound in compounds)
+            {
+                var amount = compound.Value / compound.Key.MolecularVolume;
+                components.Add(new MixtureComponent(compound.Key, amount, amount / totalAmount));
+            }
+
+            var heatCapacity = HeatCapacity.Sum(components.Select(c => c.HeatCapacity));
+
+            return new Mixture(components, temperature * heatCapacity);
+        }
+
+
         public static Mixture FromAbsoluteAmounts(IReadOnlyDictionary<Compound, AmountOfSubstance> compounds, Energy thermalEnergy)
         {
             var totalAmount = new AmountOfSubstance(compounds.Values.Sum(c => c.Value));
@@ -47,6 +63,37 @@ namespace SpaceEngineers2D.Chemistry
 
         public Temperature Temperature => ThermalEnergy / HeatCapacity;
 
+        public AggregationState AggregationState { get; }
+
+        private Mixture(IReadOnlyCollection<MixtureComponent> components, Energy thermalEnergy)
+        {
+            if (components == null || !components.Any())
+            {
+                throw new ArgumentNullException(nameof(components), @"Mixture must have at least one component");
+            }
+
+            _componentDictionary = components.ToDictionary(component => component.Compound);
+            Components = components.OrderByDescending(component => component.Portion).ToList();
+
+            ThermalEnergy = thermalEnergy;
+
+            var averageMeltingPoint = Temperature.Sum(components.Select(component => component.Portion * component.Compound.MeltingPoint));
+            var averageBoilingPoint = Temperature.Sum(components.Select(component => component.Portion * component.Compound.MeltingPoint));
+
+            if (Temperature >= averageBoilingPoint)
+            {
+                AggregationState = AggregationState.Gas;
+            }
+            else if (Temperature >= averageMeltingPoint)
+            {
+                AggregationState = AggregationState.Liquid;
+            }
+            else
+            {
+                AggregationState = AggregationState.Solid;
+            }
+        }
+
         public IDictionary<Compound, AmountOfSubstance> GetAmountsMappedByCompounds()
         {
             var amounts = new Dictionary<Compound, AmountOfSubstance>();
@@ -70,19 +117,6 @@ namespace SpaceEngineers2D.Chemistry
         public bool TryGetComponentByCompound(Compound compound, out MixtureComponent component)
         {
             return _componentDictionary.TryGetValue(compound, out component);
-        }
-
-        private Mixture(IReadOnlyCollection<MixtureComponent> components, Energy thermalEnergy)
-        {
-            if (components == null || !components.Any())
-            {
-                throw new ArgumentNullException(nameof(components), @"Mixture must have at least one component");
-            }
-
-            _componentDictionary = components.ToDictionary(component => component.Compound);
-            Components = components.OrderByDescending(component => component.Portion).ToList();
-
-            ThermalEnergy = thermalEnergy;
         }
 
         public bool HasSameConcentrationsAs(Mixture otherMixture)

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using SpaceEngineers2D.Chemistry;
 using SpaceEngineers2D.Chemistry.Quantities;
 using SpaceEngineers2D.Controllers;
 using SpaceEngineers2D.Geometry;
@@ -29,6 +31,15 @@ namespace SpaceEngineers2D
         {
             World = new World(new Player { Position = new IntVector(0, -1600) }, new Camera { Zoom = 0.05f });
 
+            var coalMixture = Mixture.FromSingleCompound(World.Compounds.C, Volume.FromLiters(100), Temperature.FromKelvin(293));
+            var oreMixture = Mixture.FromAbsoluteAmounts(
+                new Dictionary<Compound, Volume>
+                {
+                    { World.Compounds.Fe2O3, Volume.FromLiters(30) },
+                    { World.Compounds.Fe3O4, Volume.FromLiters(70) }
+                }, 
+                Temperature.FromKelvin(293));
+
             var grid = new Grid();
             for (var x = -100; x < 100; x++)
             {
@@ -42,11 +53,11 @@ namespace SpaceEngineers2D
 
                     if (_random.Next(0, 100) < 5)
                     {
-                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.Ore.InstantiateBlock());
+                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.MixtureBlockType.InstantiateBlock(coalMixture));
                         continue;
                     }
 
-                    grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.Rock.InstantiateBlock());
+                    grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.MixtureBlockType.InstantiateBlock(oreMixture));
                 }
             }
 

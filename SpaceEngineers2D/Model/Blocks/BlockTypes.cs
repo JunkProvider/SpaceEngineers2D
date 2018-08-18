@@ -25,6 +25,8 @@ namespace SpaceEngineers2D.Model.Blocks
 
         public readonly GrassBlockType Grass;
 
+        public readonly MixtureBlockType MixtureBlockType;
+
         public BlockTypes(ElementList elements, CompoundList compounds)
         {
             Rock = new StandardBlockType(
@@ -59,6 +61,8 @@ namespace SpaceEngineers2D.Model.Blocks
                 concreteBlueprint);
 
             Grass = new GrassBlockType();
+
+            MixtureBlockType = new MixtureBlockType();
         }
 
         private static ImageSource LoadImage(string file)

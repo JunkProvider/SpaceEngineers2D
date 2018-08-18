@@ -39,6 +39,7 @@ namespace SpaceEngineers2D.View
             _blockRendererRegistry.Add<StandardBlock, StandardBlock>(new StandardBlockRenderer());
             _blockRendererRegistry.Add<StructuralBlock, StructuralBlock>(new StructuralBlockRenderer());
             _blockRendererRegistry.Add<GrassBlock, GrassBlock>(new GrassBlockRenderer());
+            _blockRendererRegistry.Add<MixtureBlock, MixtureBlock>(new MixtureBlockRenderer());
 
             var lastTime = DateTime.Now;
 

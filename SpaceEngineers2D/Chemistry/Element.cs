@@ -22,11 +22,15 @@ namespace SpaceEngineers2D.Chemistry
 
         public MolecularHeatCapacity MolecularHeatCapacity { get; }
 
+        public Temperature MeltingPoint { get; }
+
+        public Temperature BoilingPoint { get; }
+
         public ElementClassification Classification { get; }
 
         public bool IsMetal => Classification == ElementClassification.Metal;
 
-        public Element(string symbol, string name, int @group, int period, int electrons, MolecularMass mass, Density density, ElementClassification classification, MolecularHeatCapacity molecularHeatCapacity)
+        public Element(string symbol, string name, int @group, int period, int electrons, MolecularMass mass, Density density, ElementClassification classification, MolecularHeatCapacity molecularHeatCapacity, Temperature meltingPoint, Temperature boilingPoint)
         {
             Symbol = symbol;
             Name = name;
@@ -37,6 +41,8 @@ namespace SpaceEngineers2D.Chemistry
             Density = density;
             Classification = classification;
             MolecularHeatCapacity = molecularHeatCapacity;
+            MeltingPoint = meltingPoint;
+            BoilingPoint = boilingPoint;
         }
 
         public override string ToString()

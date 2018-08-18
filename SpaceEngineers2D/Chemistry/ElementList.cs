@@ -17,7 +17,9 @@ namespace SpaceEngineers2D.Chemistry
             mass: MolecularMass.FromGramPerMol(1.008),
             density: Density.FromGramPerLiter(0.08988),
             classification: ElementClassification.NonMetal,
-            molecularHeatCapacity: MolecularHeatCapacity.FromJoulePerMolTimesKelvin(28.836));
+            molecularHeatCapacity: MolecularHeatCapacity.FromJoulePerMolTimesKelvin(28.836),
+            meltingPoint: Temperature.FromKelvin(13.99),
+            boilingPoint: Temperature.FromKelvin(20.271));
 
         /* public Element Helium { get; } = new Element(
             symbol: "He",
@@ -39,7 +41,9 @@ namespace SpaceEngineers2D.Chemistry
             mass: MolecularMass.FromGramPerMol(12.011), 
             density: Density.FromGramPerCubicCentimeter(2.267),
             classification: ElementClassification.NonMetal,
-            molecularHeatCapacity: MolecularHeatCapacity.FromJoulePerMolTimesKelvin(8.517));
+            molecularHeatCapacity: MolecularHeatCapacity.FromJoulePerMolTimesKelvin(8.517),
+            meltingPoint: Temperature.FromKelvin(3915),
+            boilingPoint: Temperature.FromKelvin(3915));
 
         // public Element Nitrogen { get; } = new Element("N", "Nitrogen", 15, 2, 7, MolecularMass.FromGramPerMol(14.0067), Density.FromGramPerLiter(1.2504), ElementClassification.NonMetal);
 
@@ -52,7 +56,9 @@ namespace SpaceEngineers2D.Chemistry
             mass: MolecularMass.FromGramPerMol(15.999),
             density: Density.FromGramPerLiter(1.429),
             classification: ElementClassification.NonMetal,
-            molecularHeatCapacity: MolecularHeatCapacity.FromJoulePerMolTimesKelvin(29.378 / 2));
+            molecularHeatCapacity: MolecularHeatCapacity.FromJoulePerMolTimesKelvin(29.378 / 2),
+            meltingPoint: Temperature.FromKelvin(54.36),
+            boilingPoint: Temperature.FromKelvin(90.188));
 
 
         public Element Iron { get; } = new Element(
@@ -64,7 +70,9 @@ namespace SpaceEngineers2D.Chemistry
             mass: MolecularMass.FromGramPerMol(55.845),
             density: Density.FromGramPerCubicCentimeter(7.874),
             classification: ElementClassification.Metal,
-            molecularHeatCapacity: MolecularHeatCapacity.FromJoulePerMolTimesKelvin(25.10));
+            molecularHeatCapacity: MolecularHeatCapacity.FromJoulePerMolTimesKelvin(25.10),
+            meltingPoint: Temperature.FromKelvin(1811),
+            boilingPoint: Temperature.FromKelvin(3134));
 
         public ElementList()
         {

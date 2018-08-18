@@ -25,6 +25,10 @@ namespace SpaceEngineers2D.Chemistry
 
         public MolecularHeatCapacity MolecularHeatCapacity => MolecularHeatCapacity.Sum(Components.Select(component => component.MolecularHeatCapacity));
 
+        public Temperature MeltingPoint => Temperature.Average(Components.Select(component => component.Element.MeltingPoint));
+
+        public Temperature BoilingPoint => Temperature.Average(Components.Select(component => component.Element.BoilingPoint));
+
         public Compound(string name, string forumla, IReadOnlyDictionary<Element, int> components, Density density, EnthalpyOfFormation enthalpyOfFormation)
         {
             if (components == null || !components.Any())

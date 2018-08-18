@@ -102,6 +102,8 @@
     <Compile Include="Model\Blocks\BlockType.cs" />
     <Compile Include="Model\Blocks\BlockTypes.cs" />
     <Compile Include="Model\Blocks\ConcreteBlockType.cs" />
+    <Compile Include="Model\Blocks\MixtureBlock.cs" />
+    <Compile Include="Model\Blocks\MixtureBlockType.cs" />
     <Compile Include="Model\Blocks\GrassBlock.cs" />
     <Compile Include="Model\Blocks\GrassBlockType.cs" />
     <Compile Include="Model\Blocks\IBlockInWorld.cs" />
@@ -137,6 +139,7 @@
     <Compile Include="View\BlockRenderers\BlockRendererRegistry.cs" />
     <Compile Include="View\BlockRenderers\BlockRenderer.cs" />
     <Compile Include="View\BlockRenderers\GrassBlockRenderer.cs" />
+    <Compile Include="View\BlockRenderers\MixtureBlockRenderer.cs" />
     <Compile Include="View\BlockRenderers\StandardBlockRenderer.cs" />
     <Compile Include="View\BlockRenderers\StructuralBlockRenderer.cs" />
     <Compile Include="View\Inventory\InventorySlotView.xaml.cs">
