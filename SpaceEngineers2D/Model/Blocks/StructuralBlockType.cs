@@ -4,17 +4,21 @@ namespace SpaceEngineers2D.Model.Blocks
 {
     using BlockBlueprints;
 
-    public abstract class StructuralBlockType : BlockType
+    public class StructuralBlockType : BlockType
     {
         public ImageSource Image { get; }
 
-        public abstract BlockBlueprint Blueprint { get; }
-
-        public abstract StructuralBlock InstantiateBlock();
-
-        protected StructuralBlockType(ImageSource image)
+        public BlockBlueprint Blueprint { get; }
+        
+        public StructuralBlockType(ImageSource image, BlockBlueprint blueprint)
         {
             Image = image;
+            Blueprint = blueprint;
+        }
+
+        public StructuralBlock InstantiateBlock()
+        {
+            return new StructuralBlock(this);
         }
     }
 }

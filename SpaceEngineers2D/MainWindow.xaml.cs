@@ -39,7 +39,13 @@ namespace SpaceEngineers2D
 
                     if (_random.Next(0, 100) < 5)
                     {
-                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.Ore.InstantiateBlock());
+                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.IronOreDeposit.InstantiateBlock());
+                        continue;
+                    }
+
+                    if (_random.Next(0, 100) < 5)
+                    {
+                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.CoalDeposit.InstantiateBlock());
                         continue;
                     }
 

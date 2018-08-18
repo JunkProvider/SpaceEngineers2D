@@ -9,9 +9,13 @@ namespace SpaceEngineers2D.Model.Items
 {
     public class ItemTypes
     {
-        public readonly StandardItemType Ore;
-
         public readonly StandardItemType Rock;
+
+        public readonly StandardItemType IronOre;
+
+        public readonly StandardItemType Coal;
+
+        public readonly StandardItemType Iron;
 
         public readonly List<StandardItemType> Compounds = new List<StandardItemType>();
 
@@ -21,13 +25,25 @@ namespace SpaceEngineers2D.Model.Items
                 name: "Rock",
                 mass: 2.50f,
                 volume: 1f,
-                icon: LoadImage("coal.png"));
+                icon: LoadImage("Items\\Rock.png"));
 
-            Ore = new StandardItemType(
+            IronOre = new StandardItemType(
                 name: "Iron Ore",
                 mass: 7.874f,
                 volume: 1f,
-                icon: LoadImage("diamond.png"));
+                icon: LoadImage("Items\\IronOre.png"));
+
+            Coal = new StandardItemType(
+                name: "Coal",
+                mass: 2.26f,
+                volume: 1f,
+                icon: LoadImage("Items\\Coal.png"));
+
+            Iron = new StandardItemType(
+                name: "Iron",
+                mass: 7.874f,
+                volume: 1f,
+                icon: LoadImage("Items\\Iron.png"));
         }
 
         private static ImageSource LoadImage(string file)

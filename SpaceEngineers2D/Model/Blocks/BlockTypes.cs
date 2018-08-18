@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Windows.Media.Imaging;
+using SpaceEngineers2D.Model.BlockBlueprints;
 
 namespace SpaceEngineers2D.Model.Blocks
 {
@@ -14,35 +15,53 @@ namespace SpaceEngineers2D.Model.Blocks
     {
         public readonly StandardBlockType Rock;
 
-        public readonly StandardBlockType Ore;
+        public readonly StandardBlockType IronOreDeposit;
 
-        public readonly ConcreteBlockType Concrete;
+        public readonly StandardBlockType CoalDeposit;
+
+        public readonly StructuralBlockType Concrete;
+
+        public readonly StructuralBlockType IronPlate;
 
         public readonly GrassBlockType Grass;
 
         public BlockTypes(ItemTypes itemTypes)
         {
             Rock = new StandardBlockType(
-                image: LoadImage("rock"),
+                image: LoadImage("Blocks\\Rock"),
                 droppedItems: new Dictionary<StandardItemType, int>
                 {
                     { itemTypes.Rock, 1 }
                 });
 
-            Ore = new StandardBlockType(
-                image: LoadImage("ore"),
+            IronOreDeposit = new StandardBlockType(
+                image: LoadImage("Blocks\\IronOreDeposit"),
                 droppedItems: new Dictionary<StandardItemType, int>
                 {
-                    { itemTypes.Compounds[0], 1 },
-                    { itemTypes.Compounds[1], 1 },
-                    { itemTypes.Compounds[2], 1 },
-                    { itemTypes.Compounds[3], 1 },
-                    { itemTypes.Compounds[4], 1 }
+                    { itemTypes.IronOre, 1 }
                 });
 
-            Concrete = new ConcreteBlockType(
-                image: LoadImage("stone_slab_side"),
-                itemTypes: itemTypes);
+            CoalDeposit = new StandardBlockType(
+                image: LoadImage("Blocks\\CoalDeposit"),
+                droppedItems: new Dictionary<StandardItemType, int>
+                {
+                    { itemTypes.Coal, 1 }
+                });
+
+            Concrete = new StructuralBlockType(
+                image: LoadImage("Blocks\\Concrete"),
+                blueprint: new BlockBlueprint(new List<BlockBlueprintComponent>
+                {
+                    new BlockBlueprintComponent(1, itemTypes.Rock, 10f),
+                    new BlockBlueprintComponent(1, itemTypes.Coal, 10f)
+                }));
+
+            IronPlate = new StructuralBlockType(
+                image: LoadImage("Blocks\\IronPlate"),
+                blueprint: new BlockBlueprint(new List<BlockBlueprintComponent>
+                {
+                    new BlockBlueprintComponent(1, itemTypes.Iron, 10f)
+                }));
 
             Grass = new GrassBlockType();
         }
