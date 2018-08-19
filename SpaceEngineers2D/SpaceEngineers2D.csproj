@@ -55,6 +55,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="View\BlueprintList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Inventory\InventoryView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -72,6 +76,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controllers\WorldRendererController.cs" />
+    <Compile Include="Converters\EnumMemberConverter.cs" />
+    <Compile Include="Dispatch.cs" />
+    <Compile Include="Model\BlockBlueprintSlot.cs" />
     <Compile Include="Model\BlockBlueprints\BlockBlueprint.cs" />
     <Compile Include="Model\BlockBlueprints\BlockBlueprintComponent.cs" />
     <Compile Include="Model\BlockBlueprints\BlockBlueprintComponentState.cs" />
@@ -106,6 +113,9 @@
     <Compile Include="View\BlockRenderers\GrassBlockRenderer.cs" />
     <Compile Include="View\BlockRenderers\StandardBlockRenderer.cs" />
     <Compile Include="View\BlockRenderers\StructuralBlockRenderer.cs" />
+    <Compile Include="View\BlueprintList.xaml.cs">
+      <DependentUpon>BlueprintList.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Inventory\InventoryView.xaml.cs">
       <DependentUpon>InventoryView.xaml</DependentUpon>
     </Compile>

@@ -2,6 +2,6 @@
 {
     public abstract class BlockType
     {
-        
+        public abstract string Name { get; }
     }
 }

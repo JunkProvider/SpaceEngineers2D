@@ -1,4 +1,11 @@
-﻿namespace SpaceEngineers2D.Model
+﻿using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using SpaceEngineers2D.Annotations;
+using SpaceEngineers2D.Model.BlockBlueprints;
+
+namespace SpaceEngineers2D.Model
 {
     using System.Collections.Generic;
 
@@ -6,11 +13,17 @@
     using Blocks;
     using Inventories;
 
-    public class Player : IMobileObject
+    public class Player : IMobileObject, INotifyPropertyChanged
     {
         public const int ItemPickupRange = 1000;
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public Inventory Inventory { get; } = new Inventory();
+
+        public List<BlockBlueprintSlot> BlueprintSlots { get; } = new List<BlockBlueprintSlot> { new BlockBlueprintSlot(Key.NumPad1), new BlockBlueprintSlot(Key.NumPad2), new BlockBlueprintSlot(Key.NumPad3) };
+
+        public BlockBlueprintSlot SelectedBlueprintSlot => BlueprintSlots.SingleOrDefault(blueprintSlot => blueprintSlot.Selected);
 
         public IntVector Position { get; set; }
 
@@ -43,6 +56,36 @@
             MovementOrders[Side.Right] = false;
             MovementOrders[Side.Top] = false;
             MovementOrders[Side.Bottom] = false;
+        }
+
+        public void TrySetSelectedBlueprintSlot(Key hotkey)
+        {
+            foreach (var blueprintSlot in BlueprintSlots)
+            {
+                if (blueprintSlot.BlueprintedBlock != null && blueprintSlot.Hotkey == hotkey)
+                {
+                    SelectBlueprintSlot(blueprintSlot);
+                    break;
+                }
+            }
+        }
+
+        public void SelectBlueprintSlot(BlockBlueprintSlot blueprintSlotToSelect)
+        {
+            foreach (var blueprintSlot in BlueprintSlots)
+            {
+                blueprintSlot.Selected = false;
+            }
+
+            blueprintSlotToSelect.Selected = true;
+
+            this.RaisePropertyChanged(nameof(SelectedBlueprintSlot));
+        }
+
+        [NotifyPropertyChangedInvocator]
+        private void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

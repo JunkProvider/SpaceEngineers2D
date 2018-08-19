@@ -17,6 +17,8 @@ namespace SpaceEngineers2D.Controllers
 
         public World World { get; }
 
+        private Player Player => World.Player;
+
         public WorldRendererController(World world)
         {
             World = world;
@@ -35,15 +37,13 @@ namespace SpaceEngineers2D.Controllers
         public void OnRightMouseButtonDown(IntVector mousePosition)
         {
             _activity = 2;
-
-            var player = World.Player;
-
-            if (player.TargetBlock == null)
+            
+            if (Player.TargetBlock == null)
             {
                 var grid = World.Grids.First();
                 var blockBounds = grid.GetBlockBounds(mousePosition);
 
-                if (!player.Bounds.Overlaps(blockBounds) && IsInPlayerRange(blockBounds))
+                if (!Player.Bounds.Overlaps(blockBounds) && IsInPlayerRange(blockBounds))
                 {
                     PlaceBlock(new BlockCoords(grid, blockBounds));
                 }
@@ -68,21 +68,19 @@ namespace SpaceEngineers2D.Controllers
 
         public void OnUpdate(TimeSpan elapsedTime)
         {
-            var player = World.Player;
-
             var block = World.GetBlock(_mousePosition);
 
-            player.TargetPosition = _mousePosition;
-            player.TargetBlockCoords = block != null ? new BlockCoords(block.Grid, block.Bounds) : null;
-            player.TargetBlockCoordsInRange = player.TargetBlockCoords != null && IsInPlayerRange(player.TargetBlockCoords.Bounds);
-            player.TargetBlock = block;
+            Player.TargetPosition = _mousePosition;
+            Player.TargetBlockCoords = block != null ? new BlockCoords(block.Grid, block.Bounds) : null;
+            Player.TargetBlockCoordsInRange = Player.TargetBlockCoords != null && IsInPlayerRange(Player.TargetBlockCoords.Bounds);
+            Player.TargetBlock = block;
 
-            if (_activity == 2 && player.TargetBlockCoordsInRange)
+            if (_activity == 2 && Player.TargetBlockCoordsInRange)
             {
-                player.TargetBlock.As<StructuralBlock>((structuralBlock) => WeldBlock(structuralBlock, elapsedTime));
+                Player.TargetBlock.As<StructuralBlock>((structuralBlock) => WeldBlock(structuralBlock, elapsedTime));
             }
 
-            if (_activity == 1 && player.TargetBlockCoordsInRange)
+            if (_activity == 1 && Player.TargetBlockCoordsInRange)
             {
                 GrindBlock(elapsedTime);
             }
@@ -90,10 +88,9 @@ namespace SpaceEngineers2D.Controllers
 
         private void PlaceBlock(BlockCoords coords)
         {
-            var player = World.Player;
-            var blockType = World.BlockTypes.Concrete;
+            var blockType = Player.SelectedBlueprintSlot?.BlueprintedBlock;
 
-            if (player.Inventory.TryTakeNOfType(blockType.Blueprint.Components.First().ItemType, 1, out var itemStack))
+            if (blockType != null && Player.Inventory.TryTakeNOfType(blockType.Blueprint.Components.First().ItemType, 1, out var itemStack))
             {
                 var block = blockType.InstantiateBlock();
                 block.BlueprintState.PutItem(itemStack.Item);

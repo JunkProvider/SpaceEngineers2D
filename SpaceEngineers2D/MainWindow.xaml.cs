@@ -54,15 +54,22 @@ namespace SpaceEngineers2D
             }
 
             World.Grids.Add(grid);
-            
+
+            World.Player.BlueprintSlots[0].BlueprintedBlock = World.BlockTypes.Concrete;
+            World.Player.BlueprintSlots[1].BlueprintedBlock = World.BlockTypes.IronPlate;
+
             WorldRendererParameters = new WorldRendererParameters(World, new WorldRendererController(World));
 
-            InitializeComponent();
             DataContext = this;
+
+            InitializeComponent();
         }
 
         private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
         {
+            // If executed immediately nothing happens and debugged dies when setting a breakpoint.
+            Dispatch.Exec(() => World.Player.TrySetSelectedBlueprintSlot(e.Key));
+
             switch (e.Key)
             {
                 case Key.Left:

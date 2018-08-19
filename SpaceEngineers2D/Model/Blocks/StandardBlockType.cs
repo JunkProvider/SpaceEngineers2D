@@ -9,12 +9,15 @@
     {
         public ImageSource Image{ get; }
 
+        public override string Name { get; }
+
         public IDictionary<StandardItemType, int> DroppedItems { get; }
 
         public float MaxIntegrity { get; } = 10f;
 
-        public StandardBlockType(ImageSource image, IDictionary<StandardItemType, int> droppedItems)
+        public StandardBlockType(string name, ImageSource image, IDictionary<StandardItemType, int> droppedItems)
         {
+            Name = name;
             Image = image;
             DroppedItems = droppedItems;
         }

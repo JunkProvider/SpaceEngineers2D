@@ -10,8 +10,7 @@
         d:DataContext="{d:DesignInstance Type=local:MainWindow}"
         Title="MainWindow" Width="1280" Height="800"
         KeyDown="MainWindow_OnKeyDown"
-        KeyUp="MainWindow_OnKeyUp"
->
+        KeyUp="MainWindow_OnKeyUp">
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="/Assets/Images/background.jpg" Stretch="UniformToFill"/>
@@ -20,9 +19,13 @@
                             VerticalAlignment="Stretch"
                             Background="Transparent"
                             Parameters="{Binding WorldRendererParameters}" />
-        <viewInventory:InventoryView HorizontalAlignment="Left"
-                                     VerticalAlignment="Top"
-                                     Margin="10"
-                                     DataContext="{Binding World.Player.Inventory}" />
+        <StackPanel>
+            <viewInventory:InventoryView HorizontalAlignment="Left"
+                                         Margin="10"
+                                         DataContext="{Binding World.Player.Inventory}" />
+            <view:BlueprintList HorizontalAlignment="Left"
+                                Margin="10"
+                                DataContext="{Binding World.Player}" />
+        </StackPanel>
     </Grid>
 </Window>

@@ -28,6 +28,7 @@ namespace SpaceEngineers2D.Model.Blocks
         public BlockTypes(ItemTypes itemTypes)
         {
             Rock = new StandardBlockType(
+                name: "Rock",
                 image: LoadImage("Blocks\\Rock"),
                 droppedItems: new Dictionary<StandardItemType, int>
                 {
@@ -35,6 +36,7 @@ namespace SpaceEngineers2D.Model.Blocks
                 });
 
             IronOreDeposit = new StandardBlockType(
+                name: "Iron Ore Deposit",
                 image: LoadImage("Blocks\\IronOreDeposit"),
                 droppedItems: new Dictionary<StandardItemType, int>
                 {
@@ -42,6 +44,7 @@ namespace SpaceEngineers2D.Model.Blocks
                 });
 
             CoalDeposit = new StandardBlockType(
+                name: "Coal Deposit",
                 image: LoadImage("Blocks\\CoalDeposit"),
                 droppedItems: new Dictionary<StandardItemType, int>
                 {
@@ -49,6 +52,7 @@ namespace SpaceEngineers2D.Model.Blocks
                 });
 
             Concrete = new StructuralBlockType(
+                name: "Concrete Block",
                 image: LoadImage("Blocks\\Concrete"),
                 blueprint: new BlockBlueprint(new List<BlockBlueprintComponent>
                 {
@@ -57,6 +61,7 @@ namespace SpaceEngineers2D.Model.Blocks
                 }));
 
             IronPlate = new StructuralBlockType(
+                name: "Iron Plate",
                 image: LoadImage("Blocks\\IronPlate"),
                 blueprint: new BlockBlueprint(new List<BlockBlueprintComponent>
                 {

@@ -6,12 +6,15 @@ namespace SpaceEngineers2D.Model.Blocks
 
     public class StructuralBlockType : BlockType
     {
+        public override string Name { get; }
+
         public ImageSource Image { get; }
 
         public BlockBlueprint Blueprint { get; }
         
-        public StructuralBlockType(ImageSource image, BlockBlueprint blueprint)
+        public StructuralBlockType(string name, ImageSource image, BlockBlueprint blueprint)
         {
+            Name = name;
             Image = image;
             Blueprint = blueprint;
         }

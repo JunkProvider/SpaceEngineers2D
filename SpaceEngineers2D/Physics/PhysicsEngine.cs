@@ -50,7 +50,7 @@
 
                 if (player.MovementOrders[Side.Top])
                 {
-                    player.Velocity = player.Velocity + IntVector.Up * Constants.PhysicsUnit * 5;
+                    player.Velocity = player.Velocity + IntVector.Up * Constants.PhysicsUnit * 7;
                 }
             }
         }
