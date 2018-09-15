@@ -82,6 +82,19 @@ namespace SpaceEngineers2D
                 }
             }
 
+            for (var x = -100; x < 100; x++)
+            {
+                if (_random.Next(0, 100) > 10)
+                    continue;
+
+                var height = _random.Next(2, 4);
+
+                for (var y = -height; y <= 0; y++)
+                {
+                    grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.Reed.InstantiateBlock());
+                }
+            }
+
             var blastFurnace = World.BlockTypes.BlastFurnace.InstantiateBlock();
             blastFurnace.BlueprintState.FinishImmediately();
             grid.SetBlock(new IntVector(-2, 0) * Constants.PhysicsUnit, blastFurnace);

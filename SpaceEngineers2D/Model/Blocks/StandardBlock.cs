@@ -8,7 +8,7 @@ namespace SpaceEngineers2D.Model.Blocks
 
     using Items;
 
-    public sealed class StandardBlock : Block
+    public sealed class StandardBlock : Block, IStandardRenderableBlock
     {
         public StandardBlockType StandardBlockType => (StandardBlockType)BlockType;
 
@@ -20,7 +20,7 @@ namespace SpaceEngineers2D.Model.Blocks
 
         public override bool IsDestoryed => Integrity <= 0;
 
-        public float IntegrityRatio => Integrity / StandardBlockType.MaxIntegrity;
+        public double IntegrityRatio => Integrity / StandardBlockType.MaxIntegrity;
 
         public StandardBlock(StandardBlockType blockType)
             : base(blockType)

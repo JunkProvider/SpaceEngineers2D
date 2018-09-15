@@ -36,9 +36,8 @@ namespace SpaceEngineers2D.View
         {
             InitializeComponent();
 
-            _blockRendererRegistry.Add<StandardBlock, StandardBlock>(new StandardBlockRenderer());
+            _blockRendererRegistry.Add<IStandardRenderableBlock, IStandardRenderableBlock>(new StandardBlockRenderer());
             _blockRendererRegistry.Add<StructuralBlock, StructuralBlock>(new StructuralBlockRenderer());
-            _blockRendererRegistry.Add<GrassBlock, GrassBlock>(new GrassBlockRenderer());
 
             var timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(30);

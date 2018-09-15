@@ -23,7 +23,9 @@ namespace SpaceEngineers2D.Model.Blocks
 
         public readonly StandardBlockType CoalDeposit;
 
-        public readonly StandardBlockType Grass;
+        public readonly GrassBlockType Grass;
+
+        public readonly ReedBlockType Reed;
 
         public readonly StructuralBlockType Concrete;
 
@@ -73,11 +75,13 @@ namespace SpaceEngineers2D.Model.Blocks
                     { itemTypes.Coal, 1 }
                 });
 
-            Grass = new StandardBlockType(
+            Grass = new GrassBlockType(
                 name: "Grass",
-                image: LoadImage("Blocks\\Grass"),
-                droppedItems: new Dictionary<StandardItemType, int>(),
-                isSolid: false);
+                image: LoadImage("Blocks\\Grass"));
+
+            Reed = new ReedBlockType(
+                name: "Reed",
+                image: LoadImage("Blocks\\Reed"));
 
             Concrete = new StructuralBlockType(
                 name: "Concrete Block",

@@ -16,7 +16,6 @@ namespace SpaceEngineers2D.View.BlockRenderers
 
         public void Add<TBlock, TRenderedBlock>(BlockRenderer<TRenderedBlock> renderer)
             where TBlock : TRenderedBlock
-            where TRenderedBlock : Block
         {
             this._renderers.Add(new Tuple<Type, IBlockRenderer>(typeof(TBlock), renderer));
         }

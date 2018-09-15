@@ -6,11 +6,11 @@ using SpaceEngineers2D.Physics;
 
 namespace SpaceEngineers2D.Model.Blocks
 {
-    public class GrassBlock : Block, IStandardRenderableBlock
+    public class ReedBlock : Block, IStandardRenderableBlock
     {
         private bool _isDestroyed;
 
-        public GrassBlockType GrassBlockType { get; }
+        public ReedBlockType ReedBlockType { get; }
 
         public double IntegrityRatio => 1;
 
@@ -18,11 +18,11 @@ namespace SpaceEngineers2D.Model.Blocks
 
         public override bool IsSolid => false;
 
-        public ImageSource Image => GrassBlockType.Image;
+        public ImageSource Image => ReedBlockType.Image;
 
-        public GrassBlock(GrassBlockType blockType) : base(blockType)
+        public ReedBlock(ReedBlockType blockType) : base(blockType)
         {
-            GrassBlockType = blockType;
+            ReedBlockType = blockType;
         }
 
         public override ICollection<ItemStack> GetDroppedItems()
@@ -46,7 +46,9 @@ namespace SpaceEngineers2D.Model.Blocks
 
             var bottomBlock = world.GetBlock(ownBounds.Position + (IntVector.Down * Constants.PhysicsUnitVector));
 
-            if (bottomBlock?.Object.BlockType != world.BlockTypes.Dirt && bottomBlock?.Object.BlockType != world.BlockTypes.DirtWithGrass)
+            if (bottomBlock?.Object.BlockType != world.BlockTypes.Dirt
+                && bottomBlock?.Object.BlockType != world.BlockTypes.DirtWithGrass
+                && bottomBlock?.Object.BlockType != world.BlockTypes.Reed)
             {
                 world.RemoveBlock(ownBounds.LeftTop);
             }

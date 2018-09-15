@@ -102,6 +102,10 @@
     <Compile Include="Model\Blocks\BlockInWorld.cs" />
     <Compile Include="Model\Blocks\BlockType.cs" />
     <Compile Include="Model\Blocks\BlockTypes.cs" />
+    <Compile Include="Model\Blocks\ReedBlock.cs" />
+    <Compile Include="Model\Blocks\ReedBlockType.cs" />
+    <Compile Include="Model\Blocks\GrassBlockType.cs" />
+    <Compile Include="Model\Blocks\IStandardRenderableBlock.cs" />
     <Compile Include="Model\Blocks\GrassBlock.cs" />
     <Compile Include="Model\Blocks\IBlockInWorld.cs" />
     <Compile Include="Model\Blocks\StandardBlock.cs" />
@@ -127,7 +131,6 @@
     </Compile>
     <Compile Include="View\BlockRenderers\BlockRendererRegistry.cs" />
     <Compile Include="View\BlockRenderers\BlockRenderer.cs" />
-    <Compile Include="View\BlockRenderers\GrassBlockRenderer.cs" />
     <Compile Include="View\BlockRenderers\StandardBlockRenderer.cs" />
     <Compile Include="View\BlockRenderers\StructuralBlockRenderer.cs" />
     <Compile Include="View\BlueprintList.xaml.cs">
@@ -269,6 +272,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Assets\Images\Blocks\DirtWithGrass.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Images\Blocks\Reed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
