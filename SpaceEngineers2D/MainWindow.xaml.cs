@@ -38,8 +38,32 @@ namespace SpaceEngineers2D
                 {
                     if (y == 0)
                     {
-                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.Grass.InstantiateBlock());
+                        if (_random.Next(0, 100) < 80)
+                            grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.Grass.InstantiateBlock());
+
                         continue;
+                    }
+
+                    if (y == 1)
+                    {
+                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.DirtWithGrass.InstantiateBlock());
+                        continue;
+                    }
+
+                    if (y == 2 || (y == 3 && _random.Next(0, 100) < 50))
+                    {
+                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.Dirt.InstantiateBlock());
+                        continue;
+                    }
+
+                    if (y == 4  && _random.Next(0, 100) < 50)
+                    {
+                        var topBlock = grid.GetBlock(new IntVector(x, y - 1) * Constants.PhysicsUnit);
+                        if (topBlock.Object.BlockType == World.BlockTypes.Dirt)
+                        {
+                            grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.Dirt.InstantiateBlock());
+                            continue;
+                        }
                     }
 
                     if (_random.Next(0, 100) < 5)

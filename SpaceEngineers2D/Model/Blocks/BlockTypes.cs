@@ -15,23 +15,43 @@ namespace SpaceEngineers2D.Model.Blocks
     {
         public readonly StandardBlockType Rock;
 
+        public readonly StandardBlockType Dirt;
+
+        public readonly StandardBlockType DirtWithGrass;
+
         public readonly StandardBlockType IronOreDeposit;
 
         public readonly StandardBlockType CoalDeposit;
+
+        public readonly StandardBlockType Grass;
 
         public readonly StructuralBlockType Concrete;
 
         public readonly StructuralBlockType IronPlate;
 
         public readonly BlastFurnaceBlockType BlastFurnace;
-
-        public readonly StandardBlockType Grass;
-
+        
         public BlockTypes(ItemTypes itemTypes)
         {
             Rock = new StandardBlockType(
                 name: "Rock",
                 image: LoadImage("Blocks\\Rock"),
+                droppedItems: new Dictionary<StandardItemType, int>
+                {
+                    { itemTypes.Rock, 1 }
+                });
+
+            Dirt = new StandardBlockType(
+                name: "Dirt",
+                image: LoadImage("Blocks\\Dirt"),
+                droppedItems: new Dictionary<StandardItemType, int>
+                {
+                    { itemTypes.Rock, 1 }
+                });
+
+            DirtWithGrass = new StandardBlockType(
+                name: "DirtWithGrass",
+                image: LoadImage("Blocks\\DirtWithGrass"),
                 droppedItems: new Dictionary<StandardItemType, int>
                 {
                     { itemTypes.Rock, 1 }
@@ -52,6 +72,12 @@ namespace SpaceEngineers2D.Model.Blocks
                 {
                     { itemTypes.Coal, 1 }
                 });
+
+            Grass = new StandardBlockType(
+                name: "Grass",
+                image: LoadImage("Blocks\\Grass"),
+                droppedItems: new Dictionary<StandardItemType, int>(),
+                isSolid: false);
 
             Concrete = new StructuralBlockType(
                 name: "Concrete Block",
@@ -77,12 +103,6 @@ namespace SpaceEngineers2D.Model.Blocks
                 {
                     new BlockBlueprintComponent(1, itemTypes.Rock, 10f)
                 }));
-
-            Grass = new StandardBlockType(
-                name: "Grass",
-                image: LoadImage("Blocks\\Grass"),
-                droppedItems: new Dictionary<StandardItemType, int>(),
-                isSolid: false);
         }
 
         private static ImageSource LoadImage(string file)
