@@ -30,7 +30,7 @@ namespace SpaceEngineers2D.Model
 
         public IntVector Position { get; set; }
 
-        public IntVector Size { get; set; } = new IntVector(400, 1600);
+        public IntVector Size { get; set; } = new IntVector(800, 1800);
 
         public IntRectangle Bounds => IntRectangle.FromPositionAndSize(Position, Size);
 

@@ -1,7 +1,10 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using SpaceEngineers2D.Geometry;
 using SpaceEngineers2D.Model;
@@ -32,9 +35,13 @@ namespace SpaceEngineers2D.View
 
         private readonly BlockRendererRegistry _blockRendererRegistry = new BlockRendererRegistry();
 
+        private ImageSource _playerImage;
+
         public WorldRenderer()
         {
             InitializeComponent();
+
+            _playerImage = LoadImage("Player");
 
             _blockRendererRegistry.Add<IStandardRenderableBlock, IStandardRenderableBlock>(new StandardBlockRenderer());
             _blockRendererRegistry.Add<StructuralBlock, StructuralBlock>(new StructuralBlockRenderer());
@@ -79,11 +86,7 @@ namespace SpaceEngineers2D.View
 
         private void RenderPlayer(DrawingContext dc)
         {
-            SolidColorBrush brush = new SolidColorBrush();
-            brush.Color = Colors.OrangeRed;
-            Pen pen = new Pen(Brushes.DarkRed, 0);
-
-            dc.DrawRectangle(brush, pen, Parameters.World.Camera.CastRectangle(Parameters.World.Player.Bounds).ToWindowsRect());
+            dc.DrawImage(_playerImage, Parameters.World.Camera.CastRectangle(Parameters.World.Player.Bounds).ToWindowsRect());
         }
 
         private void RenderHoveredBlockEffect(DrawingContext dc)
@@ -167,6 +170,12 @@ namespace SpaceEngineers2D.View
         private IntVector GetViewport()
         {
             return new IntVector((int)ActualWidth, (int)ActualHeight);
+        }
+
+        private static ImageSource LoadImage(string file)
+        {
+            var x = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            return new BitmapImage(new Uri(x + "\\Assets\\Images\\" + file + ".png"));
         }
     }
 }
