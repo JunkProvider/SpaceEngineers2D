@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="SpaceEngineers2D.View.Inventory.InventorySlotView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:SpaceEngineers2D.View.Inventory"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=local:InventorySlotViewModel}"
+             d:DesignHeight="100"
+             d:DesignWidth="100">
+    <Border Width="60"
+            Height="60"
+            Margin="5 0 5 0"
+            Background="#40FFFFFF"
+            BorderThickness="1"
+            BorderBrush="#80FFFFFF"
+            MouseDown="OnMouseDown">
+        <Grid ToolTip="{Binding Slot.ItemStack.Item.Name}">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Setters>
+                        <Setter Property="Visibility" Value="Hidden" />
+                    </Style.Setters>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Slot.ContainsItem}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Image HorizontalAlignment="Stretch"
+                   VerticalAlignment="Stretch"
+                   Source="{Binding Slot.ItemStack.Item.Icon}" />
+            <Border Background="Black"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom">
+                <TextBlock HorizontalAlignment="Left"
+                           VerticalAlignment="Bottom"
+                           Foreground="White"
+                           FontSize="20"
+                           Margin="5 0 5 0"
+                           Text="{Binding Slot.ItemStack.Size}" />
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

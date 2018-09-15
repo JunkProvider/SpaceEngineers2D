@@ -10,7 +10,7 @@ namespace SpaceEngineers2D.Controllers
     public class WorldRendererController
     {
         private const double PlayerRange = 2;
-
+        
         private IntVector _mousePosition;
 
         private int _activity = 0;
@@ -63,6 +63,29 @@ namespace SpaceEngineers2D.Controllers
             if (_activity == 2)
             {
                 _activity = 0;
+            }
+        }
+
+        public void OnInteraction()
+        {
+            var oldInteractingBlock = Player.InteractingBlock;
+
+            if (oldInteractingBlock != null)
+            {
+                oldInteractingBlock.Object.OnInteractionEnded();
+                Player.InteractingBlock = null;
+            }
+
+            if (Player.TargetBlock == null || oldInteractingBlock?.Object == Player.TargetBlock.Object)
+            {
+                return;
+            }
+
+            var interactionResult = Player.TargetBlock.Object.OnInteraction(new Block.OnInteractionContext(World, Player.TargetBlock.Bounds));
+
+            if (interactionResult == Block.InteractionResult.Continuing)
+            {
+                Player.InteractingBlock = Player.TargetBlock;
             }
         }
 

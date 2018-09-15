@@ -19,7 +19,7 @@ namespace SpaceEngineers2D.Model.Blocks
             Blueprint = blueprint;
         }
 
-        public StructuralBlock InstantiateBlock()
+        public virtual StructuralBlock InstantiateBlock()
         {
             return new StructuralBlock(this);
         }

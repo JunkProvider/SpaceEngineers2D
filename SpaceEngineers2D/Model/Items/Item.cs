@@ -30,5 +30,12 @@ namespace SpaceEngineers2D.Model.Items
             if (obj.GetType() != GetType()) return false;
             return Equals((Item)obj);
         }
+
+        public abstract override int GetHashCode();
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

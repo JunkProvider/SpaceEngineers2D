@@ -11,7 +11,7 @@
         Title="MainWindow" Width="1280" Height="800"
         KeyDown="MainWindow_OnKeyDown"
         KeyUp="MainWindow_OnKeyUp">
-    <Grid>
+    <Grid MouseMove="OnMouseMove">
         <Grid.Background>
             <ImageBrush ImageSource="/Assets/Images/background.jpg" Stretch="UniformToFill"/>
         </Grid.Background>
@@ -19,13 +19,30 @@
                             VerticalAlignment="Stretch"
                             Background="Transparent"
                             Parameters="{Binding WorldRendererParameters}" />
-        <StackPanel>
-            <viewInventory:InventoryView HorizontalAlignment="Left"
-                                         Margin="10"
-                                         DataContext="{Binding World.Player.Inventory}" />
-            <view:BlueprintList HorizontalAlignment="Left"
-                                Margin="10"
-                                DataContext="{Binding World.Player}" />
-        </StackPanel>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0">
+                <viewInventory:InventoryView HorizontalAlignment="Left"
+                                             Margin="10"
+                                             DataContext="{Binding ApplicationViewModel.PlayerInventoryViewModel}" />
+                <view:BlueprintList HorizontalAlignment="Left"
+                                    Margin="10"
+                                    DataContext="{Binding World.Player}" />
+
+            </StackPanel>
+            <ContentControl Grid.Row="1" Content="{Binding ApplicationViewModel.InteractingBlockViewModel}">
+                <ContentControl.Resources>
+                    <DataTemplate DataType="{x:Type view:BlastFurnaceViewModel}">
+                        <view:BlastFurnaceView />
+                    </DataTemplate>
+                </ContentControl.Resources>
+            </ContentControl>
+        </Grid>
+        <viewInventory:ItemDragCanvas HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Stretch"
+                                      DataContext="{Binding ApplicationViewModel.World.Player.HandInventorySlot}" />
     </Grid>
 </Window>

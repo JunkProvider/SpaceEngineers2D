@@ -1,10 +1,6 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using SpaceEngineers2D.Annotations;
-
-namespace SpaceEngineers2D.Model.Items
+﻿namespace SpaceEngineers2D.Model.Items
 {
-    public class ItemStack : INotifyPropertyChanged
+    public class ItemStack
     {
         public static ItemStack Combine(ItemStack a, ItemStack b)
         {
@@ -18,28 +14,10 @@ namespace SpaceEngineers2D.Model.Items
 
             return b;
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private int _size;
-
+        
         public Item Item { get; }
         
-        public int Size
-        {
-            get => _size;
-            set
-            {
-                if (value == _size)
-                    return;
-
-                _size = value;
-
-                RaisePropertyChanged(nameof(Size));
-                RaisePropertyChanged(nameof(Mass));
-                RaisePropertyChanged(nameof(Volume));
-            }
-        }
+        public int Size { get; }
 
         public float Mass => Item.Mass * Size;
 
@@ -48,7 +26,6 @@ namespace SpaceEngineers2D.Model.Items
         public ItemStack(Item item)
             : this(item, 1)
         {
-            
         }
 
         public ItemStack(Item item, int size)
@@ -57,10 +34,9 @@ namespace SpaceEngineers2D.Model.Items
             Size = size;
         }
 
-        [NotifyPropertyChangedInvocator]
-        private void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        public override string ToString()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            return Size + " " + Item;
         }
     }
 }

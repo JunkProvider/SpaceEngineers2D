@@ -55,11 +55,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="View\BlastFurnaceView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\BlueprintList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\Inventory\InventorySlotView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Inventory\InventoryView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Inventory\ItemDragCanvas.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -85,6 +97,8 @@
     <Compile Include="Model\BlockBlueprints\BlockComponentData.cs" />
     <Compile Include="Model\BlockBlueprints\BlockBlueprintState.cs" />
     <Compile Include="Model\BlockCoords.cs" />
+    <Compile Include="Model\Blocks\BlastFurnaceBlock.cs" />
+    <Compile Include="Model\Blocks\BlastFurnaceBlockType.cs" />
     <Compile Include="Model\Blocks\BlockInWorld.cs" />
     <Compile Include="Model\Blocks\BlockType.cs" />
     <Compile Include="Model\Blocks\BlockTypes.cs" />
@@ -108,6 +122,10 @@
     <Compile Include="Model\MobileItem.cs" />
     <Compile Include="Physics\PhysicsEngine.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="View\ApplicationViewModel.cs" />
+    <Compile Include="View\BlastFurnaceView.xaml.cs">
+      <DependentUpon>BlastFurnaceView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\BlockRenderers\BlockRendererRegistry.cs" />
     <Compile Include="View\BlockRenderers\BlockRenderer.cs" />
     <Compile Include="View\BlockRenderers\GrassBlockRenderer.cs" />
@@ -116,9 +134,19 @@
     <Compile Include="View\BlueprintList.xaml.cs">
       <DependentUpon>BlueprintList.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\Inventory\InventorySlotView.xaml.cs">
+      <DependentUpon>InventorySlotView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Inventory\InventorySlotViewModel.cs" />
     <Compile Include="View\Inventory\InventoryView.xaml.cs">
       <DependentUpon>InventoryView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\Inventory\InventoryViewModel.cs" />
+    <Compile Include="View\Inventory\ItemDragCanvas.xaml.cs">
+      <DependentUpon>ItemDragCanvas.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Inventory\PropertyObservable.cs" />
+    <Compile Include="View\MousePositionProvider.cs" />
     <Compile Include="View\WorldRendererParameters.cs" />
     <Compile Include="View\WorldRenderer.xaml.cs">
       <DependentUpon>WorldRenderer.xaml</DependentUpon>
@@ -224,6 +252,11 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\Images\Blocks\IronPlate.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Images\Blocks\BlastFurnace.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

@@ -4,10 +4,8 @@ using System.Windows.Input;
 using SpaceEngineers2D.Controllers;
 using SpaceEngineers2D.Geometry;
 using SpaceEngineers2D.Model;
-using SpaceEngineers2D.Model.Blocks;
 using SpaceEngineers2D.Physics;
 using SpaceEngineers2D.View;
-using SpaceEngineers2D.View.Inventory;
 
 namespace SpaceEngineers2D
 {
@@ -20,7 +18,14 @@ namespace SpaceEngineers2D
 
         public WorldRendererParameters WorldRendererParameters { get; }
 
-        private Random _random = new Random();
+        public ApplicationViewModel ApplicationViewModel { get; }
+
+        private readonly Random _random = new Random();
+
+        const Key LeftKey = Key.A;
+        const Key RightKey = Key.D;
+        const Key UpKey = Key.W;
+        const Key DownKey = Key.S;
 
         public MainWindow()
         {
@@ -53,6 +58,10 @@ namespace SpaceEngineers2D
                 }
             }
 
+            var blastFurnace = World.BlockTypes.BlastFurnace.InstantiateBlock();
+            blastFurnace.BlueprintState.FinishImmediately();
+            grid.SetBlock(new IntVector(-2, 0) * Constants.PhysicsUnit, blastFurnace);
+
             World.Grids.Add(grid);
 
             World.Player.BlueprintSlots[0].BlueprintedBlock = World.BlockTypes.Concrete;
@@ -60,8 +69,10 @@ namespace SpaceEngineers2D
 
             WorldRendererParameters = new WorldRendererParameters(World, new WorldRendererController(World));
 
-            DataContext = this;
+            ApplicationViewModel = new ApplicationViewModel(World);
 
+            DataContext = this;
+            
             InitializeComponent();
         }
 
@@ -72,17 +83,23 @@ namespace SpaceEngineers2D
 
             switch (e.Key)
             {
-                case Key.Left:
+                case LeftKey:
                     World.Player.MovementOrders[Side.Left] = true;
                     break;
-                case Key.Right:
+                case RightKey:
                     World.Player.MovementOrders[Side.Right] = true;
                     break;
-                case Key.Up:
+                case UpKey:
                     World.Player.MovementOrders[Side.Top] = true;
                     break;
-                case Key.Down:
+                case DownKey:
                     World.Player.MovementOrders[Side.Bottom] = true;
+                    break;
+                case Key.Space:
+                    PickUpClosestItem();
+                    break;
+                case Key.E:
+                    Dispatch.Exec(WorldRendererParameters.Controller.OnInteraction);
                     break;
             }
         }
@@ -91,20 +108,17 @@ namespace SpaceEngineers2D
         {
             switch (e.Key)
             {
-                case Key.Left:
+                case LeftKey:
                     World.Player.MovementOrders[Side.Left] = false;
                     break;
-                case Key.Right:
+                case RightKey:
                     World.Player.MovementOrders[Side.Right] = false;
                     break;
-                case Key.Up:
+                case UpKey:
                     World.Player.MovementOrders[Side.Top] = false;
                     break;
-                case Key.Down:
+                case DownKey:
                     World.Player.MovementOrders[Side.Bottom] = false;
-                    break;
-                case Key.Space:
-                    PickUpClosestItem();
                     break;
             }
         }
@@ -142,6 +156,11 @@ namespace SpaceEngineers2D
             }
 
             return closestItem;
+        }
+
+        private void OnMouseMove(object sender, MouseEventArgs e)
+        {
+            MousePositionProvider.Instance.AbsoluteMousePosition = Mouse.GetPosition(this);
         }
     }
 }

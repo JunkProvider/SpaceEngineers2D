@@ -7,12 +7,15 @@
 
     public class Inventory
     {
-        public List<InventorySlot> Slots { get; } = new List<InventorySlot>
+        public List<InventorySlot> Slots { get; } = new List<InventorySlot>();
+
+        public Inventory(int slotCount)
         {
-            new InventorySlot(), new InventorySlot(), new InventorySlot(),
-            new InventorySlot(), new InventorySlot(), new InventorySlot(),
-            new InventorySlot(), new InventorySlot(), new InventorySlot()
-        };
+            for (var i = 0; i < slotCount; i++)
+            {
+                this.Slots.Add(new InventorySlot());
+            }
+        }
 
         public bool TryTakeNOfType(ItemType itemType, int n, out ItemStack stack)
         {
@@ -31,14 +34,9 @@
 
         public void Put(ItemStack itemStack)
         {
-            if (itemStack.Size == 0)
-                throw new InvalidOperationException();
-
             foreach (var slot in Slots)
             {
-                slot.Put(itemStack);
-
-                if (itemStack.Size == 0)
+                if (slot.Put(itemStack))
                     break;
             }
         }

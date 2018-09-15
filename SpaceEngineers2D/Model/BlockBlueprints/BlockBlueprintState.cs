@@ -126,6 +126,16 @@
             } */
         }
 
+        public void FinishImmediately()
+        {
+            foreach (var component in _components)
+            {
+                component.ActualCount = component.RequiredCount;
+            }
+
+            Integrity = _blueprint.GetIntegrityValueSum();
+        }
+
         public ICollection<ItemStack> GetDroppedItems()
         {
             return _components

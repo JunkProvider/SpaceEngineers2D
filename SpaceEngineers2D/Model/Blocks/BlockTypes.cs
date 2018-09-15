@@ -23,6 +23,8 @@ namespace SpaceEngineers2D.Model.Blocks
 
         public readonly StructuralBlockType IronPlate;
 
+        public readonly BlastFurnaceBlockType BlastFurnace;
+
         public readonly GrassBlockType Grass;
 
         public BlockTypes(ItemTypes itemTypes)
@@ -66,6 +68,14 @@ namespace SpaceEngineers2D.Model.Blocks
                 blueprint: new BlockBlueprint(new List<BlockBlueprintComponent>
                 {
                     new BlockBlueprintComponent(1, itemTypes.Iron, 10f)
+                }));
+
+            BlastFurnace = new BlastFurnaceBlockType(
+                name: "Blast Furnace",
+                image: LoadImage("Blocks\\BlastFurnace"),
+                blueprint: new BlockBlueprint(new List<BlockBlueprintComponent>
+                {
+                    new BlockBlueprintComponent(1, itemTypes.Rock, 10f)
                 }));
 
             Grass = new GrassBlockType();

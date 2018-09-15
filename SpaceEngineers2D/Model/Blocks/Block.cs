@@ -26,5 +26,35 @@ namespace SpaceEngineers2D.Model.Blocks
         {
 
         }
+
+        public virtual InteractionResult OnInteraction(OnInteractionContext context)
+        {
+            return InteractionResult.None;
+        }
+
+        public virtual void OnInteractionEnded()
+        {
+
+        }
+
+        public class OnInteractionContext
+        {
+            public World World { get; }
+
+            public IntRectangle OwnBlockBounds { get; }
+
+            public OnInteractionContext( World world, IntRectangle ownBlockBounds)
+            {
+                World = world;
+                OwnBlockBounds = ownBlockBounds;
+            }
+        }
+
+        public enum InteractionResult
+        {
+            None,
+            Finished,
+            Continuing
+        }
     }
 }
