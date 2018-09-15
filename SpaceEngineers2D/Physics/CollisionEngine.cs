@@ -21,13 +21,16 @@
 
                 grid.ForEachWithin(extendedObjBounds, (block, blockPosition) =>
                 {
-                    var blockBounds = IntRectangle.FromPositionAndSize(
-                        blockPosition,
-                        IntVector.RightBottom * Constants.PhysicsUnit);
-
-                    if (objBounds.TryGetTouchedSide(blockBounds, out var touchedSide))
+                    if (block.IsSolid)
                     {
-                        obj.TouchedBlocks[touchedSide].Add(block);
+                        var blockBounds = IntRectangle.FromPositionAndSize(
+                            blockPosition,
+                            IntVector.RightBottom * Constants.PhysicsUnit);
+
+                        if (objBounds.TryGetTouchedSide(blockBounds, out var touchedSide))
+                        {
+                            obj.TouchedBlocks[touchedSide].Add(block);
+                        }
                     }
                 });
             }
