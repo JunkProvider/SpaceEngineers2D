@@ -25,7 +25,7 @@ namespace SpaceEngineers2D.Model.Blocks
 
         public readonly BlastFurnaceBlockType BlastFurnace;
 
-        public readonly GrassBlockType Grass;
+        public readonly StandardBlockType Grass;
 
         public BlockTypes(ItemTypes itemTypes)
         {
@@ -78,7 +78,11 @@ namespace SpaceEngineers2D.Model.Blocks
                     new BlockBlueprintComponent(1, itemTypes.Rock, 10f)
                 }));
 
-            Grass = new GrassBlockType();
+            Grass = new StandardBlockType(
+                name: "Grass",
+                image: LoadImage("Blocks\\Grass"),
+                droppedItems: new Dictionary<StandardItemType, int>(),
+                isSolid: false);
         }
 
         private static ImageSource LoadImage(string file)

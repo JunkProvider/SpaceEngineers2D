@@ -12,7 +12,7 @@ namespace SpaceEngineers2D.Model.Blocks
     {
         public StandardBlockType StandardBlockType => (StandardBlockType)BlockType;
 
-        public override bool IsSolid => true;
+        public override bool IsSolid => StandardBlockType.IsSolid;
 
         public ImageSource Image => StandardBlockType.Image;
 
