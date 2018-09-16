@@ -1,20 +1,30 @@
-﻿using System.Windows.Media;
+﻿using System.Collections.Generic;
+using System.Windows.Media;
+using SpaceEngineers2D.Persistence;
 
 namespace SpaceEngineers2D.Model.Blocks
 {
-    public class ReedBlockType : BlockType
+    public sealed class ReedBlockType : BlockType<ReedBlock>
     {
-        public override string Name { get; }
-
         public ImageSource Image { get; }
 
-        public ReedBlockType(string name, ImageSource image)
+        public ReedBlockType(int id, string name, ImageSource image)
+            : base(id, name)
         {
-            Name = name;
             Image = image;
         }
 
         public ReedBlock InstantiateBlock()
+        {
+            return new ReedBlock(this);
+        }
+
+        public override void Save(Serializer serializer, ReedBlock block, DictionaryAccess data)
+        {
+            base.Save(serializer, block, data);
+        }
+
+        public override Block Load(Deserializer deserializer, DictionaryAccess data)
         {
             return new ReedBlock(this);
         }

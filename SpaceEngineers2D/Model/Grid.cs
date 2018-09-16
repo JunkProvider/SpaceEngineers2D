@@ -9,9 +9,16 @@
 
     public class Grid
     {
+        public int Id { get; }
+
         private IntVector Position { get; set; }
 
         private readonly BinaryGridRoot<Block> _root = new BinaryGridRoot<Block>();
+
+        public Grid(int id)
+        {
+            Id = id;
+        }
 
         public IntRectangle GetBlockBounds(IntVector position)
         {
@@ -39,6 +46,11 @@
                 (int)Math.Floor((double)position.X / Constants.PhysicsUnit),
                 (int)Math.Floor((double)position.Y / Constants.PhysicsUnit));
             return _root.Set(position, block).RemovedItem;
+        }
+
+        public void ForEach(EnumerateItemDelegate<Block> func)
+        {
+            _root.ForEach((block, blockPosition) => func(block, Position + blockPosition * Constants.PhysicsUnit));
         }
 
         public void ForEachWithin(IntRectangle rectangle, EnumerateItemDelegate<Block> func)

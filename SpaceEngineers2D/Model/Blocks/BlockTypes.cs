@@ -13,29 +13,32 @@ namespace SpaceEngineers2D.Model.Blocks
 
     public class BlockTypes
     {
-        public readonly StandardBlockType Rock;
+        private Dictionary<int, IBlockType> _blockTypeDictionary;
 
-        public readonly StandardBlockType Dirt;
+        public StandardBlockType Rock { get; }
 
-        public readonly StandardBlockType DirtWithGrass;
+        public StandardBlockType Dirt { get; }
 
-        public readonly StandardBlockType IronOreDeposit;
+        public StandardBlockType DirtWithGrass { get; }
 
-        public readonly StandardBlockType CoalDeposit;
+        public StandardBlockType IronOreDeposit { get; }
 
-        public readonly GrassBlockType Grass;
+        public StandardBlockType CoalDeposit { get; }
 
-        public readonly ReedBlockType Reed;
+        public GrassBlockType Grass { get; }
 
-        public readonly StructuralBlockType Concrete;
+        public ReedBlockType Reed { get; }
 
-        public readonly StructuralBlockType IronPlate;
+        public StructuralBlockType Concrete { get; }
 
-        public readonly BlastFurnaceBlockType BlastFurnace;
-        
+        public StructuralBlockType IronPlate { get; }
+
+        public BlastFurnaceBlockType BlastFurnace { get; }
+
         public BlockTypes(ItemTypes itemTypes)
         {
             Rock = new StandardBlockType(
+                id: 1,
                 name: "Rock",
                 image: LoadImage("Blocks\\Rock"),
                 droppedItems: new Dictionary<StandardItemType, int>
@@ -44,6 +47,7 @@ namespace SpaceEngineers2D.Model.Blocks
                 });
 
             Dirt = new StandardBlockType(
+                id: 2,
                 name: "Dirt",
                 image: LoadImage("Blocks\\Dirt"),
                 droppedItems: new Dictionary<StandardItemType, int>
@@ -52,6 +56,7 @@ namespace SpaceEngineers2D.Model.Blocks
                 });
 
             DirtWithGrass = new StandardBlockType(
+                id: 3,
                 name: "DirtWithGrass",
                 image: LoadImage("Blocks\\DirtWithGrass"),
                 droppedItems: new Dictionary<StandardItemType, int>
@@ -60,6 +65,7 @@ namespace SpaceEngineers2D.Model.Blocks
                 });
 
             IronOreDeposit = new StandardBlockType(
+                id: 4,
                 name: "Iron Ore Deposit",
                 image: LoadImage("Blocks\\IronOreDeposit"),
                 droppedItems: new Dictionary<StandardItemType, int>
@@ -68,6 +74,7 @@ namespace SpaceEngineers2D.Model.Blocks
                 });
 
             CoalDeposit = new StandardBlockType(
+                id: 5,
                 name: "Coal Deposit",
                 image: LoadImage("Blocks\\CoalDeposit"),
                 droppedItems: new Dictionary<StandardItemType, int>
@@ -76,23 +83,26 @@ namespace SpaceEngineers2D.Model.Blocks
                 });
 
             Grass = new GrassBlockType(
+                id: 6,
                 name: "Grass",
                 image: LoadImage("Blocks\\Grass"));
 
             Reed = new ReedBlockType(
+                id: 7,
                 name: "Reed",
                 image: LoadImage("Blocks\\Reed"));
 
             Concrete = new StructuralBlockType(
-                name: "Concrete Block",
+                id: 8,
+                name: "Stone Wall",
                 image: LoadImage("Blocks\\Concrete"),
                 blueprint: new BlockBlueprint(new List<BlockBlueprintComponent>
                 {
-                    new BlockBlueprintComponent(1, itemTypes.Rock, 10f),
-                    new BlockBlueprintComponent(1, itemTypes.Coal, 10f)
+                    new BlockBlueprintComponent(1, itemTypes.Rock, 10f)
                 }));
 
             IronPlate = new StructuralBlockType(
+                id: 9,
                 name: "Iron Plate",
                 image: LoadImage("Blocks\\IronPlate"),
                 blueprint: new BlockBlueprint(new List<BlockBlueprintComponent>
@@ -101,12 +111,41 @@ namespace SpaceEngineers2D.Model.Blocks
                 }));
 
             BlastFurnace = new BlastFurnaceBlockType(
+                id: 10,
                 name: "Blast Furnace",
                 image: LoadImage("Blocks\\BlastFurnace"),
                 blueprint: new BlockBlueprint(new List<BlockBlueprintComponent>
                 {
                     new BlockBlueprintComponent(1, itemTypes.Rock, 10f)
                 }));
+        }
+
+        public IBlockType GetBlockType(int id)
+        {
+            if (!GetBlockTypeDictionary().TryGetValue(id, out var blockType))
+            {
+                throw new ArgumentException($@"Can not find block type with id {id}.", nameof(id));
+            }
+
+            return blockType;
+        }
+
+        public IReadOnlyDictionary<int, IBlockType> GetBlockTypeDictionary()
+        {
+            if (_blockTypeDictionary == null)
+            {
+                _blockTypeDictionary = new Dictionary<int, IBlockType>();
+
+                foreach (var property in GetType().GetProperties())
+                {
+                    if (!(property.GetValue(this) is IBlockType blockType))
+                        throw new InvalidOperationException($"All of {nameof(ItemTypes)} must be of type {nameof(ItemType)}.");
+
+                    _blockTypeDictionary.Add(blockType.Id, blockType);
+                }
+            }
+
+            return _blockTypeDictionary;
         }
 
         private static ImageSource LoadImage(string file)

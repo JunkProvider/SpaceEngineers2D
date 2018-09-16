@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -100,7 +103,7 @@
     <Compile Include="Model\Blocks\BlastFurnaceBlock.cs" />
     <Compile Include="Model\Blocks\BlastFurnaceBlockType.cs" />
     <Compile Include="Model\Blocks\BlockInWorld.cs" />
-    <Compile Include="Model\Blocks\BlockType.cs" />
+    <Compile Include="Model\Blocks\IBlockType.cs" />
     <Compile Include="Model\Blocks\BlockTypes.cs" />
     <Compile Include="Model\Blocks\ReedBlock.cs" />
     <Compile Include="Model\Blocks\ReedBlockType.cs" />
@@ -123,6 +126,19 @@
     <Compile Include="Model\Items\StandardItem.cs" />
     <Compile Include="Model\Items\StandardItemType.cs" />
     <Compile Include="Model\MobileItem.cs" />
+    <Compile Include="Persistence\DataModel\BlockBlueprintStateData.cs" />
+    <Compile Include="Persistence\DataModel\BlockData.cs" />
+    <Compile Include="Persistence\Deserializer.cs" />
+    <Compile Include="Persistence\DictionaryAccess.cs" />
+    <Compile Include="Persistence\DataModel\GridData.cs" />
+    <Compile Include="Persistence\DataModel\InventoryData.cs" />
+    <Compile Include="Persistence\DataModel\InventorySlotData.cs" />
+    <Compile Include="Persistence\IDataModel.cs" />
+    <Compile Include="Persistence\DataModel\ItemData.cs" />
+    <Compile Include="Persistence\DataModel\ItemStackData.cs" />
+    <Compile Include="Persistence\DataModel\PlayerData.cs" />
+    <Compile Include="Persistence\Serializer.cs" />
+    <Compile Include="Persistence\DataModel\WorldData.cs" />
     <Compile Include="Physics\PhysicsEngine.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="View\ApplicationViewModel.cs" />
@@ -194,6 +210,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -285,5 +302,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

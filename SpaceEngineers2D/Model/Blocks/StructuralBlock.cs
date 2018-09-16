@@ -12,7 +12,7 @@
 
         public BlockBlueprintState BlueprintState { get; }
 
-        public StructuralBlockType StructuralBlockType => (StructuralBlockType)BlockType;
+        public IStructuralBlockType StructuralBlockType { get; }
 
         public bool Finished => BlueprintState.Finished;
 
@@ -20,9 +20,10 @@
 
         public override bool IsDestoryed => BlueprintState.Integrity <= 0;
 
-        public StructuralBlock(StructuralBlockType blockType)
+        public StructuralBlock(IStructuralBlockType blockType)
             : base(blockType)
         {
+            StructuralBlockType = blockType;
             BlueprintState = new BlockBlueprintState(blockType.Blueprint);
         }
 

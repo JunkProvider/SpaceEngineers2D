@@ -4,8 +4,8 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    using SpaceEngineers2D.Model.Inventories;
-    using SpaceEngineers2D.Model.Items;
+    using Inventories;
+    using Items;
 
     public class BlockBlueprintState
     {
@@ -13,13 +13,13 @@
 
         private readonly List<BlockBlueprintComponentState> _components;
 
-        public float Integrity { get; private set; }
+        public double Integrity { get; private set; }
 
-        public float IntegrityRatio => Integrity / _blueprint.GetIntegrityValueSum();
+        public double IntegrityRatio => Integrity / _blueprint.GetIntegrityValueSum();
 
-        public float IntegrityCap => GetIntegrityCap();
+        public double IntegrityCap => GetIntegrityCap();
 
-        public float IntegrityCapRatio => IntegrityCap / _blueprint.GetIntegrityValueSum();
+        public double IntegrityCapRatio => IntegrityCap / _blueprint.GetIntegrityValueSum();
 
         public bool Finished => Integrity >= _blueprint.GetIntegrityValueSum();
 
@@ -27,6 +27,11 @@
         {
             _blueprint = blueprint;
             _components = blueprint.Components.Select(c => new BlockBlueprintComponentState(c)).ToList();
+        }
+
+        public IReadOnlyList<BlockBlueprintComponentState> GetComponents()
+        {
+            return _components;
         }
 
         public void PutItem(Item item)
@@ -46,7 +51,27 @@
             throw new ArgumentException();
         }
 
-        public bool Weld(Inventory inventory, float integrityIncrease)
+        public void PutItem(StandardItemType itemType, int count)
+        {
+            foreach (var component in _components)
+            {
+                if (component.Complete)
+                    continue;
+
+                if (component.ItemType != itemType)
+                    continue;
+
+                var countToTransfere = Math.Min(component.RemainingCount, count);
+                count -= countToTransfere;
+
+                component.ActualCount += countToTransfere;
+
+                if (count == 0)
+                    return;
+            }
+        }
+
+        public bool Weld(Inventory inventory, double integrityIncrease)
         {
             foreach (var component in _components)
             {
@@ -57,6 +82,19 @@
                     component.ActualCount += stack.Size;
             }
 
+            var maxIntegrity = GetIntegrityCap();
+
+            if (Integrity >= maxIntegrity)
+            {
+                return false;
+            }
+
+            Integrity = Math.Min(maxIntegrity, Integrity + integrityIncrease);
+            return true;
+        }
+
+        public bool Weld(double integrityIncrease)
+        {
             var maxIntegrity = GetIntegrityCap();
 
             if (Integrity >= maxIntegrity)
@@ -140,11 +178,11 @@
         {
             return _components
                 .Where(c => c.ActualCount > 0)
-                .Select(c => new ItemStack(c.ItemType.InstantiateItem(), c.ActualCount))
+                .Select(c => new ItemStack(c.ItemType.Instantiate(), c.ActualCount))
                 .ToList();
         }
 
-        private float GetIntegrityCap()
+        private double GetIntegrityCap()
         {
             return _components.Sum(c => c.ActualIntegrityValue);
         }

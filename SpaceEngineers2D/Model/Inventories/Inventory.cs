@@ -13,7 +13,7 @@
         {
             for (var i = 0; i < slotCount; i++)
             {
-                this.Slots.Add(new InventorySlot());
+                Slots.Add(new InventorySlot(i));
             }
         }
 

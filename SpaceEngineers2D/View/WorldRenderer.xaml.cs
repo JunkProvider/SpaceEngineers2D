@@ -93,7 +93,7 @@ namespace SpaceEngineers2D.View
         {
             var player = Parameters.World.Player;
 
-            SolidColorBrush brush = new SolidColorBrush();
+            var brush = new SolidColorBrush();
             brush.Color = Colors.Transparent;
 
             var strokeColor = player.TargetBlockCoordsInRange ? Colors.SteelBlue : Colors.AliceBlue;

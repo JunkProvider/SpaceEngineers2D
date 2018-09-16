@@ -22,7 +22,7 @@ namespace SpaceEngineers2D.Model
 
         public Inventory Inventory { get; } = new Inventory(9);
 
-        public InventorySlot HandInventorySlot { get; } = new InventorySlot();
+        public InventorySlot HandInventorySlot { get; } = new InventorySlot(0);
 
         public List<BlockBlueprintSlot> BlueprintSlots { get; } = new List<BlockBlueprintSlot> { new BlockBlueprintSlot(Key.NumPad1), new BlockBlueprintSlot(Key.NumPad2), new BlockBlueprintSlot(Key.NumPad3) };
 

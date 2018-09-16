@@ -1,7 +1,5 @@
 ﻿namespace SpaceEngineers2D.Geometry.BinaryGrid
 {
-    using System.Windows;
-
     public class BinaryGridRoot<T> : BinaryGridBranch<T>
     {
         public IntVector Offset { get; set; }
@@ -39,6 +37,11 @@
             }
 
             return base.Set(position, item, result);
+        }
+
+        public void ForEach(EnumerateItemDelegate<T> func)
+        {
+            base.ForEachWithin(new IntRectangle(0, 0, Size, Size), (block, coords) => func(block, coords + Offset));
         }
 
         public override void ForEachWithin(IntRectangle rectangle, EnumerateItemDelegate<T> func)

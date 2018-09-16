@@ -7,13 +7,13 @@ namespace SpaceEngineers2D.Model.Blocks
 
     public abstract class Block
     {
-        public BlockType BlockType { get; }
+        public IBlockType BlockType { get; }
 
         public abstract bool IsSolid { get; }
 
         public abstract bool IsDestoryed { get; }
 
-        protected Block(BlockType blockType)
+        protected Block(IBlockType blockType)
         {
             BlockType = blockType;
         }

@@ -29,9 +29,16 @@ namespace SpaceEngineers2D.Model.Inventories
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public int Id { get; }
+
         public bool ContainsItem => ItemStack != null;
 
         public ItemStack ItemStack { get; private set; }
+
+        public InventorySlot(int id)
+        {
+            Id = id;
+        }
 
         public ItemStack ReplaceOrCombine(ItemStack itemStack)
         {
@@ -67,7 +74,7 @@ namespace SpaceEngineers2D.Model.Inventories
             var returnedStack = new ItemStack(ItemStack.Item.Clone(), Math.Min(ItemStack.Size, n));
             var remainingStackSize = ItemStack.Size - returnedStack.Size;
 
-            if (ItemStack.Size == 0)
+            if (remainingStackSize == 0)
             {
                 ItemStack = null;
             }

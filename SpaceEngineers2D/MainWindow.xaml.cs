@@ -1,9 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Xml.Serialization;
+using Newtonsoft.Json;
 using SpaceEngineers2D.Controllers;
 using SpaceEngineers2D.Geometry;
 using SpaceEngineers2D.Model;
+using SpaceEngineers2D.Persistence;
+using SpaceEngineers2D.Persistence.DataModel;
 using SpaceEngineers2D.Physics;
 using SpaceEngineers2D.View;
 
@@ -14,6 +21,8 @@ namespace SpaceEngineers2D
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const string SaveFilePath = "C:\\Users\\junkP\\Desktop\\tmp\\SpaceEngineers2D.json";
+
         public World World { get; }
 
         public WorldRendererParameters WorldRendererParameters { get; }
@@ -29,9 +38,33 @@ namespace SpaceEngineers2D
 
         public MainWindow()
         {
+            var dict = new Dictionary<string, object>();
+
+            //return;
             World = new World(new Player { Position = new IntVector(0, -1600) }, new Camera { Zoom = 0.05f });
 
-            var grid = new Grid();
+            var grid = new Grid(0);
+            World.Grids.Add(grid);
+
+            if (!TryLoad())
+            {
+                CreateEnvironment(grid);
+            }
+
+            World.Player.BlueprintSlots[0].BlueprintedBlock = World.BlockTypes.Concrete;
+            World.Player.BlueprintSlots[1].BlueprintedBlock = World.BlockTypes.IronPlate;
+
+            WorldRendererParameters = new WorldRendererParameters(World, new WorldRendererController(World));
+
+            ApplicationViewModel = new ApplicationViewModel(World);
+
+            DataContext = this;
+            
+            InitializeComponent();
+        }
+
+        private void CreateEnvironment(Grid grid)
+        {
             for (var x = -100; x < 100; x++)
             {
                 for (var y = 0; y < 50; y++)
@@ -39,46 +72,49 @@ namespace SpaceEngineers2D
                     if (y == 0)
                     {
                         if (_random.Next(0, 100) < 80)
-                            grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.Grass.InstantiateBlock());
+                            grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit,
+                                World.BlockTypes.Grass.InstantiateBlock());
 
                         continue;
                     }
 
                     if (y == 1)
                     {
-                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.DirtWithGrass.InstantiateBlock());
+                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit,
+                            World.BlockTypes.DirtWithGrass.Instantiate());
                         continue;
                     }
 
                     if (y == 2 || (y == 3 && _random.Next(0, 100) < 50))
                     {
-                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.Dirt.InstantiateBlock());
+                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.Dirt.Instantiate());
                         continue;
                     }
 
-                    if (y == 4  && _random.Next(0, 100) < 50)
+                    if (y == 4 && _random.Next(0, 100) < 50)
                     {
                         var topBlock = grid.GetBlock(new IntVector(x, y - 1) * Constants.PhysicsUnit);
                         if (topBlock.Object.BlockType == World.BlockTypes.Dirt)
                         {
-                            grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.Dirt.InstantiateBlock());
+                            grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.Dirt.Instantiate());
                             continue;
                         }
                     }
 
                     if (_random.Next(0, 100) < 5)
                     {
-                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.IronOreDeposit.InstantiateBlock());
+                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit,
+                            World.BlockTypes.IronOreDeposit.Instantiate());
                         continue;
                     }
 
                     if (_random.Next(0, 100) < 5)
                     {
-                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.CoalDeposit.InstantiateBlock());
+                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.CoalDeposit.Instantiate());
                         continue;
                     }
 
-                    grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.Rock.InstantiateBlock());
+                    grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, World.BlockTypes.Rock.Instantiate());
                 }
             }
 
@@ -95,22 +131,50 @@ namespace SpaceEngineers2D
                 }
             }
 
-            var blastFurnace = World.BlockTypes.BlastFurnace.InstantiateBlock();
+            var blastFurnace = World.BlockTypes.BlastFurnace.Instantiate();
             blastFurnace.BlueprintState.FinishImmediately();
             grid.SetBlock(new IntVector(-2, 0) * Constants.PhysicsUnit, blastFurnace);
+        }
 
-            World.Grids.Add(grid);
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
 
-            World.Player.BlueprintSlots[0].BlueprintedBlock = World.BlockTypes.Concrete;
-            World.Player.BlueprintSlots[1].BlueprintedBlock = World.BlockTypes.IronPlate;
+            Save();
+        }
 
-            WorldRendererParameters = new WorldRendererParameters(World, new WorldRendererController(World));
+        private bool TryLoad()
+        {
+            if (!File.Exists(SaveFilePath))
+            {
+                return false;
+            }
 
-            ApplicationViewModel = new ApplicationViewModel(World);
+            var json = File.ReadAllText(SaveFilePath);
 
-            DataContext = this;
-            
-            InitializeComponent();
+            var data = JsonConvert.DeserializeObject<WorldData>(json, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.All
+            });
+
+            var deserializer = new Deserializer(World.BlockTypes, World.ItemTypes);
+            deserializer.MapWorld(World, data);
+
+            return true;
+        }
+
+        private void Save()
+        {
+            var serializer = new Serializer();
+            var data = serializer.MapWorld(World);
+
+            var json = JsonConvert.SerializeObject(data, new JsonSerializerSettings()
+            {
+                Formatting = Formatting.Indented,
+                TypeNameHandling = TypeNameHandling.All
+            });
+
+            File.WriteAllText(SaveFilePath, json);
         }
 
         private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)

@@ -1,8 +1,10 @@
-﻿using System.Windows.Media;
+﻿using System.Collections.Generic;
+using System.Windows.Media;
+using SpaceEngineers2D.Persistence;
 
 namespace SpaceEngineers2D.Model.Items
 {
-    public class StandardItemType : ItemType
+    public class StandardItemType : ItemType<StandardItem>
     {
         public float Mass { get; }
 
@@ -10,15 +12,20 @@ namespace SpaceEngineers2D.Model.Items
 
         public ImageSource Icon { get; }
 
-        public StandardItemType(string name, float mass, float volume, ImageSource icon)
-            : base(name)
+        public StandardItemType(int id, string name, float mass, float volume, ImageSource icon)
+            : base(id, name)
         {
             Mass = mass;
             Volume = volume;
             Icon = icon;
         }
 
-        public StandardItem InstantiateItem()
+        public StandardItem Instantiate()
+        {
+            return new StandardItem(this);
+        }
+
+        public override Item Load(DictionaryAccess data)
         {
             return new StandardItem(this);
         }

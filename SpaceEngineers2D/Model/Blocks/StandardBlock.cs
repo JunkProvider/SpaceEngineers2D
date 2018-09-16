@@ -16,7 +16,7 @@ namespace SpaceEngineers2D.Model.Blocks
 
         public ImageSource Image => StandardBlockType.Image;
 
-        public float Integrity { get; private set; }
+        public double Integrity { get; private set; }
 
         public override bool IsDestoryed => Integrity <= 0;
 
@@ -28,9 +28,15 @@ namespace SpaceEngineers2D.Model.Blocks
             Integrity = blockType.MaxIntegrity;
         }
 
+        public StandardBlock(StandardBlockType blockType, double integrity)
+            : base(blockType)
+        {
+            Integrity = integrity;
+        }
+
         public override ICollection<ItemStack> GetDroppedItems()
         {
-            return StandardBlockType.DroppedItems.Select(pair => new ItemStack(pair.Key.InstantiateItem(), pair.Value)).ToList();
+            return StandardBlockType.DroppedItems.Select(pair => new ItemStack(pair.Key.Instantiate(), pair.Value)).ToList();
         }
 
         public override void Damage(float damage)
