@@ -7,7 +7,7 @@ using SpaceEngineers2D.Physics;
 
 namespace SpaceEngineers2D.Controllers
 {
-    public class WorldRendererController
+    public class WorldController
     {
         private const double PlayerRange = 2;
         
@@ -19,7 +19,7 @@ namespace SpaceEngineers2D.Controllers
 
         private Player Player => World.Player;
 
-        public WorldRendererController(World world)
+        public WorldController(World world)
         {
             World = world;
         }

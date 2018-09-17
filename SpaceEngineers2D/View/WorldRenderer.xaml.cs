@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -14,28 +13,15 @@ using SpaceEngineers2D.View.BlockRenderers;
 
 namespace SpaceEngineers2D.View
 {
-    /// <summary>
-    /// Interaction logic for Canvas.xaml
-    /// </summary>
     public partial class WorldRenderer
     {
-
-        public static readonly DependencyProperty ParametersProperty = DependencyProperty.Register(
-            "Parameters", typeof(WorldRendererParameters),
-            typeof(WorldRenderer)
-        );
-
-        public WorldRendererParameters Parameters
-        {
-            get => (WorldRendererParameters)GetValue(ParametersProperty);
-            set => SetValue(ParametersProperty, value);
-        }
-
         private readonly PhysicsEngine _physicsEngine = new PhysicsEngine();
 
         private readonly BlockRendererRegistry _blockRendererRegistry = new BlockRendererRegistry();
 
-        private ImageSource _playerImage;
+        private readonly ImageSource _playerImage;
+
+        private ApplicationViewModel ApplicationViewModel => DataContext as ApplicationViewModel;
 
         public WorldRenderer()
         {
@@ -51,12 +37,12 @@ namespace SpaceEngineers2D.View
             timer.Start();
             timer.Tick += (sender, args) =>
                 {
-                    if (Parameters != null)
+                    if (ApplicationViewModel?.WorldController != null)
                     {
-                        var mousePosition = Parameters.World.Camera.UncastPosition(IntVector.FromWindowsPoint(Mouse.GetPosition(this)));
-                        Parameters.Controller.OnMouseMove(mousePosition);
-                        Parameters.Controller.OnUpdate(timer.Interval);
-                        _physicsEngine.Update(Parameters.World, timer.Interval);
+                        var mousePosition = ApplicationViewModel.World.Camera.UncastPosition(IntVector.FromWindowsPoint(Mouse.GetPosition(this)));
+                        ApplicationViewModel.WorldController.OnMouseMove(mousePosition);
+                        ApplicationViewModel.WorldController.OnUpdate(timer.Interval);
+                        _physicsEngine.Update(ApplicationViewModel.World, timer.Interval);
                         InvalidateVisual();
                     }
                 };
@@ -66,14 +52,14 @@ namespace SpaceEngineers2D.View
         {
             base.OnRender(dc);
 
-            if (Parameters == null)
+            if (ApplicationViewModel?.WorldController == null)
                 return;
 
-            var camera = Parameters.World.Camera;
+            var camera = ApplicationViewModel.World.Camera;
             var viewport = GetViewport();
 
             camera.Viewport = viewport;
-            camera.Position = Parameters.World.Player.Position + IntVector.Up * Constants.PhysicsUnit;
+            camera.Position = ApplicationViewModel.World.Player.Position + IntVector.Up * Constants.PhysicsUnit;
 
             var visibleArea = camera.UncastRectangle(IntRectangle.FromPositionAndSize(IntVector.Zero, viewport))
                 .Extend(2 * Constants.PhysicsUnit);
@@ -86,12 +72,12 @@ namespace SpaceEngineers2D.View
 
         private void RenderPlayer(DrawingContext dc)
         {
-            dc.DrawImage(_playerImage, Parameters.World.Camera.CastRectangle(Parameters.World.Player.Bounds).ToWindowsRect());
+            dc.DrawImage(_playerImage, ApplicationViewModel.World.Camera.CastRectangle(ApplicationViewModel.World.Player.Bounds).ToWindowsRect());
         }
 
         private void RenderHoveredBlockEffect(DrawingContext dc)
         {
-            var player = Parameters.World.Player;
+            var player = ApplicationViewModel.World.Player;
 
             var brush = new SolidColorBrush();
             brush.Color = Colors.Transparent;
@@ -102,7 +88,7 @@ namespace SpaceEngineers2D.View
 
             if (player.TargetBlockCoords != null)
             {
-                dc.DrawRectangle(brush, stroke, Parameters.World.Camera.CastRectangle(player.TargetBlockCoords.Bounds).ToWindowsRect());
+                dc.DrawRectangle(brush, stroke, ApplicationViewModel.World.Camera.CastRectangle(player.TargetBlockCoords.Bounds).ToWindowsRect());
             }
         }
 
@@ -112,15 +98,15 @@ namespace SpaceEngineers2D.View
             brush.Color = Colors.Yellow;
             Pen pen = new Pen(Brushes.Black, 2);
 
-            foreach (var item in Parameters.World.Items)
+            foreach (var item in ApplicationViewModel.World.Items)
             {
-                dc.DrawRectangle(brush, pen, Parameters.World.Camera.CastRectangle(item.Bounds).ToWindowsRect());
+                dc.DrawRectangle(brush, pen, ApplicationViewModel.World.Camera.CastRectangle(item.Bounds).ToWindowsRect());
             }
         }
 
         private void RenderGrids(DrawingContext dc, IntRectangle visibleArea, Camera camera)
         {
-            foreach (var grid in Parameters.World.Grids)
+            foreach (var grid in ApplicationViewModel.World.Grids)
             {
                 grid.ForEachWithin(
                     IntRectangle.FromPositionAndSize(visibleArea.Position, visibleArea.Size),
@@ -139,31 +125,37 @@ namespace SpaceEngineers2D.View
 
         private void OnMouseDown(object sender, MouseButtonEventArgs e)
         {
-            var mousePosition = Parameters.World.Camera.UncastPosition(IntVector.FromWindowsPoint(Mouse.GetPosition(this)));
+            if (ApplicationViewModel?.WorldController == null)
+                return;
+
+            var mousePosition = ApplicationViewModel.World.Camera.UncastPosition(IntVector.FromWindowsPoint(Mouse.GetPosition(this)));
 
             if (e.ChangedButton == MouseButton.Left)
             {
-                Parameters.Controller.OnLeftMouseButtonDown(mousePosition);
+                ApplicationViewModel.WorldController.OnLeftMouseButtonDown(mousePosition);
             }
 
             if (e.ChangedButton == MouseButton.Right)
             {
-                Parameters.Controller.OnRightMouseButtonDown(mousePosition);
+                ApplicationViewModel.WorldController.OnRightMouseButtonDown(mousePosition);
             }
         }
 
         private void OnMouseUp(object sender, MouseButtonEventArgs e)
         {
-            var mousePosition = Parameters.World.Camera.UncastPosition(IntVector.FromWindowsPoint(Mouse.GetPosition(this)));
+            if (ApplicationViewModel?.WorldController == null)
+                return;
+
+            var mousePosition = ApplicationViewModel.World.Camera.UncastPosition(IntVector.FromWindowsPoint(Mouse.GetPosition(this)));
 
             if (e.ChangedButton == MouseButton.Left)
             {
-                Parameters.Controller.OnLeftMouseButtonUp(mousePosition);
+                ApplicationViewModel.WorldController.OnLeftMouseButtonUp(mousePosition);
             }
 
             if (e.ChangedButton == MouseButton.Right)
             {
-                Parameters.Controller.OnRightMouseButtonUp(mousePosition);
+                ApplicationViewModel.WorldController.OnRightMouseButtonUp(mousePosition);
             }
         }
 

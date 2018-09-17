@@ -78,6 +78,18 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\LoadGameView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\MainMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\NewGameView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\WorldRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -90,7 +102,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Controllers\WorldRendererController.cs" />
+    <Compile Include="Controllers\WorldController.cs" />
     <Compile Include="Converters\EnumMemberConverter.cs" />
     <Compile Include="Dispatch.cs" />
     <Compile Include="Model\BlockBlueprintSlot.cs" />
@@ -137,6 +149,7 @@
     <Compile Include="Persistence\DataModel\ItemData.cs" />
     <Compile Include="Persistence\DataModel\ItemStackData.cs" />
     <Compile Include="Persistence\DataModel\PlayerData.cs" />
+    <Compile Include="Persistence\PersistenceService.cs" />
     <Compile Include="Persistence\Serializer.cs" />
     <Compile Include="Persistence\DataModel\WorldData.cs" />
     <Compile Include="Physics\PhysicsEngine.cs" />
@@ -145,6 +158,7 @@
     <Compile Include="View\BlastFurnaceView.xaml.cs">
       <DependentUpon>BlastFurnaceView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\BlastFurnaceViewModel.cs" />
     <Compile Include="View\BlockRenderers\BlockRendererRegistry.cs" />
     <Compile Include="View\BlockRenderers\BlockRenderer.cs" />
     <Compile Include="View\BlockRenderers\StandardBlockRenderer.cs" />
@@ -152,6 +166,7 @@
     <Compile Include="View\BlueprintList.xaml.cs">
       <DependentUpon>BlueprintList.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\Command.cs" />
     <Compile Include="View\Inventory\InventorySlotView.xaml.cs">
       <DependentUpon>InventorySlotView.xaml</DependentUpon>
     </Compile>
@@ -164,8 +179,16 @@
       <DependentUpon>ItemDragCanvas.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Inventory\PropertyObservable.cs" />
+    <Compile Include="View\LoadGameView.xaml.cs">
+      <DependentUpon>LoadGameView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\MainMenu.xaml.cs">
+      <DependentUpon>MainMenu.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\MousePositionProvider.cs" />
-    <Compile Include="View\WorldRendererParameters.cs" />
+    <Compile Include="View\NewGameView.xaml.cs">
+      <DependentUpon>NewGameView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\WorldRenderer.xaml.cs">
       <DependentUpon>WorldRenderer.xaml</DependentUpon>
     </Compile>

@@ -11,15 +11,21 @@
         Title="MainWindow" Width="1280" Height="800"
         KeyDown="MainWindow_OnKeyDown"
         KeyUp="MainWindow_OnKeyUp">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding ApplicationViewModel.ToggleMainMenuCommand}"/>
+    </Window.InputBindings>
     <Grid MouseMove="OnMouseMove">
         <Grid.Background>
             <ImageBrush ImageSource="/Assets/Images/background.jpg" Stretch="UniformToFill"/>
         </Grid.Background>
-        <view:WorldRenderer HorizontalAlignment="Stretch"
+        <view:WorldRenderer DataContext="{Binding ApplicationViewModel}"
+                            HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch"
-                            Background="Transparent"
-                            Parameters="{Binding WorldRendererParameters}" />
-        <Grid>
+                            Background="Transparent" />
+        <Grid x:Name="UpperIngameControlsGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -44,5 +50,11 @@
         <viewInventory:ItemDragCanvas HorizontalAlignment="Stretch"
                                       VerticalAlignment="Stretch"
                                       DataContext="{Binding ApplicationViewModel.World.Player.HandInventorySlot}" />
+        <view:MainMenu DataContext="{Binding ApplicationViewModel}"
+                       Visibility="{Binding Path=IsMainMenuActive, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <view:LoadGameView DataContext="{Binding ApplicationViewModel}"
+                          Visibility="{Binding Path=IsLoadGameViewActive, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <view:NewGameView DataContext="{Binding ApplicationViewModel}"
+                          Visibility="{Binding Path=IsNewGameViewActive, Converter={StaticResource BooleanToVisibilityConverter}}" />
     </Grid>
 </Window>
