@@ -155,6 +155,8 @@ namespace SpaceEngineers2D.View
         public void ActivateLoadGameView()
         {
             SavedGames = PersistenceService.Get();
+            IsMainMenuActive = true;
+            IsNewGameViewActive = false;
             IsLoadGameViewActive = true;
         }
         
@@ -165,6 +167,8 @@ namespace SpaceEngineers2D.View
 
         private void ActivateNewGameView()
         {
+            IsMainMenuActive = true;
+            IsLoadGameViewActive = false;
             IsNewGameViewActive = true;
         }
 

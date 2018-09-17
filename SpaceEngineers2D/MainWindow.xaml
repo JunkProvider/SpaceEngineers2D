@@ -16,6 +16,8 @@
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Key="Escape" Command="{Binding ApplicationViewModel.ToggleMainMenuCommand}"/>
+        <KeyBinding Key="F5" Command="{Binding ApplicationViewModel.SaveGameCommand}" />
+        <KeyBinding Key="F6" Command="{Binding ApplicationViewModel.ActivateLoadGameViewCommand}" />
     </Window.InputBindings>
     <Grid MouseMove="OnMouseMove">
         <Grid.Background>
@@ -36,7 +38,7 @@
                                              DataContext="{Binding ApplicationViewModel.PlayerInventoryViewModel}" />
                 <view:BlueprintList HorizontalAlignment="Left"
                                     Margin="10"
-                                    DataContext="{Binding World.Player}" />
+                                    DataContext="{Binding ApplicationViewModel.World.Player}" />
 
             </StackPanel>
             <ContentControl Grid.Row="1" Content="{Binding ApplicationViewModel.InteractingBlockViewModel}">
