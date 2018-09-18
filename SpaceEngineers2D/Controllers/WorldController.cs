@@ -91,6 +91,11 @@ namespace SpaceEngineers2D.Controllers
 
         public void OnUpdate(TimeSpan elapsedTime)
         {
+            foreach (var grid in World.Grids)
+            {
+                grid.ForEach((blockToUpdate, position) => blockToUpdate.OnUpdate(World, new IntRectangle(position, Constants.PhysicsUnitVector), elapsedTime));
+            }
+
             var block = World.GetBlock(_mousePosition);
 
             Player.TargetPosition = _mousePosition;

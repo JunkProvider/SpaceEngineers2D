@@ -12,9 +12,9 @@
     <Grid>
         <Border HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                Background="#40FFFFFF"
+                Background="#D0D0D0"
                 BorderThickness="1"
-                BorderBrush="#80FFFFFF">
+                BorderBrush="#E0E0E0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -25,10 +25,10 @@
                            Margin="5 0 5 0"
                            Text="Blast Furnace"
                            FontSize="20"
-                           Foreground="White"/>
+                           Foreground="#404040"/>
                 <Border Grid.Row="1"
                         BorderThickness="1"
-                        BorderBrush="#80FFFFFF" />
+                        BorderBrush="#E0E0E0" />
                 <inventory:InventoryView Grid.Row="2"
                                          DataContext="{Binding InventoryViewModel}"
                                          HorizontalAlignment="Center"

@@ -1,4 +1,5 @@
-﻿using SpaceEngineers2D.Geometry;
+﻿using System;
+using SpaceEngineers2D.Geometry;
 
 namespace SpaceEngineers2D.Model.Blocks
 {
@@ -21,6 +22,11 @@ namespace SpaceEngineers2D.Model.Blocks
         public abstract ICollection<ItemStack> GetDroppedItems();
 
         public abstract void Damage(float damage);
+
+        public virtual void OnUpdate(World world, IntRectangle ownBounds, TimeSpan elapsedTime)
+        {
+
+        }
 
         public virtual void OnNeighborChanged(World world, IntRectangle ownBounds, IBlockInWorld changedNeighbor)
         {

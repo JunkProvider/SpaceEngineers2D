@@ -33,15 +33,17 @@
 
         private static void ApplyPlayerMovementOrders(Player player)
         {
+            var playerMoveSpeed = 4;
+
             if (player.TouchedBlocks[Side.Bottom].Count != 0)
             {
                 if (player.MovementOrders[Side.Left])
                 {
-                    player.Velocity = new IntVector(-2 * Constants.PhysicsUnit, player.Velocity.Y);
+                    player.Velocity = new IntVector(-playerMoveSpeed * Constants.PhysicsUnit, player.Velocity.Y);
                 }
                 else if (player.MovementOrders[Side.Right])
                 {
-                    player.Velocity = new IntVector(2 * Constants.PhysicsUnit, player.Velocity.Y);
+                    player.Velocity = new IntVector(playerMoveSpeed * Constants.PhysicsUnit, player.Velocity.Y);
                 }
                 else
                 {

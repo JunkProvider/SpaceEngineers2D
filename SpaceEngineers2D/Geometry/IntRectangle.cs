@@ -45,7 +45,7 @@
 
         public IntVector CenterBottom => new IntVector(Left + Size.X / 2, Bottom);
 
-        private IntRectangle(IntVector position, IntVector size)
+        public IntRectangle(IntVector position, IntVector size)
         {
             Position = position;
             Size = size;

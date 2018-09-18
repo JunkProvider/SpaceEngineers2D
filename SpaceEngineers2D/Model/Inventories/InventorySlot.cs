@@ -88,6 +88,30 @@ namespace SpaceEngineers2D.Model.Inventories
             return returnedStack;
         }
 
+        public ItemStack Take(int amount)
+        {
+            if (ItemStack == null)
+                throw new InvalidOperationException();
+
+            if (ItemStack.Size < amount)
+                throw new InvalidOperationException();
+
+            var item = ItemStack.Item;
+
+            if (amount != ItemStack.Size)
+            {
+                ItemStack = new ItemStack(item, ItemStack.Size - amount);
+            }
+            else
+            {
+                ItemStack = null;
+            }
+
+            RaiseContentChanged();
+
+            return new ItemStack(item.Clone(), amount);
+        }
+
         public ItemStack Take()
         {
             var takenItemSTack = ItemStack;
