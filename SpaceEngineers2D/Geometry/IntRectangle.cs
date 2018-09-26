@@ -37,6 +37,10 @@
 
         public int Bottom => Position.Y + Size.Y;
 
+        public int Width => Size.X;
+
+        public int Height => Size.Y;
+
         public IntVector LeftTop => Position;
 
         public IntVector RightBottom => Position + Size;

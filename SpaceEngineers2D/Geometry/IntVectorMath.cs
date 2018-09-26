@@ -4,9 +4,9 @@
 
     public static class IntVectorMath
     {
-        public static IntVector MinMax(IntVector a, IntVector max, IntVector min)
+        public static IntVector MinMax(IntVector a, IntVector min, IntVector max)
         {
-            return Min(min, Max(max, a));
+            return Min(max, Max(min, a));
         }
 
         public static IntVector Min(IntVector a, IntVector b)
