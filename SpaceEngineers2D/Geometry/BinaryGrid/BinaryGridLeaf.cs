@@ -4,18 +4,17 @@
     {
         public const int Size = 2;
 
-        private readonly T[] _items = new T[Size * Size];
+        private readonly T[,,] _items = new T[Size, Size, Size];
 
         public T Get(IntVector position)
         {
-            return _items[PositionToIndex(position)];
+            return _items[position.X, position.Y, position.Z];
         }
 
         public SetItemResult<T> Set(IntVector position, T item, SetItemResult<T> result)
         {
-            var index = PositionToIndex(position);
-            result.RemovedItem = _items[index];
-            _items[index] = item;
+            result.RemovedItem = _items[position.X, position.Y, position.Z];
+            _items[position.X, position.Y, position.Z] = item;
             return result;
         }
 
@@ -25,26 +24,16 @@
             {
                 for (var y = rectangle.Top; y < rectangle.Bottom; y++)
                 {
-                    var itemPosition = new IntVector(x, y);
-                    var itemIndex = PositionToIndex(itemPosition);
-
-                    var item = _items[itemIndex];
-                    if (item != null)
+                    for (var z = rectangle.Front; z < rectangle.Back; z++)
                     {
-                        func(item, itemPosition);
+                        var item = _items[x, y, z];
+                        if (item != null)
+                        {
+                            func(item, new IntVector(x, y, z));
+                        }
                     }
                 }
             }
-        }
-
-        private int PositionToIndex(IntVector position)
-        {
-            return PositionToIndex(position.X, position.Y);
-        }
-
-        private int PositionToIndex(int x, int y)
-        {
-            return x + (y * Size);
         }
     }
 }

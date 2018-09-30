@@ -14,19 +14,19 @@ namespace SpaceEngineers2DTest.Geometry.BinaryGrid
         {
             var coordinateSystem = CoordinateSystem.CreateHorizontalCircular(0, 10);
             var grid = new CircularBinaryGrid<string>(coordinateSystem);
-            var rect = new IntRectangle(0, 0, 2, 2);
+            var rect = new IntRectangle(0, 0, 0, 2, 2, 1);
             var calls = new Dictionary<IntVector, string>();
             EnumerateItemDelegate<string> func = (item, position) => calls.Add(position, item);
             
-            AddItems(grid, new IntRectangle(-1, -1, 4, 4));
+            AddItems(grid, new IntRectangle(-1, -1, 0, 4, 4, 1));
 
             grid.ForEachWithin(rect, func);
 
             Assert.AreEqual(4, calls.Count);
-            AssertItem(calls, new IntVector(0, 0));
-            AssertItem(calls, new IntVector(1, 0));
-            AssertItem(calls, new IntVector(0, 1));
-            AssertItem(calls, new IntVector(1, 1));
+            AssertItem(calls, new IntVector(0, 0, 0));
+            AssertItem(calls, new IntVector(1, 0, 0));
+            AssertItem(calls, new IntVector(0, 1, 0));
+            AssertItem(calls, new IntVector(1, 1, 0));
         }
 
         [TestMethod]
@@ -34,22 +34,22 @@ namespace SpaceEngineers2DTest.Geometry.BinaryGrid
         {
             var coordinateSystem = CoordinateSystem.CreateHorizontalCircular(0, 10);
             var grid = new CircularBinaryGrid<string>(coordinateSystem);
-            var rect = new IntRectangle(-1, 0, 2, 2);
+            var rect = new IntRectangle(-1, 0, 0, 2, 2, 1);
             var calls = new Dictionary<IntVector, string>();
             EnumerateItemDelegate<string> func = (item, position) =>
             {
                 calls.Add(position, item);
             };
 
-            AddItems(grid, new IntRectangle(-2, -1, 4, 4));
+            AddItems(grid, new IntRectangle(-2, -1, 0, 4, 4, 1));
 
             grid.ForEachWithin(rect, func);
 
             Assert.AreEqual(4, calls.Count);
-            AssertItem(calls, new IntVector(0, 0));
-            AssertItem(calls, new IntVector(0, 1));
-            AssertItem(calls, new IntVector(9, 0));
-            AssertItem(calls, new IntVector(9, 1));
+            AssertItem(calls, new IntVector(0, 0, 0));
+            AssertItem(calls, new IntVector(0, 1, 0));
+            AssertItem(calls, new IntVector(9, 0, 0));
+            AssertItem(calls, new IntVector(9, 1, 0));
         }
 
         [TestMethod]
@@ -57,22 +57,46 @@ namespace SpaceEngineers2DTest.Geometry.BinaryGrid
         {
             var coordinateSystem = CoordinateSystem.CreateHorizontalCircular(0, 4);
             var grid = new CircularBinaryGrid<string>(coordinateSystem);
-            var rect = new IntRectangle(2, 0, 5, 1);
+            var rect = new IntRectangle(2, 0, 0, 5, 1, 1);
             var calls = new Dictionary<IntVector, string>();
             EnumerateItemDelegate<string> func = (item, position) =>
             {
                 calls.Add(position, item);
             };
 
-            AddItems(grid, new IntRectangle(0, 0, 4, 4));
+            AddItems(grid, new IntRectangle(0, 0, 0, 4, 4, 1));
 
             grid.ForEachWithin(rect, func);
 
             Assert.AreEqual(4, calls.Count);
-            AssertItem(calls, new IntVector(0, 0));
-            AssertItem(calls, new IntVector(1, 0));
-            AssertItem(calls, new IntVector(2, 0));
-            AssertItem(calls, new IntVector(3, 0));
+            AssertItem(calls, new IntVector(0, 0, 0));
+            AssertItem(calls, new IntVector(1, 0, 0));
+            AssertItem(calls, new IntVector(2, 0, 0));
+            AssertItem(calls, new IntVector(3, 0, 0));
+        }
+
+        [TestMethod]
+        public void TestEnumerateAll()
+        {
+            var coordinateSystem = CoordinateSystem.CreateHorizontalCircular(0, 16);
+            var grid = new CircularBinaryGrid<string>(coordinateSystem);
+            var calls = new Dictionary<IntVector, string>();
+            EnumerateItemDelegate<string> func = (item, position) =>
+            {
+                calls.Add(position, item);
+            };
+
+            AddItems(grid, new IntRectangle(0, 0, 0, 16, 16, 1));
+
+            grid.ForEach(func);
+            
+            for (var x = 0; x < 16; x++)
+            {
+                for (var y = 0; y < 16; y++)
+                {
+                    AssertItem(calls, new IntVector(x, y, 0));
+                }
+            }
         }
 
         private void AddItems(CircularBinaryGrid<string> grid, IntRectangle rect)
@@ -81,7 +105,7 @@ namespace SpaceEngineers2DTest.Geometry.BinaryGrid
             {
                 for (var y = rect.Top; y < rect.Bottom; y++)
                 {
-                    AddItem(grid, new IntVector(x, y));
+                    AddItem(grid, new IntVector(x, y, 0));
                 }
             }
         }

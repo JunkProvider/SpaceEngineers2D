@@ -2,15 +2,15 @@
 {
     using System.Collections.Generic;
 
-    using SpaceEngineers2D.Geometry;
-    using SpaceEngineers2D.Model.Blocks;
-    using SpaceEngineers2D.Model.Items;
+    using Geometry;
+    using Blocks;
+    using Items;
 
     public class MobileItem : IMobileObject
     {
         public IntVector Position { get; set; }
 
-        public IntVector Size { get; set; } = new IntVector(200, 200);
+        public IntVector Size { get; set; } = new IntVector(200, 200, 200);
 
         public IntRectangle Bounds => IntRectangle.FromPositionAndSize(Position, Size);
 

@@ -45,23 +45,27 @@
 
             if (player.TouchedBlocks[Side.Bottom].Count != 0)
             {
+                var velocity = player.Velocity;
+
                 if (player.MovementOrders[Side.Left])
                 {
-                    player.Velocity = new IntVector(-playerMoveSpeed * Constants.PhysicsUnit, player.Velocity.Y);
+                    velocity.X = -playerMoveSpeed * Constants.BlockSize;
                 }
                 else if (player.MovementOrders[Side.Right])
                 {
-                    player.Velocity = new IntVector(playerMoveSpeed * Constants.PhysicsUnit, player.Velocity.Y);
+                    velocity.X = playerMoveSpeed * Constants.BlockSize;
                 }
                 else
                 {
-                    player.Velocity = new IntVector(0, player.Velocity.Y);
+                    velocity.X = 0;
                 }
 
                 if (player.MovementOrders[Side.Top])
                 {
-                    player.Velocity = player.Velocity + IntVector.Up * Constants.PhysicsUnit * 7;
+                    velocity = velocity + IntVector.Up * Constants.BlockSize * 7;
                 }
+
+                player.Velocity = velocity;
             }
         }
 
@@ -80,25 +84,29 @@
 
         private void ResetVelocityInBlockedDirections(IMobileObject obj)
         {
+            var velocity = obj.Velocity;
+
             if (obj.TouchedBlocks[Side.Left].Count != 0 && obj.Velocity.X < 0)
             {
-                obj.Velocity = new IntVector(0, obj.Velocity.Y);
+                velocity.X = 0;
             }
 
             if (obj.TouchedBlocks[Side.Right].Count != 0 && obj.Velocity.X > 0)
             {
-                obj.Velocity = new IntVector(0, obj.Velocity.Y);
+                velocity.X = 0;
             }
 
             if (obj.TouchedBlocks[Side.Top].Count != 0 && obj.Velocity.Y < 0)
             {
-                obj.Velocity = new IntVector(obj.Velocity.X, 0);
+                velocity.Y = 0;
             }
 
             if (obj.TouchedBlocks[Side.Bottom].Count != 0 && obj.Velocity.Y > 0)
             {
-                obj.Velocity = new IntVector(obj.Velocity.X, 0);
+                velocity.Y = 0;
             }
+
+            obj.Velocity = velocity;
         }
     }
 }

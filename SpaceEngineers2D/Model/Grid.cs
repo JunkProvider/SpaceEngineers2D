@@ -22,59 +22,52 @@
             Id = id;
             CoordinateSystem = coordinateSystem;
             InnerGrid = new CircularBinaryGrid<Block>(new CoordinateSystem(
-                coordinateSystem.MinX / Constants.PhysicsUnit,
-                coordinateSystem.MaxX / Constants.PhysicsUnit,
-                coordinateSystem.MinY / Constants.PhysicsUnit,
-                coordinateSystem.MaxY / Constants.PhysicsUnit));
+                coordinateSystem.MinX / Constants.BlockSize,
+                coordinateSystem.MaxX / Constants.BlockSize,
+                coordinateSystem.MinY / Constants.BlockSize,
+                coordinateSystem.MaxY / Constants.BlockSize,
+                coordinateSystem.MinZ / Constants.BlockSize,
+                coordinateSystem.MaxZ / Constants.BlockSize));
         }
 
         public IntRectangle GetBlockBounds(IntVector position)
         {
             position = position - Position;
-            var blockPosition = new IntVector(
-                (int)Math.Floor((double)position.X / Constants.PhysicsUnit),
-                (int)Math.Floor((double)position.Y / Constants.PhysicsUnit));
-            blockPosition *= Constants.PhysicsUnit;
+            var blockPosition = position.Floor(Constants.BlockSize);
             blockPosition = CoordinateSystem.Normalize(blockPosition);
-            return IntRectangle.FromPositionAndSize(Position + blockPosition, IntVector.RightBottom * Constants.PhysicsUnit);
+            return IntRectangle.FromPositionAndSize(Position + blockPosition, Constants.BlockSizeVector);
         }
 
         public BlockInWorld<Block> GetBlock(IntVector position)
         {
             position = position - Position;
-            position = new IntVector(
-                (int)Math.Floor((double)position.X / Constants.PhysicsUnit),
-                (int)Math.Floor((double)position.Y / Constants.PhysicsUnit));
+            position = position.DivideRoundDown(Constants.BlockSize);
             var block = InnerGrid.Get(position);
-            return block!= null ? new BlockInWorld<Block>(block, this, Position + position * Constants.PhysicsUnit) : null;
+            return block!= null ? new BlockInWorld<Block>(block, this, Position + position * Constants.BlockSize) : null;
         }
 
         public Block SetBlock(IntVector position, Block block)
         {
             // position = CoordinateSystem.Normalize(position);
             position = position - Position;
-            position = new IntVector(
-                (int)Math.Floor((double)position.X / Constants.PhysicsUnit),
-                (int)Math.Floor((double)position.Y / Constants.PhysicsUnit));
+            position = position.DivideRoundDown(Constants.BlockSize);
             return InnerGrid.Set(position, block).RemovedItem;
         }
 
         public void ForEach(EnumerateItemDelegate<Block> func)
         {
-            InnerGrid.ForEach((block, blockPosition) => func(block, Position + blockPosition * Constants.PhysicsUnit));
+            InnerGrid.ForEach((block, blockPosition) => func(block, Position + blockPosition * Constants.BlockSize));
         }
 
         public void ForEachWithin(IntRectangle rectangle, EnumerateItemDelegate<Block> func)
         {
             var transformedRectangle = rectangle.Move(-Position);
-            transformedRectangle = IntRectangle.FromLeftTopRightAndBottom(
-                (int)Math.Floor((double)transformedRectangle.Left / Constants.PhysicsUnit),
-                (int)Math.Floor((double)transformedRectangle.Top / Constants.PhysicsUnit),
-                (int)Math.Ceiling((double)transformedRectangle.Right / Constants.PhysicsUnit),
-                (int)Math.Ceiling((double)transformedRectangle.Bottom / Constants.PhysicsUnit)
+            transformedRectangle = IntRectangle.FromPositionAndSize(
+                transformedRectangle.Position.DivideRoundDown(Constants.BlockSize),
+                transformedRectangle.Size.DivideRoundUp(Constants.BlockSize)
             );
 
-            InnerGrid.ForEachWithin(transformedRectangle, (block, blockPosition) => func(block, Position + blockPosition * Constants.PhysicsUnit));
+            InnerGrid.ForEachWithin(transformedRectangle, (block, blockPosition) => func(block, Position + blockPosition * Constants.BlockSize));
         }
     }
 }

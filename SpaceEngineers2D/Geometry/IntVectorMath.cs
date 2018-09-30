@@ -11,12 +11,12 @@
 
         public static IntVector Min(IntVector a, IntVector b)
         {
-            return new IntVector(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y));
+            return new IntVector(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y), Math.Min(a.Z, b.Z));
         }
 
         public static IntVector Max(IntVector a, IntVector b)
         {
-            return new IntVector(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y));
+            return new IntVector(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y), Math.Max(a.Z, b.Z));
         }
     }
 }

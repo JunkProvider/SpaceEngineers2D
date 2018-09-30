@@ -69,6 +69,9 @@ namespace SpaceEngineers2D
                 case Key.E:
                     Dispatch.Exec(ApplicationViewModel.WorldController.OnInteraction);
                     break;
+                case Key.Z:
+                    Dispatch.Exec(ApplicationViewModel.WorldController.OnToggleBlockPlacementLayer);
+                    break;
             }
         }
 

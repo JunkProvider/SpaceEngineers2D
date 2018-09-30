@@ -243,7 +243,7 @@ namespace SpaceEngineers2D.View
 
         private World CreateWorld()
         {
-            var world = new World(new Player { Position = new IntVector(0, -1600) }, new Camera { Zoom = 0.05f }, 30 * Constants.PhysicsUnit);
+            var world = new World(new Player { Position = new IntVector(0, -1600, 0) }, new Camera { Zoom = 0.05f }, 30 * Constants.BlockSize);
             world.Player.BlueprintSlots[0].BlueprintedBlock = world.BlockTypes.Concrete;
             world.Player.BlueprintSlots[1].BlueprintedBlock = world.BlockTypes.IronPlate;
             world.Grids.Add(new Grid(0, world.CoordinateSystem));
@@ -254,58 +254,58 @@ namespace SpaceEngineers2D.View
         {
             var grid = world.Grids.First();
 
-            for (var x = 0; x < world.Width / Constants.PhysicsUnit; x++)
+            for (var x = 0; x < world.Width / Constants.BlockSize; x++)
             {
                 for (var y = 0; y < 30; y++)
                 {
                     if (y == 0)
                     {
                         if (_random.Next(0, 100) < 80)
-                            grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, world.BlockTypes.Grass.InstantiateBlock());
+                            grid.SetBlock(new IntVector(x, y, 0) * Constants.BlockSize, world.BlockTypes.Grass.InstantiateBlock());
 
                         continue;
                     }
 
                     if (y == 1)
                     {
-                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, world.BlockTypes.DirtWithGrass.Instantiate());
+                        grid.SetBlock(new IntVector(x, y, 0) * Constants.BlockSize, world.BlockTypes.DirtWithGrass.Instantiate());
                         continue;
                     }
 
                     if (y == 2 || (y == 3 && _random.Next(0, 100) < 50))
                     {
-                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, world.BlockTypes.Dirt.Instantiate());
+                        grid.SetBlock(new IntVector(x, y, 0) * Constants.BlockSize, world.BlockTypes.Dirt.Instantiate());
                         continue;
                     }
 
                     if (y == 4 && _random.Next(0, 100) < 50)
                     {
-                        var topBlock = grid.GetBlock(new IntVector(x, y - 1) * Constants.PhysicsUnit);
+                        var topBlock = grid.GetBlock(new IntVector(x, y - 1, 0) * Constants.BlockSize);
                         if (topBlock.Object.BlockType == world.BlockTypes.Dirt)
                         {
-                            grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, world.BlockTypes.Dirt.Instantiate());
+                            grid.SetBlock(new IntVector(x, y, 0) * Constants.BlockSize, world.BlockTypes.Dirt.Instantiate());
                             continue;
                         }
                     }
 
                     if (_random.Next(0, 100) < 5)
                     {
-                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit,
+                        grid.SetBlock(new IntVector(x, y, 0) * Constants.BlockSize,
                             world.BlockTypes.IronOreDeposit.Instantiate());
                         continue;
                     }
 
                     if (_random.Next(0, 100) < 5)
                     {
-                        grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, world.BlockTypes.CoalDeposit.Instantiate());
+                        grid.SetBlock(new IntVector(x, y, 0) * Constants.BlockSize, world.BlockTypes.CoalDeposit.Instantiate());
                         continue;
                     }
 
-                    grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, world.BlockTypes.Rock.Instantiate());
+                    grid.SetBlock(new IntVector(x, y, 0) * Constants.BlockSize, world.BlockTypes.Rock.Instantiate());
                 }
             }
 
-            for (var x = 0; x < world.Width / Constants.PhysicsUnit; x++)
+            for (var x = 0; x < world.Width / Constants.BlockSize; x++)
             {
                 if (_random.Next(0, 100) > 10)
                     continue;
@@ -314,15 +314,15 @@ namespace SpaceEngineers2D.View
 
                 for (var y = -height; y <= 0; y++)
                 {
-                    grid.SetBlock(new IntVector(x, y) * Constants.PhysicsUnit, world.BlockTypes.Reed.InstantiateBlock());
+                    grid.SetBlock(new IntVector(x, y, 0) * Constants.BlockSize, world.BlockTypes.Reed.InstantiateBlock());
                 }
             }
 
             var blastFurnace = world.BlockTypes.BlastFurnace.Instantiate();
             blastFurnace.BlueprintState.FinishImmediately();
-            grid.SetBlock(new IntVector(3, 0) * Constants.PhysicsUnit, blastFurnace);
+            grid.SetBlock(new IntVector(3, 0, 0) * Constants.BlockSize, blastFurnace);
 
-            world.Player.Position = new IntVector(3, -3) * Constants.PhysicsUnitVector;
+            world.Player.Position = new IntVector(3, -3, 0) * Constants.BlockSizeVector;
         }
 
         private void SetWorld(World world)

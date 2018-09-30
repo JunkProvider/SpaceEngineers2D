@@ -8,7 +8,7 @@
 
         public float Zoom { get; set; } = 1;
 
-        public IntVector Viewport { get; set; } = IntVector.RightBottom;
+        public IntVector Viewport { get; set; } = IntVector.RightDown;
 
         public IntRectangle CastRectangle(IntRectangle rectangle)
         {

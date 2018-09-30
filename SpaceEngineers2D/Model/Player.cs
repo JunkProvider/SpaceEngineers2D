@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using SpaceEngineers2D.Annotations;
 using SpaceEngineers2D.Physics;
-using SpaceEngineers2D.View.Inventory;
 
 namespace SpaceEngineers2D.Model
 {
@@ -22,6 +21,7 @@ namespace SpaceEngineers2D.Model
 
         private IBlockInWorld _interactingBlock;
         private IntVector _position;
+        private ZLayer _blockPlacementLayer;
 
         public Inventory Inventory { get; } = new Inventory(9);
 
@@ -30,6 +30,12 @@ namespace SpaceEngineers2D.Model
         public List<BlockBlueprintSlot> BlueprintSlots { get; } = new List<BlockBlueprintSlot> { new BlockBlueprintSlot(Key.NumPad1), new BlockBlueprintSlot(Key.NumPad2), new BlockBlueprintSlot(Key.NumPad3) };
 
         public BlockBlueprintSlot SelectedBlueprintSlot => BlueprintSlots.SingleOrDefault(blueprintSlot => blueprintSlot.Selected);
+
+        public ZLayer BlockPlacementLayer
+        {
+            get => _blockPlacementLayer;
+            set => SetProperty(ref _blockPlacementLayer, value);
+        }
 
         public IntVector Position
         {
@@ -41,9 +47,9 @@ namespace SpaceEngineers2D.Model
             }
         }
 
-        public IntVector Coords => Position / Constants.PhysicsUnitVector;
+        public IntVector Coords => Position / Constants.BlockSizeVector;
 
-        public IntVector Size { get; set; } = new IntVector(800, 1800);
+        public IntVector Size { get; set; } = new IntVector(800, 1800, 1000);
 
         public IntRectangle Bounds => IntRectangle.FromPositionAndSize(Position, Size);
 
@@ -102,6 +108,18 @@ namespace SpaceEngineers2D.Model
             blueprintSlotToSelect.Selected = true;
 
             this.RaisePropertyChanged(nameof(SelectedBlueprintSlot));
+        }
+
+        public void ToggleBlockPlacementLayer()
+        {
+            if (BlockPlacementLayer == ZLayer.Foreground)
+            {
+                BlockPlacementLayer = ZLayer.Background;
+            }
+            else
+            {
+                BlockPlacementLayer = ZLayer.Foreground;
+            }
         }
 
         [NotifyPropertyChangedInvocator]

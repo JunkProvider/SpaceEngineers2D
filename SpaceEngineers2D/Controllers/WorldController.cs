@@ -37,6 +37,9 @@ namespace SpaceEngineers2D.Controllers
         public void OnRightMouseButtonDown(IntVector mousePosition)
         {
             _activity = 2;
+
+            if (Player.BlockPlacementLayer == ZLayer.Background)
+                mousePosition.Z = Constants.BlockSize;
             
             if (Player.TargetBlock == null)
             {
@@ -89,23 +92,32 @@ namespace SpaceEngineers2D.Controllers
             }
         }
 
+        public void OnToggleBlockPlacementLayer()
+        {
+            Player.ToggleBlockPlacementLayer();
+        }
+
         public void OnUpdate(TimeSpan elapsedTime)
         {
             foreach (var grid in World.Grids)
             {
-                grid.ForEach((blockToUpdate, position) => blockToUpdate.OnUpdate(World, new IntRectangle(position, Constants.PhysicsUnitVector), elapsedTime));
+                grid.ForEach((blockToUpdate, position) => blockToUpdate.OnUpdate(World, new IntRectangle(position, Constants.BlockSizeVector), elapsedTime));
             }
 
-            var block = World.GetBlock(_mousePosition);
+            var mousePosition = _mousePosition;
+            if (Player.BlockPlacementLayer == ZLayer.Background)
+                mousePosition += IntVector.Back * Constants.BlockSize;
 
-            Player.TargetPosition = _mousePosition;
+            var block = World.GetBlock(mousePosition);
+            
+            Player.TargetPosition = mousePosition;
             Player.TargetBlockCoords = block != null ? new BlockCoords(block.Grid, block.Bounds) : null;
             Player.TargetBlockCoordsInRange = Player.TargetBlockCoords != null && IsInPlayerRange(Player.TargetBlockCoords.Bounds);
             Player.TargetBlock = block;
 
             if (_activity == 2 && Player.TargetBlockCoordsInRange)
             {
-                Player.TargetBlock.As<StructuralBlock>((structuralBlock) => WeldBlock(structuralBlock, elapsedTime));
+                Player.TargetBlock.As<StructuralBlock>(structuralBlock => WeldBlock(structuralBlock, elapsedTime));
             }
 
             if (_activity == 1 && Player.TargetBlockCoordsInRange)
@@ -123,7 +135,6 @@ namespace SpaceEngineers2D.Controllers
                 var block = blockType.InstantiateBlock();
                 block.BlueprintState.PutItem(itemStack.Item);
                 coords.Grid.SetBlock(coords.Bounds.Position, block);
-                // player.WeldedBlock = new BlockInWorld<StructuralBlock>(block, coords.Grid, coords.Bounds.Position);
             }
         }
 
@@ -162,12 +173,12 @@ namespace SpaceEngineers2D.Controllers
             var playerCenter = World.Player.Bounds.Center;
             var x = rectangle.Left > playerCenter.X ? rectangle.Left : rectangle.Right;
             var y = rectangle.Top > playerCenter.Y ? rectangle.Top : rectangle.Bottom;
-            return IsInPlayerRange(new IntVector(x, y));
+            return IsInPlayerRange(new IntVector(x, y, Player.Position.Z));
         }
 
         private bool IsInPlayerRange(IntVector point)
         {
-            return (point - World.Player.Bounds.Center).SquareLength <= Math.Pow(PlayerRange * Constants.PhysicsUnit, 2);
+            return (point - World.Player.Bounds.Center).SquareLength <= Math.Pow(PlayerRange * Constants.BlockSize, 2);
         }
     }
 }

@@ -16,9 +16,9 @@
         {
             var grid = new BinaryGrid<string>();
 
-            grid.Set(new IntVector(0, 0), "a");
+            grid.Set(new IntVector(0, 0, 0), "a");
 
-            Assert.AreEqual("a", grid.Get(new IntVector(0, 0)));
+            Assert.AreEqual("a", grid.Get(new IntVector(0, 0, 0)));
         }
 
         [TestMethod]
@@ -26,9 +26,9 @@
         {
             var grid = new BinaryGrid<string>();
 
-            grid.Set(new IntVector(10, 0), "a");
+            grid.Set(new IntVector(10, 0, 0), "a");
 
-            Assert.AreEqual("a", grid.Get(new IntVector(10, 0)));
+            Assert.AreEqual("a", grid.Get(new IntVector(10, 0, 0)));
         }
 
         [TestMethod]
@@ -36,9 +36,9 @@
         {
             var grid = new BinaryGrid<string>();
 
-            grid.Set(new IntVector(0, 10), "a");
+            grid.Set(new IntVector(0, 10, 0), "a");
 
-            Assert.AreEqual("a", grid.Get(new IntVector(0, 10)));
+            Assert.AreEqual("a", grid.Get(new IntVector(0, 10, 0)));
         }
 
         [TestMethod]
@@ -46,9 +46,9 @@
         {
             var grid = new BinaryGrid<string>();
 
-            grid.Set(new IntVector(10, 10), "a");
+            grid.Set(new IntVector(10, 10, 0), "a");
 
-            Assert.AreEqual("a", grid.Get(new IntVector(10, 10)));
+            Assert.AreEqual("a", grid.Get(new IntVector(10, 10, 0)));
         }
 
         [TestMethod]
@@ -56,10 +56,10 @@
         {
             var grid = new BinaryGrid<string>();
 
-            var result = grid.Set(new IntVector(-10, 0), "a");
+            var result = grid.Set(new IntVector(-10, 0, 0), "a");
 
-            Assert.AreEqual(new IntVector(-12, 0), result.OffsetShift);
-            Assert.AreEqual("a", grid.Get(new IntVector(-10, 0)));
+            Assert.AreEqual(new IntVector(-12, 0, 0), result.OffsetShift);
+            Assert.AreEqual("a", grid.Get(new IntVector(-10, 0, 0)));
         }
 
         [TestMethod]
@@ -67,10 +67,10 @@
         {
             var grid = new BinaryGrid<string>();
 
-            var result = grid.Set(new IntVector(0, -10), "a");
+            var result = grid.Set(new IntVector(0, -10, 0), "a");
 
-            Assert.AreEqual(new IntVector(0, -12), result.OffsetShift);
-            Assert.AreEqual("a", grid.Get(new IntVector(0, -10)));
+            Assert.AreEqual(new IntVector(0, -12, 0), result.OffsetShift);
+            Assert.AreEqual("a", grid.Get(new IntVector(0, -10, 0)));
         }
 
         [TestMethod]
@@ -78,10 +78,10 @@
         {
             var grid = new BinaryGrid<string>();
 
-            var result = grid.Set(new IntVector(-10, -10), "a");
+            var result = grid.Set(new IntVector(-10, -10, 0), "a");
 
-            Assert.AreEqual(new IntVector(-12, -12), result.OffsetShift);
-            Assert.AreEqual("a", grid.Get(new IntVector(-10, -10)));
+            Assert.AreEqual(new IntVector(-12, -12, 0), result.OffsetShift);
+            Assert.AreEqual("a", grid.Get(new IntVector(-10, -10, 0)));
         }
 
         [TestMethod]
@@ -91,18 +91,18 @@
 
             var itemsToEnumerate = new Dictionary<IntVector, string>
             {
-                { new IntVector(1, 0), "a" },
-                { new IntVector(2, 0), "b" },
-                { new IntVector(2, 1), "c" },
-                { new IntVector(3, 1), "d" }
+                { new IntVector(1, 0, 0), "a" },
+                { new IntVector(2, 0, 0), "b" },
+                { new IntVector(2, 1, 0), "c" },
+                { new IntVector(3, 1, 0), "d" }
             };
 
             var itemsToIgnore = new Dictionary<IntVector, string>
             {
-                { new IntVector(0, 1), "a" },
-                { new IntVector(1, 2), "b" },
-                { new IntVector(2, 2), "c" },
-                { new IntVector(3, 2), "d" }
+                { new IntVector(0, 1, 0), "a" },
+                { new IntVector(1, 2, 0), "b" },
+                { new IntVector(2, 2, 0), "c" },
+                { new IntVector(3, 2, 0), "d" }
             };
 
             foreach (var pair in itemsToEnumerate.Concat(itemsToIgnore))
@@ -110,7 +110,7 @@
                 grid.Set(pair.Key, pair.Value);
             }
 
-            var bounds = IntRectangle.FromXYWidthAndHeight(1, 0, 3, 2);
+            var bounds = IntRectangle.FromXYZWidthHeightDepth(1, 0, 0, 3, 2, 1);
 
             var enumeratedItems = new Dictionary<IntVector, string>();
 

@@ -12,13 +12,17 @@ namespace SpaceEngineers2D.Model
         int MinY { get; }
 
         int MaxY { get; }
+
+        int MinZ { get; }
+
+        int MaxZ { get; }
     }
 
     public sealed class CoordinateSystem : ICoordinateSystem
     {
         public static CoordinateSystem CreateHorizontalCircular(int minX, int maxX)
         {
-            return new CoordinateSystem(minX, maxX, int.MinValue / 2 + 1, int.MaxValue / 2 - 1);
+            return new CoordinateSystem(minX, maxX, int.MinValue / 2 + 1, int.MaxValue / 2 - 1, int.MinValue / 2 + 1, int.MaxValue / 2 - 1);
         }
 
         public int MinX { get; }
@@ -29,7 +33,11 @@ namespace SpaceEngineers2D.Model
 
         public int MaxY { get; }
 
-        public CoordinateSystem(int minX, int maxX, int minY, int maxY)
+        public int MinZ { get; }
+
+        public int MaxZ { get; }
+
+        public CoordinateSystem(int minX, int maxX, int minY, int maxY, int minZ, int maxZ)
         {
             if (minX < int.MinValue / 2 + 1)
                 throw new ArgumentOutOfRangeException();
@@ -43,10 +51,18 @@ namespace SpaceEngineers2D.Model
             if (maxY > int.MaxValue / 2 - 1)
                 throw new ArgumentOutOfRangeException();
 
+            if (minZ < int.MinValue / 2 + 1)
+                throw new ArgumentOutOfRangeException();
+
+            if (maxZ > int.MaxValue / 2 - 1)
+                throw new ArgumentOutOfRangeException();
+
             MinX = minX;
             MaxX = maxX;
             MinY = minY;
             MaxY = maxY;
+            MinZ = minZ;
+            MaxZ = maxZ;
         }
     }
 
@@ -54,7 +70,7 @@ namespace SpaceEngineers2D.Model
     {
         public static IntVector Normalize(this ICoordinateSystem coordinateSystem, IntVector position)
         {
-            return new IntVector(coordinateSystem.NormalizeX(position.X), coordinateSystem.NormalizeY(position.Y));
+            return new IntVector(coordinateSystem.NormalizeX(position.X), coordinateSystem.NormalizeY(position.Y), position.Z);
         }
 
         public static int NormalizeX(this ICoordinateSystem coordinateSystem, int x)
@@ -75,12 +91,18 @@ namespace SpaceEngineers2D.Model
         public static IntRectangle Denormalize(this ICoordinateSystem coordinateSystem, IntVector position, IntVector size, IntVector referencePosition, IntVector referenceSize)
         {
             // TODO: consider size
-            return new IntRectangle(coordinateSystem.DenormalizeX(position.X, referencePosition.X), coordinateSystem.DenormalizeY(position.Y, referencePosition.Y), size.X, size.Y);
+            return new IntRectangle(
+                coordinateSystem.DenormalizeX(position.X, referencePosition.X),
+                coordinateSystem.DenormalizeY(position.Y, referencePosition.Y),
+                position.Z,
+                size.X,
+                size.Y,
+                size.Z);
         }
 
         public static IntVector Denormalize(this ICoordinateSystem coordinateSystem, IntVector position, IntVector referencePosition)
         {
-            return new IntVector(coordinateSystem.DenormalizeX(position.X, referencePosition.X), coordinateSystem.DenormalizeY(position.Y, referencePosition.Y));
+            return new IntVector(coordinateSystem.DenormalizeX(position.X, referencePosition.X), coordinateSystem.DenormalizeY(position.Y, referencePosition.Y), position.Z);
         }
 
         public static int DenormalizeX(this ICoordinateSystem coordinateSystem, int x, int relativeTo)

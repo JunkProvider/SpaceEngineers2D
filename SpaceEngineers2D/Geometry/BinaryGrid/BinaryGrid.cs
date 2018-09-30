@@ -1,4 +1,6 @@
-﻿namespace SpaceEngineers2D.Geometry.BinaryGrid
+﻿using System;
+
+namespace SpaceEngineers2D.Geometry.BinaryGrid
 {
     public class BinaryGrid<T> : BinaryGridBranch<T>
     {
@@ -31,7 +33,7 @@
             var absolutePosition = position;
             position -= Offset;
 
-            if (Extend(position.X, position.Y, result))
+            if (Extend(position.X, position.Y, position.Z, result))
             {
                 return Set(absolutePosition, item, result);
             }
@@ -41,60 +43,49 @@
 
         public void ForEach(EnumerateItemDelegate<T> func)
         {
-            base.ForEachWithin(new IntRectangle(0, 0, Size, Size), (block, coords) => func(block, coords + Offset));
+            base.ForEachWithin(new IntRectangle(0, 0, 0, Size, Size, Size), (block, coords) => func(block, coords + Offset));
         }
 
         public override void ForEachWithin(IntRectangle rectangle, EnumerateItemDelegate<T> func)
         {
             rectangle = IntRectangle.FromPoints(
-                IntVectorMath.MinMax(rectangle.LeftTop - Offset, IntVector.Zero, SizeVector),
-                IntVectorMath.MinMax(rectangle.RightBottom - Offset, IntVector.Zero, SizeVector)
+                IntVectorMath.MinMax(rectangle.LeftTopFront - Offset, IntVector.Zero, SizeVector),
+                IntVectorMath.MinMax(rectangle.RightBottomBack - Offset, IntVector.Zero, SizeVector)
             );
 
             base.ForEachWithin(rectangle, (block, coords) => func(block, coords + Offset));
         }
 
-        private bool Extend(int x, int y, SetItemResult<T> result)
+        private bool Extend(int x, int y, int z, SetItemResult<T> result)
         {
-            if (x < 0)
-            {
-                DoExtend(-1, y < 0 ? -1 : 0, result);
-                return true;
-            }
-            if (y < 0)
-            {
-                DoExtend(0, -1, result);
-                return true;
-            }
-            if (x >= Size)
-            {
-                DoExtend(0, y < 0 ? -1 : 0, result);
-                return true;
-            }
-            if (y >= Size)
-            {
-                DoExtend(-1, 0, result);
-                return true;
-            }
-            return false;
+            var xShift = x < 0 ? -1 : (x >= Size ? 1 : 0);
+            var yShift = y < 0 ? -1 : (y >= Size ? 1 : 0);
+            var zShift = z < 0 ? -1 : (z >= Size ? 1 : 0);
+
+            if (xShift == 0 && yShift == 0 && zShift == 0)
+                return false;
+
+            DoExtend(Math.Min(0, xShift), Math.Min(0, yShift), Math.Min(0, zShift), result);
+
+            return true;
         }
 
-        private void DoExtend(int shiftX, int shiftY, SetItemResult<T> result)
+        private void DoExtend(int shiftX, int shiftY, int shiftZ, SetItemResult<T> result)
         {
             var prevSize = Size;
-            var prevChildren = _children;
+            var prevChildren = Children;
 
-            var offsetShift = new IntVector(shiftX, shiftY) * prevSize;
+            var offsetShift = new IntVector(shiftX, shiftY, shiftZ) * prevSize;
             result.OffsetShift = result.OffsetShift + offsetShift;
             Offset += offsetShift;
 
             SetSize(prevSize * 2);
 
             var child = new BinaryGridBranch<T>(prevSize, prevChildren);
-            var childIndex = -shiftX + 2 * -shiftY;
+            var childIndex = -shiftX + 2 * -shiftY + 4 * -shiftZ;
 
-            _children = new IBinarySubGrid<T>[4];
-            _children[childIndex] = child;
+            Children = new IBinarySubGrid<T>[8];
+            Children[childIndex] = child;
         }
     }
 }

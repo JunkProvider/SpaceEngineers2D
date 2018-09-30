@@ -1,6 +1,5 @@
 ﻿namespace SpaceEngineers2D.Geometry
 {
-    using System;
     using System.Windows;
 
     public struct IntRectangle
@@ -15,14 +14,19 @@
             return new IntRectangle(leftTop, rightBottom - leftTop);
         }
 
-        public static IntRectangle FromXYWidthAndHeight(int x, int y, int width, int height)
+        public static IntRectangle FromXYWidthHeight(int x, int y, int width, int height)
         {
-            return new IntRectangle(new IntVector(x, y), new IntVector(width, height));
+            return new IntRectangle(new IntVector(x, y, 0), new IntVector(width, height, 0));
         }
 
-        public static IntRectangle FromLeftTopRightAndBottom(int left, int top, int right, int bottom)
+        public static IntRectangle FromXYZWidthHeightDepth(int x, int y, int z, int width, int height, int depth)
         {
-            return new IntRectangle(new IntVector(left, top), new IntVector(right - left, bottom - top));
+            return new IntRectangle(new IntVector(x, y, z), new IntVector(width, height, depth));
+        }
+
+        public static IntRectangle FromLeftTopFrontRightBottomBack(int left, int top, int front, int right, int bottom, int back)
+        {
+            return new IntRectangle(new IntVector(left, top, front), new IntVector(right - left, bottom - top, back - front));
         }
 
         public IntVector Position;
@@ -37,21 +41,29 @@
 
         public int Bottom => Position.Y + Size.Y;
 
+        public int Front => Position.Z;
+
+        public int Back => Position.Z + Size.Z;
+
         public int Width => Size.X;
 
         public int Height => Size.Y;
 
-        public IntVector LeftTop => Position;
+        public int Depth => Size.Z;
 
-        public IntVector RightBottom => Position + Size;
+        public IntVector LeftTopFront => Position;
+
+        public IntVector RightBottomBack => Position + Size;
 
         public IntVector Center => Position + Size / 2;
 
-        public IntVector CenterBottom => new IntVector(Left + Size.X / 2, Bottom);
+        public IntVector CenterBottom => new IntVector(Left + Width / 2, Bottom, Front + Depth / 2);
 
         public IntRange XRange => new IntRange(Left, Right);
 
         public IntRange YRange => new IntRange(Top, Bottom);
+
+        public IntRange ZRange => new IntRange(Front, Back);
 
         public IntRectangle(IntVector position, IntVector size)
         {
@@ -59,31 +71,35 @@
             Size = size;
         }
 
-        public IntRectangle(int x, int y, int width, int height)
+        public IntRectangle(int x, int y, int z, int width, int height, int depth)
         {
-            Position = new IntVector(x, y);
-            Size = new IntVector(width, height);
+            Position = new IntVector(x, y, z);
+            Size = new IntVector(width, height, depth);
         }
 
         public IntRectangle Extend(int extend)
         {
-            var extendVector = new IntVector(extend, extend);
-            return new IntRectangle(Position - extendVector, Size + (extendVector * 2));
+            return Extend(new IntVector(extend, extend, extend));
+        }
+
+        public IntRectangle Extend(IntVector extend)
+        {
+            return new IntRectangle(Position - extend, Size + (extend * 2));
         }
 
         public IntRectangle Move(IntVector offset)
         {
-            return new IntRectangle(this.Position + offset, this.Size);
+            return new IntRectangle(Position + offset, Size);
         }
 
         public bool Contains(IntVector point)
         {
-            return point.X >= Left && point.X < Right && point.Y >= Top && point.Y < Bottom;
+            return point.X >= Left && point.X < Right && point.Y >= Top && point.Y < Bottom && point.Z >= Front && point.Z < Back;
         }
 
         public bool Intersects(IntRectangle other)
         {
-            return other.Right > Left && other.Left < Right && other.Bottom > Top && other.Top < Bottom;
+            return other.Right > Left && other.Left < Right && other.Bottom > Top && other.Top < Bottom && other.Back > Front && other.Front < Back;
         }
 
         public bool TryGetTouchedSide(IntRectangle other, out Side touchedSide)
@@ -125,7 +141,7 @@
 
         public override string ToString()
         {
-            return Position.X + "|" + Position.Y + " " + Size.X + "x" + Size.Y;
+            return Position.X + "|" + Position.Y + "|" + Position.Z + " " + Size.X + "x" + Size.Y + "x" + Size.Z;
         }
     }
 }

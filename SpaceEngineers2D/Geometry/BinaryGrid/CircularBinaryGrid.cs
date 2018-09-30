@@ -52,12 +52,17 @@ namespace SpaceEngineers2D.Geometry.BinaryGrid
             var right = CoordinateSystem.NormalizeX(rectangle.Right);
             var top = CoordinateSystem.NormalizeY(rectangle.Top);
             var bottom = CoordinateSystem.NormalizeY(rectangle.Bottom);
+            var front = rectangle.Front;
 
             if (rectangle.Width >= gridWidth)
-                return new [] { new IntRectangle(CoordinateSystem.MinX, top, gridWidth, rectangle.Height) };
+                return new [] { new IntRectangle(
+                    CoordinateSystem.MinX, top, front,
+                    gridWidth, rectangle.Height, rectangle.Depth) };
 
             if (rectangle.Height >= gridHeight)
-                return new[] { new IntRectangle(left, CoordinateSystem.MinY, rectangle.Width, gridHeight) };
+                return new[] { new IntRectangle(
+                    left, CoordinateSystem.MinY, front,
+                    rectangle.Width, gridHeight, rectangle.Depth) };
 
             var normalizedRectangles = new List<IntRectangle>(2);
             
@@ -69,20 +74,30 @@ namespace SpaceEngineers2D.Geometry.BinaryGrid
                 }
                 else
                 {
-                    normalizedRectangles.Add(new IntRectangle(CoordinateSystem.MinX, top, right - CoordinateSystem.MinX, rectangle.Height));
-                    normalizedRectangles.Add(new IntRectangle(left, top, CoordinateSystem.MaxX - left, rectangle.Height));
+                    normalizedRectangles.Add(new IntRectangle(
+                        CoordinateSystem.MinX, top, front,
+                        right - CoordinateSystem.MinX, rectangle.Height, rectangle.Depth));
+                    normalizedRectangles.Add(new IntRectangle(
+                        left, top, front,
+                        CoordinateSystem.MaxX - left, rectangle.Height, rectangle.Depth));
                 }
             }
             else
             {
                 if (top > bottom)
                 {
-                    normalizedRectangles.Add(new IntRectangle(left, CoordinateSystem.MinY, rectangle.Width, bottom - CoordinateSystem.MinY));
-                    normalizedRectangles.Add(new IntRectangle(left, top, rectangle.Width, CoordinateSystem.MaxY - top));
+                    normalizedRectangles.Add(new IntRectangle(
+                        left, CoordinateSystem.MinY, front,
+                        rectangle.Width, bottom - CoordinateSystem.MinY, rectangle.Depth));
+                    normalizedRectangles.Add(new IntRectangle(
+                        left, top, front,
+                        rectangle.Width, CoordinateSystem.MaxY - top, rectangle.Depth));
                 }
                 else
                 {
-                    normalizedRectangles.Add(new IntRectangle(left, rectangle.Top, rectangle.Width, rectangle.Height));
+                    normalizedRectangles.Add(new IntRectangle(
+                        left, rectangle.Top, front,
+                        rectangle.Width, rectangle.Height, rectangle.Depth));
                 }
             }
 

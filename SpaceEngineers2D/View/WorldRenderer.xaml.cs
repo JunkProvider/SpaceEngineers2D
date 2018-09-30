@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows.Input;
@@ -60,15 +59,34 @@ namespace SpaceEngineers2D.View
             var viewport = GetViewport();
 
             camera.Viewport = viewport;
-            camera.Position = ApplicationViewModel.World.Player.Position + IntVector.Up * Constants.PhysicsUnit;
+            camera.Position = ApplicationViewModel.World.Player.Position + IntVector.Up * Constants.BlockSize;
 
             var visibleArea = camera.UncastRectangle(IntRectangle.FromPositionAndSize(IntVector.Zero, viewport))
-                .Extend(2 * Constants.PhysicsUnit);
+                .Extend(new IntVector(2 * Constants.BlockSize, Constants.BlockSize, 0));
 
+            RenderBackgroundBlocks(dc, visibleArea, camera);
             RenderPlayer(dc);
             RenderItems(dc);
-            RenderGrids(dc, visibleArea, camera);
+            RenderForegroundBlocks(dc, visibleArea, camera);
             RenderHoveredBlockEffect(dc);
+        }
+
+        private void RenderForegroundBlocks(DrawingContext dc, IntRectangle visibleArea, Camera camera)
+        {
+            var visibleAreaPosition = visibleArea.Position;
+            visibleAreaPosition.Z = 0;
+            var visibleAreaSize = visibleArea.Size;
+            visibleAreaSize.Z = Constants.BlockSize;
+            RenderGrids(dc, IntRectangle.FromPositionAndSize(visibleAreaPosition, visibleAreaSize), camera);
+        }
+
+        private void RenderBackgroundBlocks(DrawingContext dc, IntRectangle visibleArea, Camera camera)
+        {
+            var visibleAreaPosition = visibleArea.Position;
+            visibleAreaPosition.Z = Constants.BlockSize;
+            var visibleAreaSize = visibleArea.Size;
+            visibleAreaSize.Z = Constants.BlockSize;
+            RenderGrids(dc,IntRectangle.FromPositionAndSize(visibleAreaPosition, visibleAreaSize), camera);
         }
 
         private void RenderPlayer(DrawingContext dc)
@@ -110,7 +128,7 @@ namespace SpaceEngineers2D.View
             foreach (var grid in ApplicationViewModel.World.Grids)
             {
                 grid.ForEachWithin(
-                    IntRectangle.FromPositionAndSize(visibleArea.Position, visibleArea.Size),
+                    visibleArea,
                     (block, blockPosition) =>
                     {
                         var renderer = _blockRendererRegistry.Get(block.GetType());
@@ -119,7 +137,7 @@ namespace SpaceEngineers2D.View
 
                         var blockRect = IntRectangle.FromPositionAndSize(
                             denormalzedBlockPosition, 
-                            IntVector.RightBottom * Constants.PhysicsUnit);
+                            IntVector.RightDown * Constants.BlockSize);
 
                         renderer.Render(dc, camera, block, blockRect);
                     });
@@ -164,7 +182,7 @@ namespace SpaceEngineers2D.View
 
         private IntVector GetViewport()
         {
-            return new IntVector((int)ActualWidth, (int)ActualHeight);
+            return new IntVector((int)ActualWidth, (int)ActualHeight, 0);
         }
 
         private PhysicsEngine GetPhysicsEngine()

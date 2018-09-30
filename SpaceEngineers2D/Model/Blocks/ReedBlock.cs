@@ -50,7 +50,7 @@ namespace SpaceEngineers2D.Model.Blocks
                 && bottomBlock?.Object.BlockType != world.BlockTypes.DirtWithGrass
                 && bottomBlock?.Object.BlockType != world.BlockTypes.Reed)
             {
-                world.RemoveBlock(ownBounds.LeftTop);
+                world.RemoveBlock(ownBounds.LeftTopFront);
             }
         }
     }

@@ -4,8 +4,8 @@ namespace SpaceEngineers2D.Physics
 {
     public static class Constants
     {
-        public const int PhysicsUnit = 1000;
+        public const int BlockSize = 1000;
 
-        public static readonly IntVector PhysicsUnitVector = new IntVector(PhysicsUnit, PhysicsUnit);
+        public static readonly IntVector BlockSizeVector = new IntVector(BlockSize, BlockSize, BlockSize);
     }
 }

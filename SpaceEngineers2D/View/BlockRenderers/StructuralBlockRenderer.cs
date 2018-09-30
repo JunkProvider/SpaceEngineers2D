@@ -12,8 +12,9 @@ namespace SpaceEngineers2D.View.BlockRenderers
         private const float BarMinHeight = 0.05f;
         private readonly Brush _integrityCapBrush = new SolidColorBrush(Color.FromArgb(128, 64, 128, 255));
         private readonly Brush _integrityBrush = new SolidColorBrush(Color.FromArgb(255, 64, 128, 255));
+        private readonly Brush _backgroundDarkeningBrush = new SolidColorBrush(Colors.Black);
         private readonly Pen _blueprintFramePen = new Pen(new SolidColorBrush(Color.FromArgb(255, 64, 128, 255)), 2);
-        private readonly Pen _integrityPen = new Pen(Brushes.Transparent, 0);
+        private readonly Pen _transparentPen = new Pen(Brushes.Transparent, 0);
 
         protected override void Render(DrawingContext context, Camera camera, StructuralBlock block, IntRectangle rectangle)
         {
@@ -32,7 +33,16 @@ namespace SpaceEngineers2D.View.BlockRenderers
             /*var fill = new SolidColorBrush(block.Color);
             var stroke = new Pen(Brushes.Transparent, 0);*/
 
-            context.DrawImage(block.Image, camera.CastRectangle(rectangle).ToWindowsRect());            
+            var windowsRectangle = camera.CastRectangle(rectangle).ToWindowsRect();
+            
+            context.DrawImage(block.Image, windowsRectangle);
+
+            if (rectangle.Front != 0)
+            {
+                context.PushOpacity(0.2f);
+                context.DrawRectangle(_backgroundDarkeningBrush, _transparentPen, windowsRectangle);
+                context.Pop();
+            }
         }
 
         private void RenderUnfinished(DrawingContext context, Camera camera, StructuralBlock block, IntRectangle rectangle)
@@ -47,23 +57,30 @@ namespace SpaceEngineers2D.View.BlockRenderers
             // context.DrawRectangle(Brushes.Transparent, _blueprintFramePen, camera.CastRectangle(rectangle).ToWindowsRect());
 
             var integrityCap = block.BlueprintState.IntegrityCapRatio;
-            var integrityCapRect = new IntRectangle(
+            var integrityCapRect = IntRectangle.FromXYWidthHeight(
                 rectangle.Left,
                 (int)(rectangle.Top + (1 - integrityCap) * rectangle.Size.Y),
                 (int)(rectangle.Size.X * BarThickness),
                 (int)(integrityCap * rectangle.Size.Y));
 
-            context.DrawRectangle(_integrityCapBrush, _integrityPen, camera.CastRectangle(integrityCapRect).ToWindowsRect());
+            context.DrawRectangle(_integrityCapBrush, _transparentPen, camera.CastRectangle(integrityCapRect).ToWindowsRect());
 
             var integrity = block.BlueprintState.IntegrityRatio;
             var integrityRectHeight = (int)Math.Max(integrity * rectangle.Size.Y, BarMinHeight * rectangle.Size.Y);
-            var integrityRect = new IntRectangle(
+            var integrityRect = IntRectangle.FromXYWidthHeight(
                 rectangle.Left,
                 rectangle.Top + rectangle.Size.Y - integrityRectHeight,
                 (int)(rectangle.Size.X * BarThickness),
                 integrityRectHeight);
 
-            context.DrawRectangle(_integrityBrush, _integrityPen, camera.CastRectangle(integrityRect).ToWindowsRect());
+            context.DrawRectangle(_integrityBrush, _transparentPen, camera.CastRectangle(integrityRect).ToWindowsRect());
+
+            if (rectangle.Front != 0)
+            {
+                context.PushOpacity(0.2f);
+                context.DrawRectangle(_backgroundDarkeningBrush, _transparentPen, camera.CastRectangle(rectangle).ToWindowsRect());
+                context.Pop();
+            }
         }
     }
 }

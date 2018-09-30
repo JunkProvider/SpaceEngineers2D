@@ -24,7 +24,7 @@
 
         public Camera Camera { get; set; }
 
-        public IntVector Gravity { get; set; } = new IntVector(0, 9810);
+        public IntVector Gravity { get; set; } = IntVector.Down * 9810;
 
         public World(Player player, Camera camera, int width)
         {
@@ -38,12 +38,12 @@
         public bool IsBottomBlock(IntVector position, IntVector bottomBlockPosition)
         {
             CoordinateSystem.Denormalize(bottomBlockPosition, position);
-            return bottomBlockPosition.X == position.X && bottomBlockPosition.Y == position.Y + Constants.PhysicsUnit;
+            return bottomBlockPosition.X == position.X && bottomBlockPosition.Y == position.Y + Constants.BlockSize;
         }
 
         public IBlockInWorld GetBottomBlock(IntVector position)
         {
-            return GetBlock(position + IntVector.Down * Constants.PhysicsUnit);
+            return GetBlock(position + IntVector.Down * Constants.BlockSize);
         }
 
         public IBlockInWorld GetBlock(IntVector position)
@@ -62,7 +62,7 @@
 
         public void RemoveBlock(IntVector positionOfBlockToRemove)
         {
-            var areaAroundBlock = IntRectangle.FromPositionAndSize(positionOfBlockToRemove, IntVector.RightBottom * Constants.PhysicsUnit).Extend(Constants.PhysicsUnit);
+            var areaAroundBlock = IntRectangle.FromPositionAndSize(positionOfBlockToRemove, IntVector.RightDown * Constants.BlockSize).Extend(Constants.BlockSize);
             
             foreach (var grid in Grids)
             {
@@ -82,28 +82,11 @@
                         // var blockBounds = IntRectangle.FromPositionAndSize(position, Constants.PhysicsUnitVector);
                         block.OnNeighborChanged(
                             this,
-                            IntRectangle.FromPositionAndSize(position, Constants.PhysicsUnitVector),
+                            IntRectangle.FromPositionAndSize(position, Constants.BlockSizeVector),
                             new BlockInWorld<Block>(block, grid, positionOfBlockToRemove));
                     }
                 });
             }
-        }
-
-        public IntVector Normalize(IntVector position)
-        {
-            var x = position.X;
-
-            while (x >= Width)
-            {
-                x -= Width;
-            }
-
-            while (x < 0)
-            {
-                x += Width;
-            }
-
-            return new IntVector(x, position.Y);
         }
     }
 }

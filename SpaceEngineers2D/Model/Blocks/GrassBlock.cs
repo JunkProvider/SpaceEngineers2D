@@ -48,7 +48,7 @@ namespace SpaceEngineers2D.Model.Blocks
 
             if (bottomBlock?.Object.BlockType != world.BlockTypes.Dirt && bottomBlock?.Object.BlockType != world.BlockTypes.DirtWithGrass)
             {
-                world.RemoveBlock(ownBounds.LeftTop);
+                world.RemoveBlock(ownBounds.LeftTopFront);
             }
         }
     }

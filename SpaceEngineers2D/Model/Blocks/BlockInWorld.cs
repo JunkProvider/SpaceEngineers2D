@@ -20,7 +20,7 @@ namespace SpaceEngineers2D.Model.Blocks
         {
             Object = obj ?? throw new ArgumentNullException(nameof(obj));
             Grid = grid ?? throw new ArgumentNullException(nameof(grid));
-            Bounds = IntRectangle.FromPositionAndSize(position, Constants.PhysicsUnitVector);
+            Bounds = IntRectangle.FromPositionAndSize(position, Constants.BlockSizeVector);
         }
 
         public void As<TCastedBlock>(Action<BlockInWorld<TCastedBlock>> action) where TCastedBlock : Block

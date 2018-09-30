@@ -103,6 +103,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controllers\WorldController.cs" />
+    <Compile Include="Converters\BooleanConverter.cs" />
     <Compile Include="Converters\EnumMemberConverter.cs" />
     <Compile Include="Dispatch.cs" />
     <Compile Include="Geometry\BinaryGrid\CircularBinaryGrid.cs" />
@@ -141,6 +142,7 @@
     <Compile Include="Model\Items\StandardItem.cs" />
     <Compile Include="Model\Items\StandardItemType.cs" />
     <Compile Include="Model\MobileItem.cs" />
+    <Compile Include="Model\ZLayer.cs" />
     <Compile Include="Persistence\DataModel\BlockBlueprintStateData.cs" />
     <Compile Include="Persistence\DataModel\BlockData.cs" />
     <Compile Include="Persistence\Deserializer.cs" />
