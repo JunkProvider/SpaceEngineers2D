@@ -1,10 +1,10 @@
 ﻿namespace SpaceEngineers2D.Geometry.BinaryGrid
 {
-    public class BinaryGridRoot<T> : BinaryGridBranch<T>
+    public class BinaryGrid<T> : BinaryGridBranch<T>
     {
-        public IntVector Offset { get; set; }
+        private IntVector Offset { get; set; }
 
-        public BinaryGridRoot()
+        public BinaryGrid()
             :base(2 * BinaryGridLeaf<T>.Size)
         {
         }

@@ -38,13 +38,13 @@ namespace SpaceEngineers2D.Model.Blocks
         public override void OnNeighborChanged(World world, IntRectangle ownBounds, IBlockInWorld changedNeighbor)
         {
             base.OnNeighborChanged(world, ownBounds, changedNeighbor);
-
-            if (ownBounds.Left != changedNeighbor.Bounds.Left || ownBounds.Bottom != changedNeighbor.Bounds.Top)
+            
+            if (!world.IsBottomBlock(ownBounds.Position, changedNeighbor.Bounds.Position))
             {
                 return;
             }
 
-            var bottomBlock = world.GetBlock(ownBounds.Position + (IntVector.Down * Constants.PhysicsUnitVector));
+            var bottomBlock = world.GetBottomBlock(ownBounds.Position);
 
             if (bottomBlock?.Object.BlockType != world.BlockTypes.Dirt && bottomBlock?.Object.BlockType != world.BlockTypes.DirtWithGrass)
             {

@@ -105,6 +105,8 @@
     <Compile Include="Controllers\WorldController.cs" />
     <Compile Include="Converters\EnumMemberConverter.cs" />
     <Compile Include="Dispatch.cs" />
+    <Compile Include="Geometry\BinaryGrid\CircularBinaryGrid.cs" />
+    <Compile Include="Geometry\IntRange.cs" />
     <Compile Include="Model\BlockBlueprintSlot.cs" />
     <Compile Include="Model\BlockBlueprints\BlockBlueprint.cs" />
     <Compile Include="Model\BlockBlueprints\BlockBlueprintComponent.cs" />
@@ -127,6 +129,7 @@
     <Compile Include="Model\Blocks\StandardBlockType.cs" />
     <Compile Include="Model\Blocks\StructuralBlock.cs" />
     <Compile Include="Model\Blocks\StructuralBlockType.cs" />
+    <Compile Include="Model\ICoordinateSystem.cs" />
     <Compile Include="Model\IGridContainer.cs" />
     <Compile Include="Model\IMobileObject.cs" />
     <Compile Include="Model\Inventories\Inventory.cs" />
@@ -194,7 +197,7 @@
     </Compile>
     <Compile Include="Geometry\BinaryGrid\BinaryGridLeaf.cs" />
     <Compile Include="Geometry\BinaryGrid\BinaryGridBranch.cs" />
-    <Compile Include="Geometry\BinaryGrid\BinaryGridRoot.cs" />
+    <Compile Include="Geometry\BinaryGrid\BinaryGrid.cs" />
     <Compile Include="Geometry\BinaryGrid\EnumerateItemDelegate.cs" />
     <Compile Include="Geometry\BinaryGrid\IBinarySubGrid.cs" />
     <Compile Include="Geometry\BinaryGrid\SetItemResult.cs" />

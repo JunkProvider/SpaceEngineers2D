@@ -66,9 +66,19 @@ namespace SpaceEngineers2D.Geometry
             return new IntVector(X + x, Y);
         }
 
+        public IntVector SubX(int x)
+        {
+            return new IntVector(X - x, Y);
+        }
+
         public IntVector AddY(int y)
         {
             return new IntVector(X, Y + y);
+        }
+
+        public IntVector SubY(int y)
+        {
+            return new IntVector(X, Y - y);
         }
 
         public override string ToString()

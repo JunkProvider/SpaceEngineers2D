@@ -3,6 +3,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using SpaceEngineers2D.Annotations;
+using SpaceEngineers2D.Physics;
+using SpaceEngineers2D.View.Inventory;
 
 namespace SpaceEngineers2D.Model
 {
@@ -19,6 +21,7 @@ namespace SpaceEngineers2D.Model
         public event PropertyChangedEventHandler PropertyChanged;
 
         private IBlockInWorld _interactingBlock;
+        private IntVector _position;
 
         public Inventory Inventory { get; } = new Inventory(9);
 
@@ -28,7 +31,17 @@ namespace SpaceEngineers2D.Model
 
         public BlockBlueprintSlot SelectedBlueprintSlot => BlueprintSlots.SingleOrDefault(blueprintSlot => blueprintSlot.Selected);
 
-        public IntVector Position { get; set; }
+        public IntVector Position
+        {
+            get => _position;
+            set
+            {
+                if (SetProperty(ref _position, value))
+                    RaisePropertyChanged(nameof(Coords));
+            }
+        }
+
+        public IntVector Coords => Position / Constants.PhysicsUnitVector;
 
         public IntVector Size { get; set; } = new IntVector(800, 1800);
 
@@ -92,16 +105,19 @@ namespace SpaceEngineers2D.Model
         }
 
         [NotifyPropertyChangedInvocator]
-        private void SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
         {
             if (!object.Equals(field, value))
             {
                 field = value;
                 RaisePropertyChanged(propertyName);
+                return true;
             }
+
+            return false;
         }
 
-        private void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        protected void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

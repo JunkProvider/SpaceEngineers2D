@@ -43,7 +43,7 @@ namespace SpaceEngineers2D.Controllers
                 var grid = World.Grids.First();
                 var blockBounds = grid.GetBlockBounds(mousePosition);
 
-                if (!Player.Bounds.Overlaps(blockBounds) && IsInPlayerRange(blockBounds))
+                if (!Player.Bounds.Intersects(blockBounds) && IsInPlayerRange(blockBounds))
                 {
                     PlaceBlock(new BlockCoords(grid, blockBounds));
                 }

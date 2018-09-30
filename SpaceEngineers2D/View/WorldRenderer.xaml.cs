@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows.Input;
@@ -15,7 +16,7 @@ namespace SpaceEngineers2D.View
 {
     public partial class WorldRenderer
     {
-        private readonly PhysicsEngine _physicsEngine = new PhysicsEngine();
+        private PhysicsEngine _physicsEngine;
 
         private readonly BlockRendererRegistry _blockRendererRegistry = new BlockRendererRegistry();
 
@@ -42,7 +43,7 @@ namespace SpaceEngineers2D.View
                         var mousePosition = ApplicationViewModel.World.Camera.UncastPosition(IntVector.FromWindowsPoint(Mouse.GetPosition(this)));
                         ApplicationViewModel.WorldController.OnMouseMove(mousePosition);
                         ApplicationViewModel.WorldController.OnUpdate(timer.Interval);
-                        _physicsEngine.Update(ApplicationViewModel.World, timer.Interval);
+                        GetPhysicsEngine().Update(ApplicationViewModel.World, timer.Interval);
                         InvalidateVisual();
                     }
                 };
@@ -110,12 +111,14 @@ namespace SpaceEngineers2D.View
             {
                 grid.ForEachWithin(
                     IntRectangle.FromPositionAndSize(visibleArea.Position, visibleArea.Size),
-                    (block, position) =>
+                    (block, blockPosition) =>
                     {
                         var renderer = _blockRendererRegistry.Get(block.GetType());
 
+                        var denormalzedBlockPosition = ApplicationViewModel.World.CoordinateSystem.Denormalize(blockPosition, camera.Position);
+
                         var blockRect = IntRectangle.FromPositionAndSize(
-                            position,
+                            denormalzedBlockPosition, 
                             IntVector.RightBottom * Constants.PhysicsUnit);
 
                         renderer.Render(dc, camera, block, blockRect);
@@ -162,6 +165,14 @@ namespace SpaceEngineers2D.View
         private IntVector GetViewport()
         {
             return new IntVector((int)ActualWidth, (int)ActualHeight);
+        }
+
+        private PhysicsEngine GetPhysicsEngine()
+        {
+            if (_physicsEngine == null)
+                _physicsEngine = new PhysicsEngine(ApplicationViewModel.World.CoordinateSystem);
+
+            return _physicsEngine;
         }
 
         private static ImageSource LoadImage(string file)

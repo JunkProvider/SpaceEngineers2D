@@ -7,25 +7,36 @@
 
     public class CollisionEngine
     {
+        private ICoordinateSystem CoordinateSystem { get; }
+
+        public CollisionEngine(ICoordinateSystem coordinateSystem)
+        {
+            CoordinateSystem = coordinateSystem;
+        }
+        
         public void DetectTouchedBlocks(ICollection<Grid> grids, IMobileObject obj)
         {
             foreach (var pair in obj.TouchedBlocks)
             {
                 pair.Value.Clear();
             }
+            
+            var areaToCheck = IntRectangle.FromPositionAndSize(obj.Position, obj.Size).Extend(Constants.PhysicsUnit);
+
+            var objBounds = obj.Bounds;
+
+            /* var objLeft = NormalizeX(obj.Position.X);
+            var objRight = NormalizeX(obj.Position.X + obj.Size.X);
+            var objTop = NormalizeX(obj.Position.Y);
+            var objBottom = NormalizeX(obj.Position.Y + obj.Size.Y); */
 
             foreach (var grid in grids)
             {
-                var objBounds = IntRectangle.FromPositionAndSize(obj.Position, obj.Size);
-                var extendedObjBounds = IntRectangle.FromPositionAndSize(obj.Position, obj.Size).Extend(Constants.PhysicsUnit);
-
-                grid.ForEachWithin(extendedObjBounds, (block, blockPosition) =>
+                grid.ForEachWithin(areaToCheck, (block, blockPosition) =>
                 {
                     if (block.IsSolid)
                     {
-                        var blockBounds = IntRectangle.FromPositionAndSize(
-                            blockPosition,
-                            IntVector.RightBottom * Constants.PhysicsUnit);
+                        var blockBounds = CoordinateSystem.Denormalize(blockPosition, Constants.PhysicsUnitVector, objBounds.Position, objBounds.Size);
 
                         if (objBounds.TryGetTouchedSide(blockBounds, out var touchedSide))
                         {
@@ -50,74 +61,56 @@
             }
             else if (distance < 0)
             {
-                MoveLeft(grids, movingObj, distance);
+                MoveLeft(grids, movingObj, -distance);
             }
         }
 
         public void MoveRight(ICollection<Grid> grids, IMobileObject movingObj, int distance)
         {
-            var offset = distance;
-            // var touchedBlocks: BlockWithOffset[] = [];
+            var movingObjBounds = movingObj.Bounds;
 
-            foreach (var grid in grids) {
-                var movingObjPos = movingObj.Position;
-                var rightOrig = movingObjPos.X + movingObj.Size.X;
-                var rightDest = rightOrig + offset;
-                var top = movingObjPos.Y;
-                var bottom = movingObjPos.Y + movingObj.Size.Y;
+            var sweptArea = new IntRectangle(movingObjBounds.Right, movingObjBounds.Top, distance, movingObjBounds.Height);
 
-                var areaToCheck = IntRectangle.FromXYWidthAndHeight(rightOrig, top, rightDest - rightOrig, bottom - top)
-                    .Extend(Constants.PhysicsUnit);
+            var areaToCheck = sweptArea.Extend(Constants.PhysicsUnit);
 
-                grid.ForEachWithin(areaToCheck, (block, blockPos) => {
-                    if (block.IsSolid && top < blockPos.Y + Constants.PhysicsUnit && bottom > blockPos.Y)
+            foreach (var grid in grids)
+            {
+                grid.ForEachWithin(areaToCheck, (block, blockPos) =>
+                {
+                    var blockBounds = CoordinateSystem.Denormalize(blockPos, Constants.PhysicsUnitVector, sweptArea.Position, sweptArea.Size);
+
+                    if (block.IsSolid && sweptArea.Intersects(blockBounds))
                     {
-                        if (rightDest >= blockPos.X && rightOrig <= blockPos.X)
-                        {
-                            rightDest = blockPos.X;
-                            offset = rightDest - rightOrig;
-                            // touchedBlocks.push(new BlockWithOffset(block, offset));
-                        }
+                        sweptArea = new IntRectangle(sweptArea.Left, sweptArea.Top, blockBounds.Left - sweptArea.Left, sweptArea.Height);
                     }
                 });
             }
 
-            if (offset != 0)
-            {
-                movingObj.Position = movingObj.Position.AddX(offset);
-                // movingObj.touchedBlocks.items[Side.Left] = [];
-                // movingObj.touchedBlocks.items[Side.Right] = touchedBlocks.filter(b => b.offset <= offset).map(b => b.block);
-            }
+            movingObj.Position = movingObj.Position.AddX(sweptArea.Width);
         }
 
         public void MoveLeft(ICollection<Grid> grids, IMobileObject movingObj, int distance)
         {
-            var offset = distance;
-            // var touchedBlocks: BlockWithOffset[] = [];
+            var movingObjBounds = movingObj.Bounds;
 
-            foreach (var grid in grids) {
-                var movingObjPos = movingObj.Position;
-                var leftOrig = movingObjPos.X;
-                var leftDest = leftOrig + offset;
-                var top = movingObjPos.Y;
-                var bottom = movingObjPos.Y + movingObj.Size.Y;
+            var sweptArea = new IntRectangle(movingObjBounds.Left - distance, movingObjBounds.Top, distance, movingObjBounds.Height);
 
-                var areaToCheck = IntRectangle.FromXYWidthAndHeight(leftDest, top, leftOrig - leftDest, bottom - top)
-                    .Extend(Constants.PhysicsUnit);
+            var areaToCheck = sweptArea.Extend(Constants.PhysicsUnit);
 
-                grid.ForEachWithin(areaToCheck, (block, blockPos) => {
-                    if (block.IsSolid && top < blockPos.Y + Constants.PhysicsUnit && bottom > blockPos.Y)
+            foreach (var grid in grids)
+            {
+                grid.ForEachWithin(areaToCheck, (block, blockPos) =>
+                {
+                    var blockBounds = CoordinateSystem.Denormalize(blockPos, Constants.PhysicsUnitVector, sweptArea.Position, sweptArea.Size);
+
+                    if (block.IsSolid && sweptArea.Intersects(blockBounds))
                     {
-                        if (leftDest <= blockPos.X + Constants.PhysicsUnit && leftOrig >= blockPos.X + Constants.PhysicsUnit)
-                        {
-                            leftDest = blockPos.X + Constants.PhysicsUnit;
-                            offset = leftDest - leftOrig;
-                        }
+                        sweptArea = new IntRectangle(blockBounds.Right, sweptArea.Top, sweptArea.Right - blockBounds.Right, sweptArea.Height);
                     }
                 });
             }
 
-            movingObj.Position = movingObj.Position.AddX(offset);
+            movingObj.Position = movingObj.Position.SubX(sweptArea.Width);
         }
 
         public void MoveVertical(ICollection<Grid> grids, IMobileObject movingObj, int offset)
@@ -128,66 +121,65 @@
             }
             else if (offset < 0)
             {
-                MoveUp(grids, movingObj, offset);
+                MoveUp(grids, movingObj, -offset);
             }
         }
 
         public void MoveDown(ICollection<Grid> grids, IMobileObject movingObj, int distance)
         {
-            var offset = distance;
+            var movingObjBounds = movingObj.Bounds;
+            
+            var sweptArea = new IntRectangle(movingObjBounds.Left, movingObjBounds.Bottom, movingObjBounds.Width, distance);
+            
+            var areaToCheck = sweptArea.Extend(Constants.PhysicsUnit);
 
             foreach (var grid in grids) {
-                var movingObjPos = movingObj.Position;
-                var bottomOrig = movingObjPos.Y + movingObj.Size.Y;
-                var bottomDest = bottomOrig + offset;
-                var left = movingObjPos.X;
-                var right = movingObjPos.X + movingObj.Size.X;
+                grid.ForEachWithin(areaToCheck, (block, blockPos) =>
+                {
+                    var blockBounds = CoordinateSystem.Denormalize(blockPos, Constants.PhysicsUnitVector, sweptArea.Position, sweptArea.Size);
 
-                var areaToCheck = IntRectangle.FromXYWidthAndHeight(left, bottomOrig, right - left, bottomDest - bottomOrig)
-                    .Extend(Constants.PhysicsUnit);
-
-                grid.ForEachWithin(areaToCheck, (block, blockPos) => {
-                    if (block.IsSolid && left < blockPos.X + Constants.PhysicsUnit && right > blockPos.X)
+                    if (block.IsSolid && sweptArea.Intersects(blockBounds))
                     {
-                        if (bottomDest > blockPos.Y && bottomOrig <= blockPos.Y)
-                        {
-                            bottomDest = blockPos.Y;
-                            offset = bottomDest - bottomOrig;
-                        }
+                        sweptArea = new IntRectangle(sweptArea.Left, sweptArea.Top, sweptArea.Width, blockBounds.Top - sweptArea.Top);
                     }
                 });
             }
 
-            movingObj.Position = movingObj.Position.AddY(offset);
+            movingObj.Position = movingObj.Position.AddY(sweptArea.Height);
         }
 
         public void MoveUp(ICollection<Grid> grids, IMobileObject movingObj, int distance)
         {
-            var offset = distance;
+            var movingObjBounds = movingObj.Bounds;
 
-            foreach (var grid in grids) {
-                var movingObjPos = movingObj.Position;
-                var topOrig = movingObjPos.Y;
-                var topDest = topOrig + offset;
-                var left = movingObjPos.X;
-                var right = movingObjPos.X + movingObj.Size.X;
+            var sweptArea = new IntRectangle(movingObjBounds.Left, movingObjBounds.Top - distance, movingObjBounds.Width, distance);
 
-                var areaToCheck = IntRectangle.FromXYWidthAndHeight(left, topOrig, right - left, topOrig - topDest)
-                    .Extend(Constants.PhysicsUnit);
+            var areaToCheck = sweptArea.Extend(Constants.PhysicsUnit);
 
-                grid.ForEachWithin(areaToCheck, (block, blockPos) => {
-                    if (block.IsSolid && left < blockPos.X + Constants.PhysicsUnit && right > blockPos.X)
+            foreach (var grid in grids)
+            {
+                grid.ForEachWithin(areaToCheck, (block, blockPos) =>
+                {
+                    var blockBounds = CoordinateSystem.Denormalize(blockPos, Constants.PhysicsUnitVector, sweptArea.Position, sweptArea.Size);
+
+                    if (block.IsSolid && sweptArea.Intersects(blockBounds))
                     {
-                        if (topDest < blockPos.Y + Constants.PhysicsUnit && topOrig >= blockPos.Y + Constants.PhysicsUnit)
-                        {
-                            topDest = blockPos.Y + Constants.PhysicsUnit;
-                            offset = topDest - topOrig;
-                        }
+                        sweptArea = new IntRectangle(sweptArea.Left, blockBounds.Bottom, sweptArea.Width, sweptArea.Bottom - blockBounds.Bottom);
                     }
                 });
             }
 
-            movingObj.Position = movingObj.Position.AddY(offset);
+            movingObj.Position = movingObj.Position.SubY(sweptArea.Height);
+        }
+
+        private int NormalizeX(int x)
+        {
+            return CoordinateSystem.NormalizeX(x);
+        }
+
+        private int NormalizeY(int y)
+        {
+            return CoordinateSystem.NormalizeX(y);
         }
     }
 }

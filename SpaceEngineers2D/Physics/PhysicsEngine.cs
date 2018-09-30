@@ -1,14 +1,20 @@
 ﻿namespace SpaceEngineers2D.Physics
 {
     using System;
-    using System.Windows;
-
-    using SpaceEngineers2D.Geometry;
-    using SpaceEngineers2D.Model;
+    using Geometry;
+    using Model;
 
     public class PhysicsEngine
     {
-        private CollisionEngine _collisionEngine = new CollisionEngine();
+        private readonly CollisionEngine _collisionEngine;
+
+        public ICoordinateSystem CoordinateSystem { get; }
+
+        public PhysicsEngine(ICoordinateSystem coordinateSystem)
+        {
+            CoordinateSystem = coordinateSystem;
+            _collisionEngine = new CollisionEngine(coordinateSystem);
+        }
 
         public void Update(World world, TimeSpan elapsedTime)
         {
@@ -29,6 +35,8 @@
                 _collisionEngine.Move(world.Grids, item, item.Velocity * elapsedTime.TotalSeconds);
                 _collisionEngine.DetectTouchedBlocks(world.Grids, item);
             }
+
+            player.Position = CoordinateSystem.Normalize(player.Position);
         }
 
         private static void ApplyPlayerMovementOrders(Player player)

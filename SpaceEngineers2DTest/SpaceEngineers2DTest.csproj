@@ -48,7 +48,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Geometry\BinaryGrid\BinaryGridRootTest.cs" />
+    <Compile Include="Geometry\BinaryGrid\BinaryGridTest.cs" />
+    <Compile Include="Geometry\BinaryGrid\CircularBinaryGridTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -213,7 +213,7 @@ namespace SpaceEngineers2D.View
                 PersistenceService.Save(CurrentSaveName, World);
 
             var world = CreateWorld();
-            CreateEnvironment(world);
+            InitializeNewWorld(world);
             
             PersistenceService.Save(NewGameName, world);
             CurrentSaveName = NewGameName;
@@ -243,20 +243,20 @@ namespace SpaceEngineers2D.View
 
         private World CreateWorld()
         {
-            var world = new World(new Player { Position = new IntVector(0, -1600) }, new Camera { Zoom = 0.05f });
+            var world = new World(new Player { Position = new IntVector(0, -1600) }, new Camera { Zoom = 0.05f }, 30 * Constants.PhysicsUnit);
             world.Player.BlueprintSlots[0].BlueprintedBlock = world.BlockTypes.Concrete;
             world.Player.BlueprintSlots[1].BlueprintedBlock = world.BlockTypes.IronPlate;
-            world.Grids.Add(new Grid(0));
+            world.Grids.Add(new Grid(0, world.CoordinateSystem));
             return world;
         }
 
-        private void CreateEnvironment(World world)
+        private void InitializeNewWorld(World world)
         {
             var grid = world.Grids.First();
 
-            for (var x = -100; x < 100; x++)
+            for (var x = 0; x < world.Width / Constants.PhysicsUnit; x++)
             {
-                for (var y = 0; y < 50; y++)
+                for (var y = 0; y < 30; y++)
                 {
                     if (y == 0)
                     {
@@ -305,7 +305,7 @@ namespace SpaceEngineers2D.View
                 }
             }
 
-            for (var x = -100; x < 100; x++)
+            for (var x = 0; x < world.Width / Constants.PhysicsUnit; x++)
             {
                 if (_random.Next(0, 100) > 10)
                     continue;
@@ -320,7 +320,9 @@ namespace SpaceEngineers2D.View
 
             var blastFurnace = world.BlockTypes.BlastFurnace.Instantiate();
             blastFurnace.BlueprintState.FinishImmediately();
-            grid.SetBlock(new IntVector(-2, 0) * Constants.PhysicsUnit, blastFurnace);
+            grid.SetBlock(new IntVector(3, 0) * Constants.PhysicsUnit, blastFurnace);
+
+            world.Player.Position = new IntVector(3, -3) * Constants.PhysicsUnitVector;
         }
 
         private void SetWorld(World world)

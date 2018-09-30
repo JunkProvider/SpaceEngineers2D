@@ -9,12 +9,12 @@
     using SpaceEngineers2D.Geometry.BinaryGrid;
 
     [TestClass]
-    public class BinaryGridRootTest
+    public class BinaryGridTest
     {
         [TestMethod]
         public void Test1()
         {
-            var grid = new BinaryGridRoot<string>();
+            var grid = new BinaryGrid<string>();
 
             grid.Set(new IntVector(0, 0), "a");
 
@@ -24,7 +24,7 @@
         [TestMethod]
         public void Test2()
         {
-            var grid = new BinaryGridRoot<string>();
+            var grid = new BinaryGrid<string>();
 
             grid.Set(new IntVector(10, 0), "a");
 
@@ -34,7 +34,7 @@
         [TestMethod]
         public void Test3()
         {
-            var grid = new BinaryGridRoot<string>();
+            var grid = new BinaryGrid<string>();
 
             grid.Set(new IntVector(0, 10), "a");
 
@@ -44,7 +44,7 @@
         [TestMethod]
         public void Test4()
         {
-            var grid = new BinaryGridRoot<string>();
+            var grid = new BinaryGrid<string>();
 
             grid.Set(new IntVector(10, 10), "a");
 
@@ -54,7 +54,7 @@
         [TestMethod]
         public void Test5()
         {
-            var grid = new BinaryGridRoot<string>();
+            var grid = new BinaryGrid<string>();
 
             var result = grid.Set(new IntVector(-10, 0), "a");
 
@@ -65,7 +65,7 @@
         [TestMethod]
         public void Test6()
         {
-            var grid = new BinaryGridRoot<string>();
+            var grid = new BinaryGrid<string>();
 
             var result = grid.Set(new IntVector(0, -10), "a");
 
@@ -76,7 +76,7 @@
         [TestMethod]
         public void Test7()
         {
-            var grid = new BinaryGridRoot<string>();
+            var grid = new BinaryGrid<string>();
 
             var result = grid.Set(new IntVector(-10, -10), "a");
 
@@ -87,7 +87,7 @@
         [TestMethod]
         public void Test8()
         {
-            var grid = new BinaryGridRoot<string>();
+            var grid = new BinaryGrid<string>();
 
             var itemsToEnumerate = new Dictionary<IntVector, string>
             {

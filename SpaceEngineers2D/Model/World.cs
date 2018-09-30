@@ -1,12 +1,10 @@
-﻿using SpaceEngineers2D.Physics;
-
-namespace SpaceEngineers2D.Model
+﻿namespace SpaceEngineers2D.Model
 {
     using System.Collections.Generic;
-
-    using SpaceEngineers2D.Geometry;
-    using SpaceEngineers2D.Model.Blocks;
-    using SpaceEngineers2D.Model.Items;
+    using Physics;
+    using Geometry;
+    using Blocks;
+    using Items;
 
     public class World : IGridContainer
     {
@@ -16,6 +14,10 @@ namespace SpaceEngineers2D.Model
 
         public ICollection<Grid> Grids { get; set; } = new List<Grid>();
 
+        public int Width => CoordinateSystem.MaxX - CoordinateSystem.MinX;
+
+        public ICoordinateSystem CoordinateSystem { get; }
+
         public Player Player { get; set; }
 
         public ISet<MobileItem> Items { get; set; } = new HashSet<MobileItem>();
@@ -24,12 +26,24 @@ namespace SpaceEngineers2D.Model
 
         public IntVector Gravity { get; set; } = new IntVector(0, 9810);
 
-        public World(Player player, Camera camera)
+        public World(Player player, Camera camera, int width)
         {
             Player = player;
             Camera = camera;
             ItemTypes = new ItemTypes();
             BlockTypes = new BlockTypes(ItemTypes);
+            CoordinateSystem = Model.CoordinateSystem.CreateHorizontalCircular(0, width);
+        }
+
+        public bool IsBottomBlock(IntVector position, IntVector bottomBlockPosition)
+        {
+            CoordinateSystem.Denormalize(bottomBlockPosition, position);
+            return bottomBlockPosition.X == position.X && bottomBlockPosition.Y == position.Y + Constants.PhysicsUnit;
+        }
+
+        public IBlockInWorld GetBottomBlock(IntVector position)
+        {
+            return GetBlock(position + IntVector.Down * Constants.PhysicsUnit);
         }
 
         public IBlockInWorld GetBlock(IntVector position)
@@ -59,14 +73,37 @@ namespace SpaceEngineers2D.Model
                     continue;
                 }
 
+                // var removedBlockBounds = IntRectangle.FromPositionAndSize(positionOfBlockToRemove, Constants.PhysicsUnitVector);
+
                 grid.ForEachWithin(areaAroundBlock, (block, position) =>
                 {
                     if (block != null && block != removedBlock)
                     {
-                        block.OnNeighborChanged(this, IntRectangle.FromPositionAndSize(position, Constants.PhysicsUnitVector), new BlockInWorld<Block>(block, grid, positionOfBlockToRemove));
+                        // var blockBounds = IntRectangle.FromPositionAndSize(position, Constants.PhysicsUnitVector);
+                        block.OnNeighborChanged(
+                            this,
+                            IntRectangle.FromPositionAndSize(position, Constants.PhysicsUnitVector),
+                            new BlockInWorld<Block>(block, grid, positionOfBlockToRemove));
                     }
                 });
             }
+        }
+
+        public IntVector Normalize(IntVector position)
+        {
+            var x = position.X;
+
+            while (x >= Width)
+            {
+                x -= Width;
+            }
+
+            while (x < 0)
+            {
+                x += Width;
+            }
+
+            return new IntVector(x, position.Y);
         }
     }
 }

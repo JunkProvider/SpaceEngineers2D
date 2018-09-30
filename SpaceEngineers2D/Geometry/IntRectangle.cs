@@ -49,6 +49,10 @@
 
         public IntVector CenterBottom => new IntVector(Left + Size.X / 2, Bottom);
 
+        public IntRange XRange => new IntRange(Left, Right);
+
+        public IntRange YRange => new IntRange(Top, Bottom);
+
         public IntRectangle(IntVector position, IntVector size)
         {
             Position = position;
@@ -77,7 +81,7 @@
             return point.X >= Left && point.X < Right && point.Y >= Top && point.Y < Bottom;
         }
 
-        public bool Overlaps(IntRectangle other)
+        public bool Intersects(IntRectangle other)
         {
             return other.Right > Left && other.Left < Right && other.Bottom > Top && other.Top < Bottom;
         }
