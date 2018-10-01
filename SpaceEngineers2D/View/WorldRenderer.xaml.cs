@@ -23,6 +23,8 @@ namespace SpaceEngineers2D.View
 
         private ApplicationViewModel ApplicationViewModel => DataContext as ApplicationViewModel;
 
+        private DateTime LastUpdateTime { get; set; }
+
         public WorldRenderer()
         {
             InitializeComponent();
@@ -34,15 +36,20 @@ namespace SpaceEngineers2D.View
 
             var timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(30);
+            LastUpdateTime = DateTime.Now;
             timer.Start();
             timer.Tick += (sender, args) =>
                 {
                     if (ApplicationViewModel?.WorldController != null)
                     {
+                        var time = DateTime.Now;
+                        var elapsedTime = time - LastUpdateTime;
+                        LastUpdateTime = time;
+
                         var mousePosition = ApplicationViewModel.World.Camera.UncastPosition(IntVector.FromWindowsPoint(Mouse.GetPosition(this)));
                         ApplicationViewModel.WorldController.OnMouseMove(mousePosition);
-                        ApplicationViewModel.WorldController.OnUpdate(timer.Interval);
-                        GetPhysicsEngine().Update(ApplicationViewModel.World, timer.Interval);
+                        ApplicationViewModel.WorldController.OnUpdate(elapsedTime);
+                        GetPhysicsEngine().Update(ApplicationViewModel.World, elapsedTime);
                         InvalidateVisual();
                     }
                 };

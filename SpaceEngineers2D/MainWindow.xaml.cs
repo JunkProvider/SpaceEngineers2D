@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows.Input;
+using System.Windows.Media;
 using SpaceEngineers2D.Geometry;
 using SpaceEngineers2D.Model;
 using SpaceEngineers2D.Persistence;
