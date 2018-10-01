@@ -2,6 +2,6 @@
 {
     public enum Side
     {
-        Left, Top, Bottom, Right
+        Left, Top, Bottom, Right, Front, Back
     }
 }

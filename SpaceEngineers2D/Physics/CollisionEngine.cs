@@ -25,11 +25,6 @@
 
             var objBounds = obj.Bounds;
 
-            /* var objLeft = NormalizeX(obj.Position.X);
-            var objRight = NormalizeX(obj.Position.X + obj.Size.X);
-            var objTop = NormalizeX(obj.Position.Y);
-            var objBottom = NormalizeX(obj.Position.Y + obj.Size.Y); */
-
             foreach (var grid in grids)
             {
                 grid.ForEachWithin(areaToCheck, (block, blockPosition) =>

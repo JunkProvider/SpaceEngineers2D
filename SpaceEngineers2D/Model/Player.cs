@@ -79,6 +79,8 @@ namespace SpaceEngineers2D.Model
             TouchedBlocks[Side.Right] = new List<Block>();
             TouchedBlocks[Side.Top] = new List<Block>();
             TouchedBlocks[Side.Bottom] = new List<Block>();
+            TouchedBlocks[Side.Front] = new List<Block>();
+            TouchedBlocks[Side.Back] = new List<Block>();
 
             MovementOrders[Side.Left] = false;
             MovementOrders[Side.Right] = false;

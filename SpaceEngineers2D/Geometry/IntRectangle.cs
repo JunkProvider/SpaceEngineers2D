@@ -104,7 +104,7 @@
 
         public bool TryGetTouchedSide(IntRectangle other, out Side touchedSide)
         {
-            if (Left < other.Right && Right > other.Left)
+            if (Left < other.Right && Right > other.Left && Front < other.Back && Back > other.Front)
             {
                 if (Top == other.Bottom)
                 {
@@ -117,7 +117,8 @@
                     return true;
                 }
             }
-            if (Top < other.Bottom && Bottom > other.Top)
+
+            if (Top < other.Bottom && Bottom > other.Top && Front < other.Back && Back > other.Front)
             {
                 if (Left == other.Right)
                 {
@@ -130,6 +131,21 @@
                     return true;
                 }
             }
+
+            if (Left < other.Right && Right > other.Left && Top < other.Bottom && Bottom > other.Top)
+            {
+                if (Front == other.Back)
+                {
+                    touchedSide = Side.Front;
+                    return true;
+                }
+                if (Back == other.Front)
+                {
+                    touchedSide = Side.Back;
+                    return true;
+                }
+            }
+
             touchedSide = Side.Left;
             return false;
         }
