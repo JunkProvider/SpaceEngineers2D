@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using SpaceEngineers2D.Model;
 using SpaceEngineers2D.Model.BlockBlueprints;
 using SpaceEngineers2D.Model.Blocks;
+using SpaceEngineers2D.Model.Entities;
 using SpaceEngineers2D.Model.Inventories;
 using SpaceEngineers2D.Model.Items;
 using SpaceEngineers2D.Persistence.DataModel;
@@ -15,20 +16,22 @@ namespace SpaceEngineers2D.Persistence
     {
         private BlockTypes BlockTypes { get; }
 
+        public EntityTypes EntityTypes { get; }
+
         private ItemTypes ItemTypes { get; }
 
-        public Deserializer(BlockTypes blockTypes, ItemTypes itemTypes)
+        public Deserializer(BlockTypes blockTypes, EntityTypes entityTypes, ItemTypes itemTypes)
         {
             BlockTypes = blockTypes;
+            EntityTypes = entityTypes;
             ItemTypes = itemTypes;
         }
 
         public void MapWorld(World world, WorldData worldData)
         {
-            world.Player.Position = worldData.Player.Position;
-            MapInventory(world.Player.Inventory, worldData.Player.Inventory);
 
             var gridDataDictionary = worldData.Grids.ToDictionary(gridData => gridData.Id);
+
             foreach (var grid in world.Grids)
             {
                 if (gridDataDictionary.TryGetValue(grid.Id, out var gridData))
@@ -36,6 +39,19 @@ namespace SpaceEngineers2D.Persistence
                     MapGrid(grid, gridData);
                 }
             }
+
+            foreach (var entityData in worldData.Entities)
+            {
+                world.Entities.Add(MapEntity(entityData));
+            }
+        }
+
+        public IEntity MapEntity(EntityData entityData)
+        {
+            var entityType = EntityTypes.GetEntityType(entityData.EntityTypeId);
+            var entity = entityType.Load(new LoadContext(this, BlockTypes, EntityTypes, ItemTypes), new DictionaryAccess(entityData.Data));
+            entity.Position = entityData.Position;
+            return entity;
         }
 
         public void MapInventory(Inventory inventory, InventoryData inventoryData)
@@ -58,7 +74,6 @@ namespace SpaceEngineers2D.Persistence
             var itemType = ItemTypes.GetItemType(slotData.ItemStack.Item.ItemTypeId);
             var item = itemType.Load(new DictionaryAccess(slotData.ItemStack.Item.Data));
             var itemStack = new ItemStack(item, slotData.ItemStack.Size);
-
             slot.Put(itemStack);
         }
 

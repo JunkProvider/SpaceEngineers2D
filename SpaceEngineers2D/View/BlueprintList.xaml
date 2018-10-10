@@ -5,8 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:model="clr-namespace:SpaceEngineers2D.Model"
              xmlns:converters="clr-namespace:SpaceEngineers2D.Converters"
+             xmlns:entities="clr-namespace:SpaceEngineers2D.Model.Entities"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance Type=model:Player}">
+             d:DataContext="{d:DesignInstance Type=entities:Player}">
     <UserControl.Resources>
         <converters:EnumMemberConverter x:Key="EnumMemberConverter" />
     </UserControl.Resources>

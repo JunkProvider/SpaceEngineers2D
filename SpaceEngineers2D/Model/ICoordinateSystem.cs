@@ -85,19 +85,22 @@ namespace SpaceEngineers2D.Model
 
         public static IntRectangle Denormalize(this ICoordinateSystem coordinateSystem, IntRectangle bounds, IntRectangle referenceBounds)
         {
-            return coordinateSystem.Denormalize(bounds.Position, bounds.Size, referenceBounds.Position, referenceBounds.Size);
+            var center = bounds.Center;
+            var referenceCenter = referenceBounds.Center;
+            return IntRectangle.FromCenterAndSite(
+                new IntVector(
+                    coordinateSystem.DenormalizeX(center.X, referenceCenter.X),
+                    coordinateSystem.DenormalizeY(center.Y, referenceCenter.Y),
+                    center.Z), 
+                bounds.Size);
         }
 
         public static IntRectangle Denormalize(this ICoordinateSystem coordinateSystem, IntVector position, IntVector size, IntVector referencePosition, IntVector referenceSize)
         {
             // TODO: consider size
-            return new IntRectangle(
-                coordinateSystem.DenormalizeX(position.X, referencePosition.X),
-                coordinateSystem.DenormalizeY(position.Y, referencePosition.Y),
-                position.Z,
-                size.X,
-                size.Y,
-                size.Z);
+            return coordinateSystem.Denormalize(
+                IntRectangle.FromPositionAndSize(position, size),
+                IntRectangle.FromPositionAndSize(referencePosition, referenceSize));
         }
 
         public static IntVector Denormalize(this ICoordinateSystem coordinateSystem, IntVector position, IntVector referencePosition)

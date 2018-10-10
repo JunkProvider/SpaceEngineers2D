@@ -2,6 +2,7 @@
 using System.Linq;
 using SpaceEngineers2D.Model;
 using SpaceEngineers2D.Model.BlockBlueprints;
+using SpaceEngineers2D.Model.Entities;
 using SpaceEngineers2D.Model.Inventories;
 using SpaceEngineers2D.Persistence.DataModel;
 
@@ -12,11 +13,16 @@ namespace SpaceEngineers2D.Persistence
         public WorldData MapWorld(World world)
         {
             return new WorldData(
-                player: new PlayerData(
-                    position: world.Player.Position,
-                    inventory: MapInventory(world.Player.Inventory)),
+                entities: world.Entities.Select(MapEntity).ToList(),
                 grids: world.Grids.Select(MapGrid).ToList()
             );
+        }
+
+        private EntityData MapEntity(IEntity entity)
+        {
+            var data = new Dictionary<string, object>();
+            entity.EntityType.Save(this, entity, new DictionaryAccess(data));
+            return new EntityData(entity.EntityType.Id, entity.Position, data);
         }
 
         public InventoryData MapInventory(Inventory inventory)

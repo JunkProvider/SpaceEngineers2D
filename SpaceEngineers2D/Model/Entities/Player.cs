@@ -1,26 +1,24 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using SpaceEngineers2D.Annotations;
+using SpaceEngineers2D.Geometry;
+using SpaceEngineers2D.Model.Blocks;
+using SpaceEngineers2D.Model.Inventories;
 using SpaceEngineers2D.Physics;
 
-namespace SpaceEngineers2D.Model
+namespace SpaceEngineers2D.Model.Entities
 {
-    using System.Collections.Generic;
-
-    using Geometry;
-    using Blocks;
-    using Inventories;
-
-    public class Player : IMobileObject, INotifyPropertyChanged
+    public class Player : Entity, INotifyPropertyChanged
     {
         public const int ItemPickupRange = 1000;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         private IBlockInWorld _interactingBlock;
-        private IntVector _position;
         private ZLayer _blockPlacementLayer;
 
         public Inventory Inventory { get; } = new Inventory(9);
@@ -36,24 +34,10 @@ namespace SpaceEngineers2D.Model
             get => _blockPlacementLayer;
             set => SetProperty(ref _blockPlacementLayer, value);
         }
-
-        public IntVector Position
-        {
-            get => _position;
-            set
-            {
-                if (SetProperty(ref _position, value))
-                    RaisePropertyChanged(nameof(Coords));
-            }
-        }
-
+        
         public IntVector Coords => Position / Constants.BlockSizeVector;
 
-        public IntVector Size { get; set; } = new IntVector(800, 1800, 1000);
-
-        public IntRectangle Bounds => IntRectangle.FromPositionAndSize(Position, Size);
-
-        public IntVector Velocity { get; set; }
+        public override IntVector Size { get; } = new IntVector(800, 1800, 1000);
 
         public Dictionary<Side, bool> MovementOrders { get; set; } = new Dictionary<Side, bool>();
 
@@ -71,17 +55,9 @@ namespace SpaceEngineers2D.Model
             set => SetProperty(ref _interactingBlock, value);
         }
 
-        public Dictionary<Side, List<Block>> TouchedBlocks { get; set; } = new Dictionary<Side, List<Block>>();
-
-        public Player()
+        public Player(PlayerType entityType)
+            : base(entityType)
         {
-            TouchedBlocks[Side.Left] = new List<Block>();
-            TouchedBlocks[Side.Right] = new List<Block>();
-            TouchedBlocks[Side.Top] = new List<Block>();
-            TouchedBlocks[Side.Bottom] = new List<Block>();
-            TouchedBlocks[Side.Front] = new List<Block>();
-            TouchedBlocks[Side.Back] = new List<Block>();
-
             MovementOrders[Side.Left] = false;
             MovementOrders[Side.Right] = false;
             MovementOrders[Side.Top] = false;
@@ -121,6 +97,43 @@ namespace SpaceEngineers2D.Model
             else
             {
                 BlockPlacementLayer = ZLayer.Foreground;
+            }
+        }
+
+        public override void Update(World world, TimeSpan elapsedTime)
+        {
+            base.Update(world, elapsedTime);
+
+            ApplyMovementOrders();
+        }
+
+        private void ApplyMovementOrders()
+        {
+            var playerMoveSpeed = 4;
+
+            if (TouchedBlocks[Side.Bottom].Count != 0)
+            {
+                var velocity = Velocity;
+
+                if (MovementOrders[Side.Left])
+                {
+                    velocity.X = -playerMoveSpeed * Constants.BlockSize;
+                }
+                else if (MovementOrders[Side.Right])
+                {
+                    velocity.X = playerMoveSpeed * Constants.BlockSize;
+                }
+                else
+                {
+                    velocity.X = 0;
+                }
+
+                if (MovementOrders[Side.Top])
+                {
+                    velocity = velocity + IntVector.Up * Constants.BlockSize * 7;
+                }
+
+                Velocity = velocity;
             }
         }
 

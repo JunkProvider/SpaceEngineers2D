@@ -7,6 +7,8 @@ using SpaceEngineers2D.Controllers;
 using SpaceEngineers2D.Geometry;
 using SpaceEngineers2D.Model;
 using SpaceEngineers2D.Model.Blocks;
+using SpaceEngineers2D.Model.Entities;
+using SpaceEngineers2D.Model.Items;
 using SpaceEngineers2D.Persistence;
 using SpaceEngineers2D.Physics;
 using SpaceEngineers2D.View.Inventory;
@@ -26,17 +28,31 @@ namespace SpaceEngineers2D.View
         private bool _isNewGameViewActive;
         private string _newGameName;
         private IReadOnlyList<string> _savedGames;
+        private Player _player;
+        private PhysicsEngine _physics;
 
-        public string CurrentSaveName
-        {
-            get => _currentSaveName;
-            private set => SetProperty(ref _currentSaveName, value);
-        }
+        public BlockTypes BlockTypes { get; }
+
+        public EntityTypes EntityTypes { get; }
+
+        public ItemTypes ItemTypes { get; }
 
         public World World
         {
             get => _world;
             private set => SetProperty(ref _world, value);
+        }
+
+        public Player Player
+        {
+            get => _player;
+            private set => SetProperty(ref _player, value);
+        }
+
+        public PhysicsEngine Physics
+        {
+            get => _physics;
+            private set => SetProperty(ref _physics, value);
         }
 
         public WorldController WorldController
@@ -75,6 +91,12 @@ namespace SpaceEngineers2D.View
             private set => SetProperty(ref _savedGames, value);
         }
 
+        public string CurrentSaveName
+        {
+            get => _currentSaveName;
+            private set => SetProperty(ref _currentSaveName, value);
+        }
+
         public bool IsNewGameViewActive
         {
             get => _isNewGameViewActive;
@@ -108,6 +130,11 @@ namespace SpaceEngineers2D.View
         public ApplicationViewModel(PersistenceService persistenceService)
         {
             PersistenceService = persistenceService;
+
+            ItemTypes = new ItemTypes();
+            BlockTypes = new BlockTypes(ItemTypes);
+            EntityTypes = new EntityTypes();
+
             ToggleMainMenuCommand = new Command(CanToggleMainMenu, ToggleMainMenu);
             ActivateLoadGameViewCommand = new Command(CanActivateLoadGameView, ActivateLoadGameView);
             LoadGameCommand = new Command<string>(CanLoadGame, LoadGame);
@@ -187,6 +214,9 @@ namespace SpaceEngineers2D.View
             var world = CreateWorld();
 
             PersistenceService.Load(name, world);
+
+            Player = world.Entities.OfType<Player>().First();
+
             CurrentSaveName = name;
 
             SetWorld(world);
@@ -243,14 +273,28 @@ namespace SpaceEngineers2D.View
 
         private World CreateWorld()
         {
-            var world = new World(new Player { Position = new IntVector(0, -1600, 0) }, new Camera { Zoom = 0.05f }, 30 * Constants.BlockSize);
-            world.Player.BlueprintSlots[0].BlueprintedBlock = world.BlockTypes.Concrete;
-            world.Player.BlueprintSlots[1].BlueprintedBlock = world.BlockTypes.IronPlate;
+            var world = new World(BlockTypes, EntityTypes, ItemTypes, new Camera { Zoom = 0.05f }, 30 * Constants.BlockSize);
             world.Grids.Add(new Grid(0, world.CoordinateSystem));
+
             return world;
         }
 
         private void InitializeNewWorld(World world)
+        {
+            InitializeWorldEnvironment(world);
+
+            Player = EntityTypes.Player.Instantiate(BlockTypes);
+            world.Entities.Add(Player);
+
+            for (var i = 0; i < 3; i++)
+            {
+                var frog = EntityTypes.Frog.Instantiate();
+                frog.Position = new IntVector(_random.Next(0, world.Width), -5 * Constants.BlockSize, 0);
+                world.Entities.Add(frog);
+            }
+        }
+
+        private void InitializeWorldEnvironment(World world)
         {
             var grid = world.Grids.First();
 
@@ -261,14 +305,16 @@ namespace SpaceEngineers2D.View
                     if (y == 0)
                     {
                         if (_random.Next(0, 100) < 80)
-                            grid.SetBlock(new IntVector(x, y, 0) * Constants.BlockSize, world.BlockTypes.Grass.InstantiateBlock());
+                            grid.SetBlock(new IntVector(x, y, 0) * Constants.BlockSize,
+                                world.BlockTypes.Grass.InstantiateBlock());
 
                         continue;
                     }
 
                     if (y == 1)
                     {
-                        grid.SetBlock(new IntVector(x, y, 0) * Constants.BlockSize, world.BlockTypes.DirtWithGrass.Instantiate());
+                        grid.SetBlock(new IntVector(x, y, 0) * Constants.BlockSize,
+                            world.BlockTypes.DirtWithGrass.Instantiate());
                         continue;
                     }
 
@@ -321,25 +367,26 @@ namespace SpaceEngineers2D.View
             var blastFurnace = world.BlockTypes.BlastFurnace.Instantiate();
             blastFurnace.BlueprintState.FinishImmediately();
             grid.SetBlock(new IntVector(3, 0, 0) * Constants.BlockSize, blastFurnace);
-
-            world.Player.Position = new IntVector(3, -3, 0) * Constants.BlockSizeVector;
         }
 
         private void SetWorld(World world)
         {
             if (World != null)
             {
-                World.Player.PropertyChanged -= OnPlayerPropertyChanged;
+                Player.PropertyChanged -= OnPlayerPropertyChanged;
             }
 
             World = world;
 
             if (world != null)
             {
-                PlayerInventoryViewModel = new InventoryViewModel(world.Player.Inventory, world.Player.HandInventorySlot);
+                PlayerInventoryViewModel = new InventoryViewModel(Player.Inventory, Player.HandInventorySlot);
+                Physics = new PhysicsEngine(world.CoordinateSystem);
                 WorldController = new WorldController(world);
 
-                World.Player.PropertyChanged += OnPlayerPropertyChanged;
+                Physics.Initialize(world);
+
+                Player.PropertyChanged += OnPlayerPropertyChanged;
             }
             else
             {
@@ -355,7 +402,7 @@ namespace SpaceEngineers2D.View
 
         private void OnPlayerPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(World.Player.InteractingBlock))
+            if (e.PropertyName == nameof(Player.InteractingBlock))
             {
                 UpdateInteractingBlockViewModel();
             }
@@ -363,10 +410,10 @@ namespace SpaceEngineers2D.View
 
         private void UpdateInteractingBlockViewModel()
         {
-            switch (World?.Player.InteractingBlock?.Object)
+            switch (Player?.InteractingBlock?.Object)
             {
                 case BlastFurnaceBlock blastFurnaceBlock:
-                    InteractingBlockViewModel = new BlastFurnaceViewModel(new InventoryViewModel(blastFurnaceBlock.Inventory, World.Player.HandInventorySlot));
+                    InteractingBlockViewModel = new BlastFurnaceViewModel(new InventoryViewModel(blastFurnaceBlock.Inventory, Player.HandInventorySlot));
                     break;
                 default:
                     InteractingBlockViewModel = null;

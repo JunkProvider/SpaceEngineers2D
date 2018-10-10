@@ -1,4 +1,7 @@
-﻿namespace SpaceEngineers2D.Model
+﻿using SpaceEngineers2D.Model.Entities;
+using SpaceEngineers2D.View.Inventory;
+
+namespace SpaceEngineers2D.Model
 {
     using System.Collections.Generic;
     using Physics;
@@ -6,19 +9,21 @@
     using Blocks;
     using Items;
 
-    public class World : IGridContainer
+    public class World : PropertyObservable, IGridContainer
     {
-        public ItemTypes ItemTypes { get; }
-
         public BlockTypes BlockTypes { get; }
 
+        public EntityTypes EntityTypes { get; }
+
+        public ItemTypes ItemTypes { get; }
+
         public ICollection<Grid> Grids { get; set; } = new List<Grid>();
+
+        public ISet<IEntity> Entities { get; set; } = new HashSet<IEntity>();
 
         public int Width => CoordinateSystem.MaxX - CoordinateSystem.MinX;
 
         public ICoordinateSystem CoordinateSystem { get; }
-
-        public Player Player { get; set; }
 
         public ISet<MobileItem> Items { get; set; } = new HashSet<MobileItem>();
 
@@ -26,12 +31,13 @@
 
         public IntVector Gravity { get; set; } = IntVector.Down * 9810;
 
-        public World(Player player, Camera camera, int width)
+        public World(BlockTypes blockTypes, EntityTypes entityTypes, ItemTypes itemTypes, Camera camera, int width)
         {
-            Player = player;
             Camera = camera;
-            ItemTypes = new ItemTypes();
-            BlockTypes = new BlockTypes(ItemTypes);
+            BlockTypes = blockTypes;
+            EntityTypes = entityTypes;
+            ItemTypes = itemTypes;
+            
             CoordinateSystem = Model.CoordinateSystem.CreateHorizontalCircular(0, width);
         }
 

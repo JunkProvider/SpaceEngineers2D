@@ -1,4 +1,7 @@
-﻿namespace SpaceEngineers2D.Physics
+﻿using System.ComponentModel.Design;
+using SpaceEngineers2D.Model.Entities;
+
+namespace SpaceEngineers2D.Physics
 {
     using System;
     using Geometry;
@@ -16,57 +19,49 @@
             _collisionEngine = new CollisionEngine(coordinateSystem);
         }
 
+        public void Initialize(World world)
+        {
+            foreach (var entity in world.Entities)
+            {
+                _collisionEngine.DetectTouchedBlocks(world.Grids, entity);
+            }
+        }
+
         public void Update(World world, TimeSpan elapsedTime)
         {
-            var player = world.Player;
-
-            ApplyDrag(player);
-            ApplyGravityIfNotBlocked(player, world.Gravity, elapsedTime);
-            ResetVelocityInBlockedDirections(player);
-            ApplyPlayerMovementOrders(player);
-            _collisionEngine.Move(world.Grids, player, player.Velocity * elapsedTime.TotalSeconds);
-            _collisionEngine.DetectTouchedBlocks(world.Grids, player);
+            foreach (var entity in world.Entities)
+            {
+                UpdateEntity(world, entity, elapsedTime);
+            }
 
             foreach (var item in world.Items)
             {
-                ApplyDrag(item);
-                ApplyGravityIfNotBlocked(item, world.Gravity, elapsedTime);
-                ResetVelocityInBlockedDirections(item);
-                _collisionEngine.Move(world.Grids, item, item.Velocity * elapsedTime.TotalSeconds);
-                _collisionEngine.DetectTouchedBlocks(world.Grids, item);
+                UpdateItem(world, item, elapsedTime);
             }
-
-            player.Position = CoordinateSystem.Normalize(player.Position);
         }
 
-        private static void ApplyPlayerMovementOrders(Player player)
+        private void UpdateItem(World world, MobileItem item, TimeSpan elapsedTime)
         {
-            var playerMoveSpeed = 4;
+            ApplyDrag(item, elapsedTime);
+            ApplyGravityIfNotBlocked(item, world.Gravity, elapsedTime);
+            ResetVelocityInBlockedDirections(item);
+            _collisionEngine.Move(world.Grids, item, item.Velocity * elapsedTime.TotalSeconds);
+            _collisionEngine.DetectTouchedBlocks(world.Grids, item);
+        }
 
-            if (player.TouchedBlocks[Side.Bottom].Count != 0)
-            {
-                var velocity = player.Velocity;
+        private void UpdateEntity(World world, IEntity entity, TimeSpan elapsedTime)
+        {
+            ApplyGravityIfNotBlocked(entity, world.Gravity, elapsedTime);
 
-                if (player.MovementOrders[Side.Left])
-                {
-                    velocity.X = -playerMoveSpeed * Constants.BlockSize;
-                }
-                else if (player.MovementOrders[Side.Right])
-                {
-                    velocity.X = playerMoveSpeed * Constants.BlockSize;
-                }
-                else
-                {
-                    velocity.X = 0;
-                }
+            ApplyDrag(entity, elapsedTime);
 
-                if (player.MovementOrders[Side.Top])
-                {
-                    velocity = velocity + IntVector.Up * Constants.BlockSize * 7;
-                }
+            _collisionEngine.Move(world.Grids, entity, entity.Velocity * elapsedTime.TotalSeconds);
 
-                player.Velocity = velocity;
-            }
+            entity.Position = CoordinateSystem.Normalize(entity.Position);
+
+            _collisionEngine.DetectTouchedBlocks(world.Grids, entity);
+
+            ResetVelocityInBlockedDirections(entity);
         }
 
         private void ApplyGravityIfNotBlocked(IMobileObject obj, IntVector gravity, TimeSpan elapsedTime)
@@ -77,9 +72,10 @@
             }
         }
 
-        private void ApplyDrag(IMobileObject obj)
+        private void ApplyDrag(IMobileObject obj, TimeSpan elapsedTime)
         {
-            obj.Velocity = obj.Velocity * 0.99f;
+            var dragFactor = Math.Min(1, 0.05f * elapsedTime.TotalSeconds);
+            obj.Velocity = obj.Velocity - obj.Velocity * dragFactor;
         }
 
         private void ResetVelocityInBlockedDirections(IMobileObject obj)

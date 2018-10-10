@@ -38,7 +38,7 @@
                                              DataContext="{Binding ApplicationViewModel.PlayerInventoryViewModel}" />
                 <view:BlueprintList HorizontalAlignment="Left"
                                     Margin="10"
-                                    DataContext="{Binding ApplicationViewModel.World.Player}" />
+                                    DataContext="{Binding ApplicationViewModel.Player}" />
 
             </StackPanel>
             <ContentControl Grid.Row="1" Content="{Binding ApplicationViewModel.InteractingBlockViewModel}">
@@ -51,7 +51,7 @@
         </Grid>
         <viewInventory:ItemDragCanvas HorizontalAlignment="Stretch"
                                       VerticalAlignment="Stretch"
-                                      DataContext="{Binding ApplicationViewModel.World.Player.HandInventorySlot}" />
+                                      DataContext="{Binding ApplicationViewModel.Player.HandInventorySlot}" />
         <view:MainMenu DataContext="{Binding ApplicationViewModel}"
                        Visibility="{Binding Path=IsMainMenuActive, Converter={StaticResource BooleanToVisibilityConverter}}" />
         <view:LoadGameView DataContext="{Binding ApplicationViewModel}"

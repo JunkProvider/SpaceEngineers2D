@@ -4,13 +4,13 @@ namespace SpaceEngineers2D.Persistence.DataModel
 {
     public class WorldData : IDataModel
     {
-        public PlayerData Player { get; set; }
-
         public List<GridData> Grids { get; set; }
 
-        public WorldData(PlayerData player, List<GridData> grids)
+        public List<EntityData> Entities { get; set; }
+
+        public WorldData(List<EntityData> entities, List<GridData> grids)
         {
-            Player = player;
+            Entities = entities;
             Grids = grids;
         }
 

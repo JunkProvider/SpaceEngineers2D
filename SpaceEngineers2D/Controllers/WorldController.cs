@@ -3,6 +3,7 @@ using System.Linq;
 using SpaceEngineers2D.Geometry;
 using SpaceEngineers2D.Model;
 using SpaceEngineers2D.Model.Blocks;
+using SpaceEngineers2D.Model.Entities;
 using SpaceEngineers2D.Physics;
 
 namespace SpaceEngineers2D.Controllers
@@ -17,11 +18,12 @@ namespace SpaceEngineers2D.Controllers
 
         public World World { get; }
 
-        private Player Player => World.Player;
+        private Player Player { get; }
 
         public WorldController(World world)
         {
             World = world;
+            Player = world.Entities.OfType<Player>().First();
         }
 
         public void OnMouseMove(IntVector mousePosition)
@@ -104,6 +106,11 @@ namespace SpaceEngineers2D.Controllers
                 grid.ForEach((blockToUpdate, position) => blockToUpdate.OnUpdate(World, new IntRectangle(position, Constants.BlockSizeVector), elapsedTime));
             }
 
+            foreach (var entity in World.Entities)
+            {
+                entity.Update(World, elapsedTime);
+            }
+
             var mousePosition = _mousePosition;
             if (Player.BlockPlacementLayer == ZLayer.Background)
                 mousePosition += IntVector.Back * Constants.BlockSize;
@@ -140,12 +147,12 @@ namespace SpaceEngineers2D.Controllers
 
         private void WeldBlock(BlockInWorld<StructuralBlock> block, TimeSpan elapsedTime)
         {
-            block.Object.BlueprintState.Weld(World.Player.Inventory, 10 * (float)elapsedTime.TotalSeconds);
+            block.Object.BlueprintState.Weld(Player.Inventory, 10 * (float)elapsedTime.TotalSeconds);
         }
 
         private void GrindBlock(TimeSpan elapsedTime)
         {
-            var block = World.Player.TargetBlock;
+            var block = Player.TargetBlock;
 
             block.Object.Damage(10 * (float)elapsedTime.TotalSeconds);
 
@@ -164,13 +171,13 @@ namespace SpaceEngineers2D.Controllers
                 /* var itemObj = new MobileItem(itemStack) { Position = command.Block.AbsolutePosition };
                 command.World.Items.Add(itemObj); */
 
-                World.Player.Inventory.Put(itemStack);
+                Player.Inventory.Put(itemStack);
             }
         }
 
         private bool IsInPlayerRange(IntRectangle rectangle)
         {
-            var playerCenter = World.Player.Bounds.Center;
+            var playerCenter = Player.Bounds.Center;
             var x = rectangle.Left > playerCenter.X ? rectangle.Left : rectangle.Right;
             var y = rectangle.Top > playerCenter.Y ? rectangle.Top : rectangle.Bottom;
             return IsInPlayerRange(new IntVector(x, y, Player.Position.Z));
@@ -178,7 +185,7 @@ namespace SpaceEngineers2D.Controllers
 
         private bool IsInPlayerRange(IntVector point)
         {
-            return (point - World.Player.Bounds.Center).SquareLength <= Math.Pow(PlayerRange * Constants.BlockSize, 2);
+            return (point - Player.Bounds.Center).SquareLength <= Math.Pow(PlayerRange * Constants.BlockSize, 2);
         }
     }
 }

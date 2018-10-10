@@ -4,6 +4,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using SpaceEngineers2D.Geometry;
 using SpaceEngineers2D.Model;
+using SpaceEngineers2D.Model.Entities;
 using SpaceEngineers2D.Persistence;
 using SpaceEngineers2D.View;
 
@@ -48,21 +49,21 @@ namespace SpaceEngineers2D
                 return;
 
             // If executed immediately nothing happens and debugged dies when setting a breakpoint.
-            Dispatch.Exec(() => ApplicationViewModel.World.Player.TrySetSelectedBlueprintSlot(e.Key));
+            Dispatch.Exec(() => ApplicationViewModel.Player.TrySetSelectedBlueprintSlot(e.Key));
 
             switch (e.Key)
             {
                 case LeftKey:
-                    ApplicationViewModel.World.Player.MovementOrders[Side.Left] = true;
+                    ApplicationViewModel.Player.MovementOrders[Side.Left] = true;
                     break;
                 case RightKey:
-                    ApplicationViewModel.World.Player.MovementOrders[Side.Right] = true;
+                    ApplicationViewModel.Player.MovementOrders[Side.Right] = true;
                     break;
                 case UpKey:
-                    ApplicationViewModel.World.Player.MovementOrders[Side.Top] = true;
+                    ApplicationViewModel.Player.MovementOrders[Side.Top] = true;
                     break;
                 case DownKey:
-                    ApplicationViewModel.World.Player.MovementOrders[Side.Bottom] = true;
+                    ApplicationViewModel.Player.MovementOrders[Side.Bottom] = true;
                     break;
                 case Key.Space:
                     PickUpClosestItem();
@@ -84,16 +85,16 @@ namespace SpaceEngineers2D
             switch (e.Key)
             {
                 case LeftKey:
-                    ApplicationViewModel.World.Player.MovementOrders[Side.Left] = false;
+                    ApplicationViewModel.Player.MovementOrders[Side.Left] = false;
                     break;
                 case RightKey:
-                    ApplicationViewModel.World.Player.MovementOrders[Side.Right] = false;
+                    ApplicationViewModel.Player.MovementOrders[Side.Right] = false;
                     break;
                 case UpKey:
-                    ApplicationViewModel.World.Player.MovementOrders[Side.Top] = false;
+                    ApplicationViewModel.Player.MovementOrders[Side.Top] = false;
                     break;
                 case DownKey:
-                    ApplicationViewModel.World.Player.MovementOrders[Side.Bottom] = false;
+                    ApplicationViewModel.Player.MovementOrders[Side.Bottom] = false;
                     break;
             }
         }
@@ -103,7 +104,7 @@ namespace SpaceEngineers2D
             if (ApplicationViewModel.World == null)
                 return;
 
-            var player = ApplicationViewModel.World.Player;
+            var player = ApplicationViewModel.Player;
             var item = GetClosestItem(player.Bounds.Center);
 
             if (item == null)

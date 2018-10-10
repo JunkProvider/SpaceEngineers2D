@@ -9,6 +9,11 @@
             return new IntRectangle(position, size);
         }
 
+        public static IntRectangle FromCenterAndSite(IntVector center, IntVector size)
+        {
+            return IntRectangle.FromPositionAndSize(center - size / 2, size);
+        }
+
         public static IntRectangle FromPoints(IntVector leftTop, IntVector rightBottom)
         {
             return new IntRectangle(leftTop, rightBottom - leftTop);

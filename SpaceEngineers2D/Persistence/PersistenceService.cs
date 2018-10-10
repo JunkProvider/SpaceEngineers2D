@@ -38,7 +38,7 @@ namespace SpaceEngineers2D.Persistence
                 TypeNameHandling = TypeNameHandling.All
             });
 
-            var deserializer = new Deserializer(world.BlockTypes, world.ItemTypes);
+            var deserializer = new Deserializer(world.BlockTypes, world.EntityTypes, world.ItemTypes);
             deserializer.MapWorld(world, data);
         }
 

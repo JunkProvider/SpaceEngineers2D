@@ -2,8 +2,8 @@
 {
     using System.Collections.Generic;
 
-    using SpaceEngineers2D.Geometry;
-    using SpaceEngineers2D.Model.Blocks;
+    using Geometry;
+    using Blocks;
 
     public interface IMobileObject
     {

@@ -19,8 +19,6 @@ namespace SpaceEngineers2D.View
 
         private readonly BlockRendererRegistry _blockRendererRegistry = new BlockRendererRegistry();
 
-        private readonly ImageSource _playerImage;
-
         private ApplicationViewModel ApplicationViewModel => DataContext as ApplicationViewModel;
 
         private DateTime LastUpdateTime { get; set; }
@@ -28,8 +26,6 @@ namespace SpaceEngineers2D.View
         public WorldRenderer()
         {
             InitializeComponent();
-
-            _playerImage = LoadImage("Player");
 
             _blockRendererRegistry.Add<IStandardRenderableBlock, IStandardRenderableBlock>(new StandardBlockRenderer());
             _blockRendererRegistry.Add<StructuralBlock, StructuralBlock>(new StructuralBlockRenderer());
@@ -46,10 +42,12 @@ namespace SpaceEngineers2D.View
                         var elapsedTime = time - LastUpdateTime;
                         LastUpdateTime = time;
 
+                        ApplicationViewModel.Physics.Update(ApplicationViewModel.World, elapsedTime);
+
                         var mousePosition = ApplicationViewModel.World.Camera.UncastPosition(IntVector.FromWindowsPoint(Mouse.GetPosition(this)));
                         ApplicationViewModel.WorldController.OnMouseMove(mousePosition);
                         ApplicationViewModel.WorldController.OnUpdate(elapsedTime);
-                        GetPhysicsEngine().Update(ApplicationViewModel.World, elapsedTime);
+                        
                         InvalidateVisual();
                     }
                 };
@@ -66,13 +64,13 @@ namespace SpaceEngineers2D.View
             var viewport = GetViewport();
 
             camera.Viewport = viewport;
-            camera.Position = ApplicationViewModel.World.Player.Position + IntVector.Up * Constants.BlockSize;
+            camera.Position = ApplicationViewModel.Player.Position + IntVector.Up * Constants.BlockSize;
 
             var visibleArea = camera.UncastRectangle(IntRectangle.FromPositionAndSize(IntVector.Zero, viewport))
                 .Extend(new IntVector(2 * Constants.BlockSize, Constants.BlockSize, 0));
 
             RenderBackgroundBlocks(dc, visibleArea, camera);
-            RenderPlayer(dc);
+            RenderEntities(dc, visibleArea, camera);
             RenderItems(dc);
             RenderForegroundBlocks(dc, visibleArea, camera);
             RenderHoveredBlockEffect(dc);
@@ -96,14 +94,18 @@ namespace SpaceEngineers2D.View
             RenderGrids(dc,IntRectangle.FromPositionAndSize(visibleAreaPosition, visibleAreaSize), camera);
         }
 
-        private void RenderPlayer(DrawingContext dc)
+        private void RenderEntities(DrawingContext dc, IntRectangle visibleArea, Camera camera)
         {
-            dc.DrawImage(_playerImage, ApplicationViewModel.World.Camera.CastRectangle(ApplicationViewModel.World.Player.Bounds).ToWindowsRect());
+            foreach (var entity in ApplicationViewModel.World.Entities)
+            {
+                var bounds = ApplicationViewModel.World.CoordinateSystem.Denormalize(entity.Bounds, visibleArea);
+                dc.DrawImage(entity.Image, ApplicationViewModel.World.Camera.CastRectangle(bounds).ToWindowsRect());
+            }
         }
 
         private void RenderHoveredBlockEffect(DrawingContext dc)
         {
-            var player = ApplicationViewModel.World.Player;
+            var player = ApplicationViewModel.Player;
 
             var brush = new SolidColorBrush();
             brush.Color = Colors.Transparent;
@@ -190,20 +192,6 @@ namespace SpaceEngineers2D.View
         private IntVector GetViewport()
         {
             return new IntVector((int)ActualWidth, (int)ActualHeight, 0);
-        }
-
-        private PhysicsEngine GetPhysicsEngine()
-        {
-            if (_physicsEngine == null)
-                _physicsEngine = new PhysicsEngine(ApplicationViewModel.World.CoordinateSystem);
-
-            return _physicsEngine;
-        }
-
-        private static ImageSource LoadImage(string file)
-        {
-            var x = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            return new BitmapImage(new Uri(x + "\\Assets\\Images\\" + file + ".png"));
         }
     }
 }
