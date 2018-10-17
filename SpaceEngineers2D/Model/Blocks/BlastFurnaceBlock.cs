@@ -15,9 +15,9 @@ namespace SpaceEngineers2D.Model.Blocks
         {
         }
 
-        public override void OnUpdate(World world, IntRectangle ownBounds, TimeSpan elapsedTime)
+        public override void OnUpdate(World world, TimeSpan elapsedTime)
         {
-            base.OnUpdate(world, ownBounds, elapsedTime);
+            base.OnUpdate(world, elapsedTime);
 
             var coalSlot = Inventory.Slots.FirstOrDefault(slot => slot.ContainsItem && slot.ItemStack.Item.ItemType == world.ItemTypes.Coal);
 

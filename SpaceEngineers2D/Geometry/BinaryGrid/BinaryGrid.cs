@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SpaceEngineers2D.Geometry.BinaryGrid
 {
@@ -44,6 +45,21 @@ namespace SpaceEngineers2D.Geometry.BinaryGrid
         public void ForEach(EnumerateItemDelegate<T> func)
         {
             base.ForEachWithin(new IntRectangle(0, 0, 0, Size, Size, Size), (block, coords) => func(block, coords + Offset));
+        }
+
+        public IEnumerable<T> GetAll()
+        {
+            return base.GetAllWithin(IntRectangle.FromPositionAndSize(IntVector.Zero, SizeVector));
+        }
+
+        public override IEnumerable<T> GetAllWithin(IntRectangle rectangle)
+        {
+            rectangle = IntRectangle.FromPoints(
+                IntVectorMath.MinMax(rectangle.LeftTopFront - Offset, IntVector.Zero, SizeVector),
+                IntVectorMath.MinMax(rectangle.RightBottomBack - Offset, IntVector.Zero, SizeVector)
+            );
+
+            return base.GetAllWithin(rectangle);
         }
 
         public override void ForEachWithin(IntRectangle rectangle, EnumerateItemDelegate<T> func)

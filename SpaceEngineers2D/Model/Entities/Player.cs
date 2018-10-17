@@ -111,7 +111,7 @@ namespace SpaceEngineers2D.Model.Entities
         {
             var playerMoveSpeed = 4;
 
-            if (TouchedBlocks[Side.Bottom].Count != 0)
+            if (TouchedObjects[Side.Bottom].Count != 0)
             {
                 var velocity = Velocity;
 

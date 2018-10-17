@@ -1,4 +1,6 @@
-﻿namespace SpaceEngineers2D.Geometry.BinaryGrid
+﻿using System.Collections.Generic;
+
+namespace SpaceEngineers2D.Geometry.BinaryGrid
 {
     public class BinaryGridLeaf<T> : IBinarySubGrid<T>
     {
@@ -16,6 +18,24 @@
             result.RemovedItem = _items[position.X, position.Y, position.Z];
             _items[position.X, position.Y, position.Z] = item;
             return result;
+        }
+
+        public IEnumerable<T> GetAllWithin(IntRectangle rectangle)
+        {
+            for (var x = rectangle.Left; x < rectangle.Right; x++)
+            {
+                for (var y = rectangle.Top; y < rectangle.Bottom; y++)
+                {
+                    for (var z = rectangle.Front; z < rectangle.Back; z++)
+                    {
+                        var item = _items[x, y, z];
+                        if (item != null)
+                        {
+                            yield return item;
+                        }
+                    }
+                }
+            }
         }
 
         public void ForEachWithin(IntRectangle rectangle, EnumerateItemDelegate<T> func)

@@ -1,4 +1,8 @@
-﻿namespace SpaceEngineers2D.Physics
+﻿using System;
+using System.Linq;
+using SpaceEngineers2D.Model.Entities;
+
+namespace SpaceEngineers2D.Physics
 {
     using System.Collections.Generic;
 
@@ -14,53 +18,104 @@
             CoordinateSystem = coordinateSystem;
         }
         
-        public void DetectTouchedBlocks(ICollection<Grid> grids, IMobileObject obj)
+        public void DetectTouchedBlocks(ICollisionEngineContext context, IMovableObject checkedObject)
         {
-            foreach (var pair in obj.TouchedBlocks)
-            {
-                pair.Value.Clear();
-            }
-            
-            var areaToCheck = IntRectangle.FromPositionAndSize(obj.Position, obj.Size).Extend(Constants.BlockSize);
+            checkedObject.TouchedObjects.Clear();
 
-            var objBounds = obj.Bounds;
+            var areaToCheck = IntRectangle.FromPositionAndSize(checkedObject.Position, checkedObject.Size).Extend(Constants.BlockSize);
 
-            foreach (var grid in grids)
+            var checkedObjBounds = checkedObject.Bounds;
+
+            foreach (var obj in context.GetCollidableObjectsWithin(areaToCheck))
             {
-                grid.ForEachWithin(areaToCheck, (block, blockPosition) =>
+                if (obj == checkedObject)
+                    continue;
+
+                if (obj.IsSolid)
                 {
-                    if (block.IsSolid)
-                    {
-                        var blockBounds = CoordinateSystem.Denormalize(blockPosition, Constants.BlockSizeVector, objBounds.Position, objBounds.Size);
+                    var objBounds = CoordinateSystem.Denormalize(obj.Bounds, checkedObjBounds);
 
-                        if (objBounds.TryGetTouchedSide(blockBounds, out var touchedSide))
-                        {
-                            obj.TouchedBlocks[touchedSide].Add(block);
-                        }
+                    if (checkedObjBounds.TryGetTouchedSide(objBounds, out var touchedSide))
+                    {
+                        checkedObject.TouchedObjects[touchedSide].Add(obj);
                     }
-                });
+                }
             }
         }
 
-        public void Move(ICollection<Grid> grids, IMobileObject movingObj, IntVector offset)
+        public void Move(ICollisionEngineContext context, TimeSpan elspsedTime)
         {
-            MoveHorizontal(grids, movingObj, offset.X);
-            MoveVertical(grids, movingObj, offset.Y);
+            var leftMovingObjects = new List<IMovableObject>();
+            var rightMovingObjects = new List<IMovableObject>();
+            var upMovingObjects = new List<IMovableObject>();
+            var downMovingObjects = new List<IMovableObject>();
+
+            foreach (var entity in context.GetMovableObjects())
+            {
+                if (entity.Velocity.X < 0)
+                {
+                    leftMovingObjects.Add(entity);
+                }
+                else if (entity.Velocity.X > 0)
+                {
+                    rightMovingObjects.Add(entity);
+                }
+
+                if (entity.Velocity.Y < 0)
+                {
+                    upMovingObjects.Add(entity);
+                }
+                else if (entity.Velocity.Y > 0)
+                {
+                    downMovingObjects.Add(entity);
+                }
+            }
+
+            leftMovingObjects = leftMovingObjects.OrderBy(entity => entity.Position.X).ToList();
+            rightMovingObjects = rightMovingObjects.OrderByDescending(entity => entity.Position.X).ToList();
+            upMovingObjects = upMovingObjects.OrderBy(entity => entity.Position.Y).ToList();
+            downMovingObjects = downMovingObjects.OrderByDescending(entity => entity.Position.Y).ToList();
+
+            foreach (var entity in leftMovingObjects)
+            {
+                MoveLeft(context, entity, (int)(-entity.Velocity.X * elspsedTime.TotalSeconds));
+            }
+
+            foreach (var entity in rightMovingObjects)
+            {
+                MoveRight(context, entity, (int)(entity.Velocity.X * elspsedTime.TotalSeconds));
+            }
+
+            foreach (var entity in upMovingObjects)
+            {
+                MoveUp(context, entity, (int)(-entity.Velocity.Y * elspsedTime.TotalSeconds));
+            }
+
+            foreach (var entity in downMovingObjects)
+            {
+                MoveDown(context, entity, (int)(entity.Velocity.Y * elspsedTime.TotalSeconds));
+            }
         }
 
-        public void MoveHorizontal(ICollection<Grid> grids, IMobileObject movingObj, int distance)
+        public void Move(ICollisionEngineContext context, IMovableObject movingObj, IntVector offset)
+        {
+            MoveHorizontal(context, movingObj, offset.X);
+            MoveVertical(context, movingObj, offset.Y);
+        }
+
+        public void MoveHorizontal(ICollisionEngineContext context, IMovableObject movingObj, int distance)
         {
             if (distance > 0)
             {
-                MoveRight(grids, movingObj, distance);
+                MoveRight(context, movingObj, distance);
             }
             else if (distance < 0)
             {
-                MoveLeft(grids, movingObj, -distance);
+                MoveLeft(context, movingObj, -distance);
             }
         }
 
-        public void MoveRight(ICollection<Grid> grids, IMobileObject movingObj, int distance)
+        public void MoveRight(ICollisionEngineContext context, IMovableObject movingObj, int distance)
         {
             var movingObjBounds = movingObj.Bounds;
 
@@ -68,23 +123,21 @@
 
             var areaToCheck = sweptArea.Extend(Constants.BlockSize);
 
-            foreach (var grid in grids)
+            foreach (var obj in context.GetCollidableObjectsWithin(areaToCheck))
             {
-                grid.ForEachWithin(areaToCheck, (block, blockPos) =>
-                {
-                    var blockBounds = CoordinateSystem.Denormalize(blockPos, Constants.BlockSizeVector, sweptArea.Position, sweptArea.Size);
+                if (obj == movingObj)
+                    continue;
 
-                    if (block.IsSolid && sweptArea.Intersects(blockBounds))
-                    {
-                        sweptArea = new IntRectangle(sweptArea.Left, sweptArea.Top, sweptArea.Front, blockBounds.Left - sweptArea.Left, sweptArea.Height, sweptArea.Depth);
-                    }
-                });
+                var objBounds = CoordinateSystem.Denormalize(obj.Bounds, sweptArea);
+
+                if (obj.IsSolid && sweptArea.Intersects(objBounds))
+                    sweptArea = new IntRectangle(sweptArea.Left, sweptArea.Top, sweptArea.Front, objBounds.Left - sweptArea.Left, sweptArea.Height, sweptArea.Depth);
             }
 
             movingObj.Position = movingObj.Position.MoveRight(sweptArea.Width);
         }
 
-        public void MoveLeft(ICollection<Grid> grids, IMobileObject movingObj, int distance)
+        public void MoveLeft(ICollisionEngineContext context, IMovableObject movingObj, int distance)
         {
             var movingObjBounds = movingObj.Bounds;
 
@@ -92,35 +145,33 @@
 
             var areaToCheck = sweptArea.Extend(Constants.BlockSize);
 
-            foreach (var grid in grids)
+            foreach (var obj in context.GetCollidableObjectsWithin(areaToCheck))
             {
-                grid.ForEachWithin(areaToCheck, (block, blockPos) =>
-                {
-                    var blockBounds = CoordinateSystem.Denormalize(blockPos, Constants.BlockSizeVector, sweptArea.Position, sweptArea.Size);
+                if (obj == movingObj)
+                    continue;
 
-                    if (block.IsSolid && sweptArea.Intersects(blockBounds))
-                    {
-                        sweptArea = new IntRectangle(blockBounds.Right, sweptArea.Top, sweptArea.Front, sweptArea.Right - blockBounds.Right, sweptArea.Height, sweptArea.Depth);
-                    }
-                });
+                var objBounds = CoordinateSystem.Denormalize(obj.Bounds, sweptArea);
+
+                if (obj.IsSolid && sweptArea.Intersects(objBounds))
+                    sweptArea = new IntRectangle(objBounds.Right, sweptArea.Top, sweptArea.Front, sweptArea.Right - objBounds.Right, sweptArea.Height, sweptArea.Depth);
             }
 
             movingObj.Position = movingObj.Position.MoveLeft(sweptArea.Width);
         }
 
-        public void MoveVertical(ICollection<Grid> grids, IMobileObject movingObj, int offset)
+        public void MoveVertical(ICollisionEngineContext context, IMovableObject movingObj, int offset)
         {
             if (offset > 0)
             {
-                MoveDown(grids, movingObj, offset);
+                MoveDown(context, movingObj, offset);
             }
             else if (offset < 0)
             {
-                MoveUp(grids, movingObj, -offset);
+                MoveUp(context, movingObj, -offset);
             }
         }
 
-        public void MoveDown(ICollection<Grid> grids, IMobileObject movingObj, int distance)
+        public void MoveDown(ICollisionEngineContext context, IMovableObject movingObj, int distance)
         {
             var movingObjBounds = movingObj.Bounds;
             
@@ -128,22 +179,21 @@
             
             var areaToCheck = sweptArea.Extend(Constants.BlockSize);
 
-            foreach (var grid in grids) {
-                grid.ForEachWithin(areaToCheck, (block, blockPos) =>
-                {
-                    var blockBounds = CoordinateSystem.Denormalize(blockPos, Constants.BlockSizeVector, sweptArea.Position, sweptArea.Size);
+            foreach (var obj in context.GetCollidableObjectsWithin(areaToCheck))
+            {
+                if (obj == movingObj)
+                    continue;
 
-                    if (block.IsSolid && sweptArea.Intersects(blockBounds))
-                    {
-                        sweptArea = new IntRectangle(sweptArea.Left, sweptArea.Top, sweptArea.Front, sweptArea.Width, blockBounds.Top - sweptArea.Top, sweptArea.Depth);
-                    }
-                });
+                var objBounds = CoordinateSystem.Denormalize(obj.Bounds, sweptArea);
+
+                if (obj.IsSolid && sweptArea.Intersects(objBounds))
+                    sweptArea = new IntRectangle(sweptArea.Left, sweptArea.Top, sweptArea.Front, sweptArea.Width, objBounds.Top - sweptArea.Top, sweptArea.Depth);
             }
 
             movingObj.Position = movingObj.Position.MoveDown(sweptArea.Height);
         }
 
-        public void MoveUp(ICollection<Grid> grids, IMobileObject movingObj, int distance)
+        public void MoveUp(ICollisionEngineContext context, IMovableObject movingObj, int distance)
         {
             var movingObjBounds = movingObj.Bounds;
 
@@ -151,19 +201,17 @@
 
             var areaToCheck = sweptArea.Extend(Constants.BlockSize);
 
-            foreach (var grid in grids)
+            foreach (var obj in context.GetCollidableObjectsWithin(areaToCheck))
             {
-                grid.ForEachWithin(areaToCheck, (block, blockPos) =>
-                {
-                    var blockBounds = CoordinateSystem.Denormalize(blockPos, Constants.BlockSizeVector, sweptArea.Position, sweptArea.Size);
+                if (obj == movingObj)
+                    continue;
 
-                    if (block.IsSolid && sweptArea.Intersects(blockBounds))
-                    {
-                        sweptArea = new IntRectangle(sweptArea.Left, blockBounds.Bottom, sweptArea.Front, sweptArea.Width, sweptArea.Bottom - blockBounds.Bottom, sweptArea.Depth);
-                    }
-                });
+                var objBounds = CoordinateSystem.Denormalize(obj.Bounds, sweptArea);
+
+                if (obj.IsSolid && sweptArea.Intersects(objBounds))
+                    sweptArea = new IntRectangle(sweptArea.Left, objBounds.Bottom, sweptArea.Front, sweptArea.Width, sweptArea.Bottom - objBounds.Bottom, sweptArea.Depth);
             }
-
+            
             movingObj.Position = movingObj.Position.MoveUp(sweptArea.Height);
         }
     }

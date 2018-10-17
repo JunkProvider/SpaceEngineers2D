@@ -58,19 +58,17 @@ namespace SpaceEngineers2D.Persistence
         {
             var blockDataList = new List<BlockData>();
 
-            grid.ForEach((block, position) =>
+            foreach (var block in grid.GetAll())
             {
                 var blockDataData = new Dictionary<string, object>();
 
                 block.BlockType.Save(this, block, new DictionaryAccess(blockDataData));
 
                 blockDataList.Add(new BlockData(
-                    position: position,
+                    position: block.Position,
                     blockTypeId: block.BlockType.Id,
                     data: blockDataData));
-
-
-            });
+            }
 
             return new GridData(
                 id: grid.Id,

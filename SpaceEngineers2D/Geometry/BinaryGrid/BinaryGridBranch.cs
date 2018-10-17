@@ -1,4 +1,7 @@
-﻿namespace SpaceEngineers2D.Geometry.BinaryGrid
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace SpaceEngineers2D.Geometry.BinaryGrid
 {
     using System;
 
@@ -139,6 +142,38 @@
             }
 
             throw new InvalidOperationException("Logic Error.");
+        }
+
+        public virtual IEnumerable<T> GetAllWithin(IntRectangle rectangle)
+        {
+            var halfSize = HalfSize;
+            var minX = rectangle.Left;
+            var maxX = rectangle.Right;
+            var minY = rectangle.Top;
+            var maxY = rectangle.Bottom;
+            var minZ = rectangle.Front;
+            var maxZ = rectangle.Back;
+
+            var items = Enumerable.Empty<T>();
+
+            items = GetFromChild(items, 0, minX, minY, minZ, Math.Min(halfSize, maxX), Math.Min(halfSize, maxY), Math.Min(halfSize, maxZ));
+            items = GetFromChild(items, 1, Math.Max(0, minX - halfSize), minY, minZ, maxX - halfSize, Math.Min(halfSize, maxY), Math.Min(halfSize, maxZ));
+            items = GetFromChild(items, 2, minX, Math.Max(0, minY - halfSize), minZ, Math.Min(halfSize, maxX), maxY - halfSize, Math.Min(halfSize, maxZ));
+            items = GetFromChild(items, 3, Math.Max(0, minX - halfSize), Math.Max(0, minY - halfSize), minZ, maxX - halfSize, maxY - halfSize, Math.Min(halfSize, maxZ));
+            items = GetFromChild(items, 4, minX, minY, Math.Max(0, minZ - halfSize), Math.Min(halfSize, maxX), Math.Min(halfSize, maxY), maxZ - halfSize);
+            items = GetFromChild(items, 5, Math.Max(0, minX - halfSize), minY, Math.Max(0, minZ - halfSize), maxX - halfSize, Math.Min(halfSize, maxY), maxZ - halfSize);
+            items = GetFromChild(items, 6, minX, Math.Max(0, minY - halfSize), Math.Max(0, minZ - halfSize), Math.Min(halfSize, maxX), maxY - halfSize, maxZ - halfSize);
+            items = GetFromChild(items, 7, Math.Max(0, minX - halfSize), Math.Max(0, minY - halfSize), Math.Max(0, minZ - halfSize), maxX - halfSize, maxY - halfSize, maxZ - halfSize);
+
+            return items;
+        }
+
+        private IEnumerable<T> GetFromChild(IEnumerable<T> items, int index, int left, int top, int front, int right, int bottom, int back)
+        {
+            if (Children[index] == null)
+                return items;
+
+            return items.Concat(Children[index].GetAllWithin(IntRectangle.FromLeftTopFrontRightBottomBack(left, top, front, right, bottom, back)));
         }
 
         public virtual void ForEachWithin(IntRectangle rectangle, EnumerateItemDelegate<T> func)

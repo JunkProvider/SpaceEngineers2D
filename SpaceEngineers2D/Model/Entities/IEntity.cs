@@ -3,7 +3,7 @@ using System.Windows.Media;
 
 namespace SpaceEngineers2D.Model.Entities
 {
-    public interface IEntity : IMobileObject
+    public interface IEntity : IMovableObject
     {
         IEntityType EntityType { get; }
 

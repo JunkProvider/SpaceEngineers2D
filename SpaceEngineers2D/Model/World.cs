@@ -1,4 +1,5 @@
-﻿using SpaceEngineers2D.Model.Entities;
+﻿using System.Linq;
+using SpaceEngineers2D.Model.Entities;
 using SpaceEngineers2D.View.Inventory;
 
 namespace SpaceEngineers2D.Model
@@ -9,7 +10,7 @@ namespace SpaceEngineers2D.Model
     using Blocks;
     using Items;
 
-    public class World : PropertyObservable, IGridContainer
+    public class World : PropertyObservable, IGridContainer, IPhysicsEngineContext
     {
         public BlockTypes BlockTypes { get; }
 
@@ -25,7 +26,7 @@ namespace SpaceEngineers2D.Model
 
         public ICoordinateSystem CoordinateSystem { get; }
 
-        public ISet<MobileItem> Items { get; set; } = new HashSet<MobileItem>();
+        public ISet<MovableItem> Items { get; set; } = new HashSet<MovableItem>();
 
         public Camera Camera { get; set; }
 
@@ -39,6 +40,16 @@ namespace SpaceEngineers2D.Model
             ItemTypes = itemTypes;
             
             CoordinateSystem = Model.CoordinateSystem.CreateHorizontalCircular(0, width);
+        }
+
+        public IEnumerable<ICollidable> GetCollidableObjectsWithin(IntRectangle rectangle)
+        {
+            return Grids.SelectMany(grid => grid.GetAllWithin(rectangle)).Cast<ICollidable>().Concat(Entities);
+        }
+
+        public IEnumerable<IMovableObject> GetMovableObjects()
+        {
+            return Entities;
         }
 
         public bool IsBottomBlock(IntVector position, IntVector bottomBlockPosition)
@@ -81,17 +92,16 @@ namespace SpaceEngineers2D.Model
 
                 // var removedBlockBounds = IntRectangle.FromPositionAndSize(positionOfBlockToRemove, Constants.PhysicsUnitVector);
 
-                grid.ForEachWithin(areaAroundBlock, (block, position) =>
+                foreach (var block in grid.GetAllWithin(areaAroundBlock))
                 {
                     if (block != null && block != removedBlock)
                     {
                         // var blockBounds = IntRectangle.FromPositionAndSize(position, Constants.PhysicsUnitVector);
                         block.OnNeighborChanged(
                             this,
-                            IntRectangle.FromPositionAndSize(position, Constants.BlockSizeVector),
                             new BlockInWorld<Block>(block, grid, positionOfBlockToRemove));
                     }
-                });
+                }
             }
         }
     }

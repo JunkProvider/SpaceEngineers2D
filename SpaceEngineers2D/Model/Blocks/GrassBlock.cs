@@ -35,20 +35,20 @@ namespace SpaceEngineers2D.Model.Blocks
             _isDestroyed = true;
         }
 
-        public override void OnNeighborChanged(World world, IntRectangle ownBounds, IBlockInWorld changedNeighbor)
+        public override void OnNeighborChanged(World world, IBlockInWorld changedNeighbor)
         {
-            base.OnNeighborChanged(world, ownBounds, changedNeighbor);
+            base.OnNeighborChanged(world, changedNeighbor);
             
-            if (!world.IsBottomBlock(ownBounds.Position, changedNeighbor.Bounds.Position))
+            if (!world.IsBottomBlock(Bounds.Position, changedNeighbor.Bounds.Position))
             {
                 return;
             }
 
-            var bottomBlock = world.GetBottomBlock(ownBounds.Position);
+            var bottomBlock = world.GetBottomBlock(Bounds.Position);
 
             if (bottomBlock?.Object.BlockType != world.BlockTypes.Dirt && bottomBlock?.Object.BlockType != world.BlockTypes.DirtWithGrass)
             {
-                world.RemoveBlock(ownBounds.LeftTopFront);
+                world.RemoveBlock(Bounds.LeftTopFront);
             }
         }
     }

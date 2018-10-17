@@ -103,7 +103,10 @@ namespace SpaceEngineers2D.Controllers
         {
             foreach (var grid in World.Grids)
             {
-                grid.ForEach((blockToUpdate, position) => blockToUpdate.OnUpdate(World, new IntRectangle(position, Constants.BlockSizeVector), elapsedTime));
+                foreach (var blockToUpdate in grid.GetAll())
+                {
+                    blockToUpdate.OnUpdate(World, elapsedTime);
+                }
             }
 
             foreach (var entity in World.Entities)

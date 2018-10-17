@@ -20,6 +20,11 @@ namespace SpaceEngineers2D.Model
 
     public sealed class CoordinateSystem : ICoordinateSystem
     {
+        public static CoordinateSystem Create()
+        {
+            return new CoordinateSystem(int.MinValue / 2 + 1, int.MaxValue / 2 - 1, int.MinValue / 2 + 1, int.MaxValue / 2 - 1, int.MinValue / 2 + 1, int.MaxValue / 2 - 1);
+        }
+
         public static CoordinateSystem CreateHorizontalCircular(int minX, int maxX)
         {
             return new CoordinateSystem(minX, maxX, int.MinValue / 2 + 1, int.MaxValue / 2 - 1, int.MinValue / 2 + 1, int.MaxValue / 2 - 1);

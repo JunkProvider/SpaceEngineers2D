@@ -138,11 +138,12 @@
     <Compile Include="Model\Entities\IEntity.cs" />
     <Compile Include="Model\Entities\IEntityType.cs" />
     <Compile Include="Model\Entities\FrogType.cs" />
+    <Compile Include="Model\ICollidable.cs" />
     <Compile Include="Model\LoadContext.cs" />
     <Compile Include="Model\Entities\PlayerType.cs" />
     <Compile Include="Model\ICoordinateSystem.cs" />
     <Compile Include="Model\IGridContainer.cs" />
-    <Compile Include="Model\IMobileObject.cs" />
+    <Compile Include="Model\IMovableObject.cs" />
     <Compile Include="Model\Inventories\Inventory.cs" />
     <Compile Include="Model\Inventories\InventorySlot.cs" />
     <Compile Include="Model\Items\Item.cs" />
@@ -151,7 +152,8 @@
     <Compile Include="Model\Items\ItemTypes.cs" />
     <Compile Include="Model\Items\StandardItem.cs" />
     <Compile Include="Model\Items\StandardItemType.cs" />
-    <Compile Include="Model\MobileItem.cs" />
+    <Compile Include="Model\MovableItem.cs" />
+    <Compile Include="Model\TouchedObjectCollection.cs" />
     <Compile Include="Model\ZLayer.cs" />
     <Compile Include="Persistence\DataModel\BlockBlueprintStateData.cs" />
     <Compile Include="Persistence\DataModel\BlockData.cs" />
@@ -168,6 +170,8 @@
     <Compile Include="Persistence\PersistenceService.cs" />
     <Compile Include="Persistence\Serializer.cs" />
     <Compile Include="Persistence\DataModel\WorldData.cs" />
+    <Compile Include="Physics\ICollisionEngineContext.cs" />
+    <Compile Include="Physics\IPhysicsEngineContext.cs" />
     <Compile Include="Physics\PhysicsEngine.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="View\ApplicationViewModel.cs" />

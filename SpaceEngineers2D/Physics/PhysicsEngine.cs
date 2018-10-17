@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.Design;
-using SpaceEngineers2D.Model.Entities;
+﻿using System.Linq;
+using System.Windows.Media.Animation;
 
 namespace SpaceEngineers2D.Physics
 {
@@ -19,90 +19,148 @@ namespace SpaceEngineers2D.Physics
             _collisionEngine = new CollisionEngine(coordinateSystem);
         }
 
-        public void Initialize(World world)
+        public void Initialize(IPhysicsEngineContext world)
         {
-            foreach (var entity in world.Entities)
+            foreach (var entity in world.GetMovableObjects())
             {
-                _collisionEngine.DetectTouchedBlocks(world.Grids, entity);
+                _collisionEngine.DetectTouchedBlocks(world, entity);
             }
         }
 
-        public void Update(World world, TimeSpan elapsedTime)
+        public void Update(IPhysicsEngineContext world, TimeSpan elapsedTime)
         {
-            foreach (var entity in world.Entities)
+            _collisionEngine.Move(world, elapsedTime);
+
+            foreach (var movableObject in world.GetMovableObjects())
             {
-                UpdateEntity(world, entity, elapsedTime);
+                movableObject.Position = CoordinateSystem.Normalize(movableObject.Position);
             }
 
-            foreach (var item in world.Items)
+            foreach (var movableObject in world.GetMovableObjects())
             {
-                UpdateItem(world, item, elapsedTime);
+                _collisionEngine.DetectTouchedBlocks(world, movableObject);
+            }
+
+            foreach (var movableObject in world.GetMovableObjects())
+            {
+                ResetVelocityInBlockedDirections(movableObject);
+            }
+
+            foreach (var movableObject in world.GetMovableObjects())
+            {
+                ApplyGravityIfNotBlocked(movableObject, world.Gravity, elapsedTime);
+                ApplyDrag(movableObject, elapsedTime);
             }
         }
 
-        private void UpdateItem(World world, MobileItem item, TimeSpan elapsedTime)
+        private void ApplyGravityIfNotBlocked(IMovableObject obj, IntVector gravity, TimeSpan elapsedTime)
         {
-            ApplyDrag(item, elapsedTime);
-            ApplyGravityIfNotBlocked(item, world.Gravity, elapsedTime);
-            ResetVelocityInBlockedDirections(item);
-            _collisionEngine.Move(world.Grids, item, item.Velocity * elapsedTime.TotalSeconds);
-            _collisionEngine.DetectTouchedBlocks(world.Grids, item);
-        }
-
-        private void UpdateEntity(World world, IEntity entity, TimeSpan elapsedTime)
-        {
-            ApplyGravityIfNotBlocked(entity, world.Gravity, elapsedTime);
-
-            ApplyDrag(entity, elapsedTime);
-
-            _collisionEngine.Move(world.Grids, entity, entity.Velocity * elapsedTime.TotalSeconds);
-
-            entity.Position = CoordinateSystem.Normalize(entity.Position);
-
-            _collisionEngine.DetectTouchedBlocks(world.Grids, entity);
-
-            ResetVelocityInBlockedDirections(entity);
-        }
-
-        private void ApplyGravityIfNotBlocked(IMobileObject obj, IntVector gravity, TimeSpan elapsedTime)
-        {
-            if (obj.TouchedBlocks[Side.Bottom].Count == 0)
+            if (!obj.TouchedObjects[Side.Bottom].Any() || obj.TouchedObjects[Side.Bottom].All(o => o is IMovableObject))
             {
                 obj.Velocity = obj.Velocity + gravity * elapsedTime.TotalSeconds;
             }
         }
 
-        private void ApplyDrag(IMobileObject obj, TimeSpan elapsedTime)
+        private void ApplyDrag(IMovableObject obj, TimeSpan elapsedTime)
         {
             var dragFactor = Math.Min(1, 0.05f * elapsedTime.TotalSeconds);
             obj.Velocity = obj.Velocity - obj.Velocity * dragFactor;
         }
 
-        private void ResetVelocityInBlockedDirections(IMobileObject obj)
+        private void ResetVelocityInBlockedDirections(IMovableObject obj)
         {
             var velocity = obj.Velocity;
 
-            if (obj.TouchedBlocks[Side.Left].Count != 0 && obj.Velocity.X < 0)
+            if (obj.Velocity.X < 0)
             {
-                velocity.X = 0;
+                foreach (var touchedObj in obj.TouchedObjects[Side.Left])
+                {
+                    if (touchedObj is IMovableObject movableTouchedObj)
+                    {
+                        if (movableTouchedObj.Velocity.X > velocity.X)
+                        {
+                            velocity.X = (velocity.X + movableTouchedObj.Velocity.X) / 2;
+                            movableTouchedObj.Velocity = movableTouchedObj.Velocity.WithX(velocity.X);
+                        }
+                    }
+                    else
+                    {
+                        velocity.X = 0;
+                    }
+                }
             }
 
-            if (obj.TouchedBlocks[Side.Right].Count != 0 && obj.Velocity.X > 0)
+            if (obj.Velocity.X > 0)
             {
-                velocity.X = 0;
+                foreach (var touchedObj in obj.TouchedObjects[Side.Right])
+                {
+                    if (touchedObj is IMovableObject movableTouchedObj)
+                    {
+                        if (movableTouchedObj.Velocity.X < velocity.X)
+                        {
+                            velocity.X = (velocity.X + movableTouchedObj.Velocity.X) / 2;
+                            movableTouchedObj.Velocity = movableTouchedObj.Velocity.WithX(velocity.X);
+                        }
+                    }
+                    else
+                    {
+                        velocity.X = 0;
+                    }
+                }
             }
 
-            if (obj.TouchedBlocks[Side.Top].Count != 0 && obj.Velocity.Y < 0)
+            if (obj.Velocity.Y < 0)
             {
-                velocity.Y = 0;
+                foreach (var touchedObj in obj.TouchedObjects[Side.Top])
+                {
+                    if (touchedObj is IMovableObject movableTouchedObj)
+                    {
+                        if (movableTouchedObj.Velocity.Y > velocity.Y)
+                        {
+                            velocity.Y = (velocity.Y + movableTouchedObj.Velocity.Y) / 2;
+                            movableTouchedObj.Velocity = movableTouchedObj.Velocity.WithY(velocity.Y);
+                        }
+                    }
+                    else
+                    {
+                        velocity.Y = 0;
+                    }
+                }
             }
 
-            if (obj.TouchedBlocks[Side.Bottom].Count != 0 && obj.Velocity.Y > 0)
+            if (obj.Velocity.Y > 0)
             {
-                velocity.Y = 0;
+                foreach (var touchedObj in obj.TouchedObjects[Side.Bottom])
+                {
+                    if (touchedObj is IMovableObject movableTouchedObj)
+                    {
+                        if (movableTouchedObj.Velocity.Y < velocity.Y)
+                        {
+                            velocity.Y = (velocity.Y + movableTouchedObj.Velocity.Y) / 2;
+                            movableTouchedObj.Velocity = movableTouchedObj.Velocity.WithY(velocity.Y);
+                        }
+                    }
+                    else
+                    {
+                        velocity.Y = 0;
+                    }
+                }
             }
 
             obj.Velocity = velocity;
+        }
+    }
+
+    public class Collision
+    {
+        public IMovableObject ObjectA { get; }
+
+        public IMovableObject ObjectB { get; }
+
+        public Collision(IMovableObject objectA, IMovableObject objectB)
+        {
+            ObjectA = objectA;
+            ObjectB = objectB;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace SpaceEngineers2D.Model
+﻿using System.Collections.Generic;
+
+namespace SpaceEngineers2D.Model
 {
     using System;
 
@@ -48,26 +50,30 @@
 
         public Block SetBlock(IntVector position, Block block)
         {
-            // position = CoordinateSystem.Normalize(position);
             position = position - Position;
             position = position.DivideRoundDown(Constants.BlockSize);
+            if (block != null)
+            {
+                block.Position = CoordinateSystem.Normalize(Position + position * Constants.BlockSize);
+            }
             return InnerGrid.Set(position, block).RemovedItem;
         }
 
-        public void ForEach(EnumerateItemDelegate<Block> func)
+        public IEnumerable<Block> GetAll()
         {
-            InnerGrid.ForEach((block, blockPosition) => func(block, Position + blockPosition * Constants.BlockSize));
+            return InnerGrid.GetAll();
         }
 
-        public void ForEachWithin(IntRectangle rectangle, EnumerateItemDelegate<Block> func)
+        public IEnumerable<Block> GetAllWithin(IntRectangle rectangle)
         {
             var transformedRectangle = rectangle.Move(-Position);
+
             transformedRectangle = IntRectangle.FromPositionAndSize(
                 transformedRectangle.Position.DivideRoundDown(Constants.BlockSize),
                 transformedRectangle.Size.DivideRoundUp(Constants.BlockSize)
             );
 
-            InnerGrid.ForEachWithin(transformedRectangle, (block, blockPosition) => func(block, Position + blockPosition * Constants.BlockSize));
+            return InnerGrid.GetAllWithin(transformedRectangle);
         }
     }
 }

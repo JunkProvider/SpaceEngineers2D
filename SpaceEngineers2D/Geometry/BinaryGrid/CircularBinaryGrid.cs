@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SpaceEngineers2D.Model;
 
 namespace SpaceEngineers2D.Geometry.BinaryGrid
@@ -30,16 +31,17 @@ namespace SpaceEngineers2D.Geometry.BinaryGrid
             Grid.ForEach(func);
         }
 
-        public void ForEachWithin(IntRectangle rectangle, EnumerateItemDelegate<T> func)
+        public IEnumerable<T> GetAll()
         {
-            var normalizedRectangles = GetNormalizedRectangles(rectangle);
-
-            foreach (var normalizedRectangle in normalizedRectangles)
-            {
-                Grid.ForEachWithin(normalizedRectangle, func);
-            }
+            return Grid.GetAll();
         }
 
+        public IEnumerable<T> GetAllWithin(IntRectangle rectangle)
+        {
+            var normalizedRectangles = GetNormalizedRectangles(rectangle);
+            return normalizedRectangles.SelectMany(normalizedRectangle => Grid.GetAllWithin(normalizedRectangle));
+        }
+        
         private IEnumerable<IntRectangle> GetNormalizedRectangles(IntRectangle rectangle)
         {
             if (rectangle.Width == 0 || rectangle.Height == 0)

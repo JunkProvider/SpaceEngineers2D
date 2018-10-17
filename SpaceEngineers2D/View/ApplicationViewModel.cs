@@ -284,14 +284,19 @@ namespace SpaceEngineers2D.View
             InitializeWorldEnvironment(world);
 
             Player = EntityTypes.Player.Instantiate(BlockTypes);
+            Player.Position = new IntVector(0, -6, 0) * Constants.BlockSize;
             world.Entities.Add(Player);
 
-            for (var i = 0; i < 3; i++)
+            var frog = EntityTypes.Frog.Instantiate();
+            frog.Position = new IntVector(0, Player.Bounds.Bottom, 0);
+            world.Entities.Add(frog);
+
+            /* for (var i = 0; i < 3; i++)
             {
                 var frog = EntityTypes.Frog.Instantiate();
                 frog.Position = new IntVector(_random.Next(0, world.Width), -5 * Constants.BlockSize, 0);
                 world.Entities.Add(frog);
-            }
+            } */
         }
 
         private void InitializeWorldEnvironment(World world)

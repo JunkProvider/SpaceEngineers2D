@@ -1,18 +1,27 @@
 ﻿using System;
 using SpaceEngineers2D.Geometry;
+using SpaceEngineers2D.Physics;
 
 namespace SpaceEngineers2D.Model.Blocks
 {
     using System.Collections.Generic;
     using Items;
 
-    public abstract class Block
+    public abstract class Block : ICollidable
     {
         public IBlockType BlockType { get; }
+
+        public IntVector Position { get; set; }
+
+        public IntVector Size => Constants.BlockSizeVector;
+
+        public IntRectangle Bounds => IntRectangle.FromPositionAndSize(Position, Size);
 
         public abstract bool IsSolid { get; }
 
         public abstract bool IsDestoryed { get; }
+
+        public IntVector Velocity => IntVector.Zero;
 
         protected Block(IBlockType blockType)
         {
@@ -23,12 +32,12 @@ namespace SpaceEngineers2D.Model.Blocks
 
         public abstract void Damage(float damage);
 
-        public virtual void OnUpdate(World world, IntRectangle ownBounds, TimeSpan elapsedTime)
+        public virtual void OnUpdate(World world, TimeSpan elapsedTime)
         {
 
         }
 
-        public virtual void OnNeighborChanged(World world, IntRectangle ownBounds, IBlockInWorld changedNeighbor)
+        public virtual void OnNeighborChanged(World world, IBlockInWorld changedNeighbor)
         {
 
         }

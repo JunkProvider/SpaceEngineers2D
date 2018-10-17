@@ -118,10 +118,10 @@ namespace SpaceEngineers2D
             }
         }
 
-        private MobileItem GetClosestItem(IntVector position)
+        private MovableItem GetClosestItem(IntVector position)
         {
             var closestDistance = double.PositiveInfinity;
-            MobileItem closestItem = null;
+            MovableItem closestItem = null;
 
             foreach (var item in ApplicationViewModel.World.Items)
             {

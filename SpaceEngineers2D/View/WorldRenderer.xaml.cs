@@ -1,9 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using SpaceEngineers2D.Geometry;
 using SpaceEngineers2D.Model;
@@ -15,8 +12,6 @@ namespace SpaceEngineers2D.View
 {
     public partial class WorldRenderer
     {
-        private PhysicsEngine _physicsEngine;
-
         private readonly BlockRendererRegistry _blockRendererRegistry = new BlockRendererRegistry();
 
         private ApplicationViewModel ApplicationViewModel => DataContext as ApplicationViewModel;
@@ -91,7 +86,7 @@ namespace SpaceEngineers2D.View
             visibleAreaPosition.Z = Constants.BlockSize;
             var visibleAreaSize = visibleArea.Size;
             visibleAreaSize.Z = Constants.BlockSize;
-            RenderGrids(dc,IntRectangle.FromPositionAndSize(visibleAreaPosition, visibleAreaSize), camera);
+            RenderGrids(dc, IntRectangle.FromPositionAndSize(visibleAreaPosition, visibleAreaSize), camera);
         }
 
         private void RenderEntities(DrawingContext dc, IntRectangle visibleArea, Camera camera)
@@ -136,20 +131,12 @@ namespace SpaceEngineers2D.View
         {
             foreach (var grid in ApplicationViewModel.World.Grids)
             {
-                grid.ForEachWithin(
-                    visibleArea,
-                    (block, blockPosition) =>
-                    {
-                        var renderer = _blockRendererRegistry.Get(block.GetType());
-
-                        var denormalzedBlockPosition = ApplicationViewModel.World.CoordinateSystem.Denormalize(blockPosition, camera.Position);
-
-                        var blockRect = IntRectangle.FromPositionAndSize(
-                            denormalzedBlockPosition, 
-                            IntVector.RightDown * Constants.BlockSize);
-
-                        renderer.Render(dc, camera, block, blockRect);
-                    });
+                foreach (var block in grid.GetAllWithin(visibleArea))
+                {
+                    var renderer = _blockRendererRegistry.Get(block.GetType());
+                    var blockRect = ApplicationViewModel.World.CoordinateSystem.Denormalize(block.Bounds, visibleArea);
+                    renderer.Render(dc, camera, block, blockRect);
+                }
             }
         }
 

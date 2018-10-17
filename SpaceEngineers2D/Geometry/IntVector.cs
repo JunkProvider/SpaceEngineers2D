@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Windows;
 
 namespace SpaceEngineers2D.Geometry
@@ -89,6 +90,16 @@ namespace SpaceEngineers2D.Geometry
         public IntVector MoveUp(int y)
         {
             return new IntVector(X, Y - y, Z);
+        }
+
+        public IntVector WithX(int x)
+        {
+            return new IntVector(x, Y, Z);
+        }
+
+        public IntVector WithY(int y)
+        {
+            return new IntVector(X, y, Z);
         }
 
         public IntVector Floor(int step)

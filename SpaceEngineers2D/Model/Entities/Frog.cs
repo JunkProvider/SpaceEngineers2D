@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using SpaceEngineers2D.Geometry;
-using SpaceEngineers2D.Model.Blocks;
 using SpaceEngineers2D.Physics;
 
 namespace SpaceEngineers2D.Model.Entities
@@ -13,12 +12,6 @@ namespace SpaceEngineers2D.Model.Entities
         public Frog(FrogType entityType)
             : base(entityType)
         {
-            TouchedBlocks[Side.Left] = new List<Block>();
-            TouchedBlocks[Side.Right] = new List<Block>();
-            TouchedBlocks[Side.Top] = new List<Block>();
-            TouchedBlocks[Side.Bottom] = new List<Block>();
-            TouchedBlocks[Side.Front] = new List<Block>();
-            TouchedBlocks[Side.Back] = new List<Block>();
         }
 
         public override void Update(World world, TimeSpan elapsedTime)
@@ -30,7 +23,7 @@ namespace SpaceEngineers2D.Model.Entities
 
         private void ApplyMovementOrders()
         {
-            if (TouchedBlocks[Side.Bottom].Count != 0)
+            if (TouchedObjects[Side.Bottom].Any())
             {
                 var velocity = Velocity;
 
